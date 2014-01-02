@@ -1,0 +1,10 @@
+*.yml
+*.sql
+*.idea
+*~
+*.lock
+db/schema.rb
+tmp/
+test/*.json
+log/
+nbproject/

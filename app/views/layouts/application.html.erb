@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>DrugMonitoringProgram</title>
+  <%= stylesheet_link_tag :all %>
+  <%= javascript_include_tag :defaults %>
+  <%= csrf_meta_tag %>
+  <style>
+      span{
+          color: #ffffff;
+          font-size: 35px;
+          margin-left: 20px;
+          font-family: arial;
+
+      }
+      span.title{
+          margin-left: 35px;
+          font-weight: bold;
+          cursor: pointer;
+      }
+      span.title:hover{
+          color: silver;
+      }
+  </style>
+</head>
+<body >
+
+<div style="width: 1400px;text-align: center;margin-left: auto;margin-right: auto;">
+
+  <div style="text-align: left">
+  <span style="font-size: 65px;color: black;margin-left: 0px;font-family:arial; ">
+    Drug Monitoring Program
+  </span>
+  </div>
+  <div style="text-align:left;height: 70px; border-radius: 15px;border: 1px solid #ffffff; background: purple;">
+    <div style="vertical-align:middle;display:table-cell;height: 70px;">
+      <span class="title">Home</span>
+      <span class="title">Reports</span>
+      <span class="title">Publications</span>
+      <span class="title">Logout</span>
+    </div>
+  </div>
+  <%= yield %>
+</div>
+
+
+</body>
+</html>
