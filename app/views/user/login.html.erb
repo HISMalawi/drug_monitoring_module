@@ -1,0 +1,96 @@
+<%= javascript_include_tag 'jquery' %>
+<script language="javascript" type="text/javascript" src="/javascripts/jquery.ui.draggable.js"></script>
+<script language="javascript" type="text/javascript" src="/javascripts/jquery.alerts.js"></script>
+
+<link href="/stylesheets/jquery.alerts.css" rel="stylesheet" type="text/css" media="screen" />
+<script type="text/javascript">
+  <!--
+  function verify()
+  {
+      var username = document.getElementById("username").value;
+      var password = document.getElementById("password").value;
+
+      if (username.trim() == "" )
+      {
+          jAlert("Username can not be blank", "Incomplete Information");
+      }
+      else if (password.trim() == "" )
+      {
+          jAlert("Password can not be blank", "Incomplete Information");
+      }
+      else
+      {
+
+          jQuery.ajax({
+              url:  "/user/verify_user?password=" + password + "&username=" + username ,
+              type:"POST",
+              success: function(){
+                  window.location = "/"
+
+              },
+              error: function(){
+                  jAlert("Username and password did not match", "Invalid Credentials");
+              }
+
+          });
+      }
+  }
+  //-->
+</script>
+<style type="text/css">
+    div.container{
+        background-color: #15191C;
+        width: 50%;
+        margin-left: auto;
+        margin-right: auto;
+        border-radius:30px;
+        font-size: 40px;
+        font-family: arial;
+        text-align: center;
+        margin-top: 100px;;
+    }
+    button.login{
+        font-family: arial;
+        font-size: 35px;
+        background-color:silver;
+        width: 300px;
+        height: 70px;
+        border-radius:35px;
+        border: 1px solid #FFFFFF;
+    }
+    input{
+        font-family: arial;
+        font-size: 35px;
+    }
+    div.main{
+        width: 100%;
+        height: 99.9%;
+        background-color: #15191C;
+        border-width: 1px 0px 0px 0px;
+        border-style: solid;
+        border-color: #f5f5f5;
+    }
+</style>
+<div class="main">
+  <br>
+  <div style="height:380px;color:#f5f5f5;" class="container">
+    <br>DMP LOGIN<br>
+    <table cellspacing="20" style="margin-top:20px;width: 100%;color:#f5f5f5;font-size: 35px;font-family: arial; text-align: center;">
+      <tr>
+        <td style="text-align: right">Username</td>
+        <td style="text-align: left"><input type="text" id="username"></td>
+      </tr>
+      <tr>
+        <td style="text-align: right">Password</td>
+        <td style="text-align: left"><input type="password" id=password></td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <br>
+          <button class="login" onclick="verify()">Login</button>
+        </td>
+      </tr>
+    </table>
+
+  </div>
+</div>

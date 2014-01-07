@@ -1,0 +1,16 @@
+
+development:
+  adapter: mysql
+  database: drug_mgmt
+  username: root
+  password: password
+  host: localhost
+  pool: 50000
+
+production:
+  adapter: mysql
+  database: drug_mgmt
+  username: root
+  password: password
+  host: localhost
+  pool: 50000

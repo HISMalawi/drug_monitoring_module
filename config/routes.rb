@@ -1,6 +1,35 @@
 DrugMonitoringProgram::Application.routes.draw do
+
+  ################### USER ##############################
+  match '/login' => "user#login"
+
+  match '/logout' => "user#logout"
+
+  match '/verify_user' => "user#verify_user"
+
+  get "user/index"
+
+  get "user/login"
+
+  get "user/logout"
+
+  get "user/create"
+
+  get "user/edit"
+
+  post "user/verify_user"
+
+  ################### PUBLICATION #######################
+  match '/publications' => "publication#index"
+  get "publication/index"
+
+  ################### REPORT ############################
+  get "report/index"
+
+  ################### HOME ##############################
+
+  match '/home' => "home#index"
   get "home/index"
-  get "home/logged_home"
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
