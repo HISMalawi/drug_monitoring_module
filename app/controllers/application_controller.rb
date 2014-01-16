@@ -5,6 +5,7 @@ class ApplicationController < ActionController::Base
   protected
 
   def check_logged_in
+
     if session[:user_id].blank?
       respond_to do |format|
         format.html { redirect_to :controller => 'user',:action => 'login' }

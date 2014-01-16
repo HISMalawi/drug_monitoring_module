@@ -1,7 +1,6 @@
 class CreateObservations < ActiveRecord::Migration
   def change
     create_table :observations, :primary_key => :observation_id do |t|
-      t.integer :observation_id
       t.integer :site_id
       t.integer :definition_id
       t.integer :value_numeric

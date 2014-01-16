@@ -50,6 +50,7 @@ DrugMonitoringProgram::Application.routes.draw do
 
   match '/home' => "home#index"
   get "home/index"
+  get "home/graph"
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
