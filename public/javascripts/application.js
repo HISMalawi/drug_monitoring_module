@@ -8,3 +8,58 @@
 //= require jquery_ujs
 //= require twitter/bootstrap
 //= require_tree .
+
+
+function checkDate(id){
+    if(!__$(id).value.trim().match(/^\d{4}\-((0[1-9])|(1[0-2]))\-(([0-2][0-9])|(3[0-1]))$|^$/)){
+        __$(id).style.color = "red";
+        __$(id + "_lbl").style.color = "red";
+    } else if(__$(id).value.trim().match(/^\d{4}\-((0[1-9])|(1[0-2]))\-(([0-2][0-9])|(3[0-1]))$|^$/)){
+        var d = new Date(__$(id).value.trim());
+
+        if(isNaN(d.getFullYear())){
+            __$(id).style.color = "red";
+            __$(id + "_lbl").style.color = "red";
+        } else {
+            __$(id).style.color = "green";
+            __$(id + "_lbl").style.color = "green";
+        }
+
+    } else {
+        __$(id).style.color = "black";
+        __$(id + "_lbl").style.color = "black";
+    }
+
+    setTimeout("checkDate('" + id + "')", 100);
+
+}
+
+function checkIfNumber(id){
+    if(__$(id)){
+
+        if(!__$(id).value.trim().match(/^\d+(\.\d+)?$/)){
+            __$(id).style.color = "red";
+            __$(id + "_lbl").style.color = "red";
+        } else {
+            __$(id).style.color = "black";
+            __$(id + "_lbl").style.color = "black";
+        }
+
+        setTimeout("checkIfNumber('" + id + "')", 100);
+
+    }
+}
+
+function highlight(id, conditional){
+    if(__$(id) ){
+
+        if(conditional){
+            __$(id).style.color = "red";
+            __$(id + "_lbl").style.color = "red";
+        } else {
+            __$(id).style.color = "black";
+            __$(id).style.color = "black";
+        }
+
+    }
+}

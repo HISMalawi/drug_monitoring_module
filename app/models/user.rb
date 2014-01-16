@@ -9,8 +9,8 @@ class User < ActiveRecord::Base
   set_primary_key :user_id
   has_one :user_role
   cattr_accessor :current
-
   before_save :encrypt_password
+  self.default_scope :conditions => "#{self.table_name}.voided = 0"
 
   def self.random_string(len)
     #generat a random password consisting of strings and digits

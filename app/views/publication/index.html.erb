@@ -1,2 +1,85 @@
-<h1>Publication#index</h1>
-<p>Find me in app/views/publication/index.html.erb</p>
+<link rel="stylesheet" type="text/css" href="/stylesheets/demo_table.css" />
+<script type="text/javascript" language="javascript" src="/javascripts/jquery.js"></script>
+<script type="text/javascript" language="javascript" src="/javascripts/jquery.dataTables.js"></script>
+<script type="text/javascript" charset="utf-8">
+    $(document).ready(function() {
+        $('#articles').dataTable({
+            "aaSorting": [[ 2, "desc" ]],
+            'iDisplayLength': 10,
+            "bLengthChange": false
+        });
+    } );
+</script>
+
+<style type="text/css">
+  div{
+      font-size: 25px;
+      font-family: arial;
+
+  }
+  th{
+      font-size: 25px;
+      font-family: arial;
+      font-weight: bold;
+
+  }
+  input{
+      font-size: 24px;
+      font-family: arial;
+
+  }
+  img.icon{
+      height: 40px;
+      width: 40px;
+  }
+</style>
+
+<div style="margin-top: 10px;">
+  <table class="display" id='articles' width="100%">
+    <thead>
+        <tr>
+           <th style="text-align: left">Title</th>
+           <th style="text-align: left">Author</th>
+           <th>Year of Publication</th>
+           <th >&nbsp;</th>
+
+        </tr>
+    </thead>
+    <tbody>
+
+      <% @publications.each do |publication| %>
+        <tr class='<%= cycle("even gradeC", "odd gradeX") %>'>
+          <td>Trident</td>
+          <td>Internet
+            Explorer 4.0</td>
+          <td>2012</td>
+          <td class="center">
+            <img class="icon" src="/images/view_doc.png" alt="view">
+            <img class="icon" src="/images/download.png" alt="download">
+          </td>
+        </tr>
+      <% end %>
+    <tr class="odd gradeX">
+          <td>Trident</td>
+          <td>Internet
+            Explorer 4.0</td>
+          <td>2012</td>
+          <td class="center">
+            <img class="icon" src="/images/view_doc.png" alt="view">
+            <img class="icon" src="/images/download.png" alt="download" onmousedown="'/data/Q4-2013-Overview.pdf'">
+          </td>
+        </tr>
+        <tr class="even gradeC">
+          <td>Trident</td>
+          <td>Internet
+            Explorer 5.0</td>
+          <td>2013</td>
+          <td class="center">
+            <img class="icon" src="/images/view_doc.png" alt="view">
+            <img class="icon" src="/images/download.png" alt="download" onmousedown="window.location='/data/Q4-2013-Overview.pdf'">
+          </td>
+        </tr>
+
+    </tbody>
+  </table>
+</div>

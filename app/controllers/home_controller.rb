@@ -5,6 +5,27 @@ class HomeController < ApplicationController
     end
   end
 
+  def grapher
 
+    groups = ["Site", "Drug", "Aggregate"]
+
+    @type = groups[rand(3)]
+
+
+  end
+
+  def site
+
+  end
+
+  def drug
+
+  end
+
+  def aggregate
+
+  end
 
 end
+
+

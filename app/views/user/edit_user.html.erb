@@ -1,0 +1,126 @@
+
+<style type="text/css">
+    input{
+        width: auto;
+        font-size: 28px;
+    }
+    select{
+        width: auto;
+        font-size: 28px;
+    }
+    button{
+        width: auto;
+        font-size: 28px;
+    }
+    table.halfpage{
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+    .halfpage tr{
+        height: 80px;
+
+    }
+    .halfpage caption{
+        font-weight:bold;
+    }
+</style>
+
+
+<div class="main_container">
+
+  <table class="halfpage" cellspacing="10px" cellpadding="20px">
+    <form method="post" action="/user/save" >
+      <caption style="font-family: arial;font-size:34px;">Edit User Details</caption>
+      <tr>
+        <td id="username_lbl">User Name</td>
+        <td><input type="text" name="username" id='username' value='<%= @user.username %>'></td>
+      </tr>
+      <tr>
+        <td id='password_lbl'>Password</td>
+        <td><input name="password" type="password" id='password'></td>
+      </tr>
+      <tr>
+        <td id='repassword_lbl'>Re-enter Password</td>
+        <td><input name="repassword" type="password" id='repassword'></td>
+      </tr>
+      <tr>
+        <td>User Role</td>
+        <td>
+          <select id="user_role">
+            <option>Other</option>
+            <option>Administrator</option>
+          </select>
+        </td>
+      </tr>
+    </form>
+    <tr>
+      <td colspan="2" style="text-align: center;">
+        <button onclick="verify_form();" style="width: 300px;height:60px;border-radius: 30px;" class="main">Save</button>
+      </td>
+    </tr>
+  </table>
+
+</div>
+
+<script type="text/javascript">
+    <!--
+    function verify_form()
+    {
+
+        var username = document.getElementById('username').value;
+        var password = document.getElementById('password').value;
+        var password2 = document.getElementById('repassword').value;
+        var role = document.getElementById("user_role").value;
+
+        if (username.trim() == "")
+        {
+            jAlert("Username cannot be blank", "Incomplete Information");
+            highlight('username_lbl',true);
+        }
+        else if (password.trim() == "")
+        {
+            jAlert("A password cannot be blank", "Incomplete Information");
+            highlight('password_lbl',true);
+        }
+        else if (password2.trim() == "")
+        {
+            jAlert("Re enter password for confirmation", "Incomplete Information");
+            highlight('repassword_lbl',true);
+        }
+        else if (password != password2)
+        {
+            jAlert("Passwords provided do not match", "Incomplete Information");
+            highlight('repassword_lbl',true);
+            highlight('password_lbl',true);
+        }
+        else
+        {
+            jQuery.ajax({
+                url:  "/user/save_edit?password=" + password + "&username=" + username +"&role=" +role+"&user_id=" + <%=@user.id%>,
+                type:"POST",
+                success: function(msg){
+                    jAlert(msg, "User Edit Outcome")
+                    window.location = "/user/edit";
+                },
+                error: function(){
+                    jAlert("Could not edit user", "Unsuccessful!");
+                }
+
+            });
+        }
+
+
+    }
+
+    function clear()
+    {
+        document.getElementById('username').value = "";
+        document.getElementById('password').value = "";
+        document.getElementById('repassword').value = "";
+
+    }
+    //-->
+</script>
+

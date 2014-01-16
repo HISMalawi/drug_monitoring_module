@@ -1,5 +1,7 @@
 DrugMonitoringProgram::Application.routes.draw do
 
+  get "administration/index"
+
   ################### USER ##############################
   match '/login' => "user#login"
 
@@ -17,11 +19,29 @@ DrugMonitoringProgram::Application.routes.draw do
 
   get "user/edit"
 
+  get "user/edit_user"
+
   post "user/verify_user"
+
+  post "user/save"
+
+  post "user/delete"
+
+  post "user/save_edit"
 
   ################### PUBLICATION #######################
   match '/publications' => "publication#index"
   get "publication/index"
+
+  get "publication/new"
+
+  get "publication/edit"
+
+  post "publication/delete"
+
+  post "publication/save"
+
+  ################### OBSERVATION ######################
 
   ################### REPORT ############################
   get "report/index"

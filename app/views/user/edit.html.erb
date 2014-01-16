@@ -1,2 +1,89 @@
-<h1>User#edit</h1>
-<p>Find me in app/views/user/edit.html.erb</p>
+<link rel="stylesheet" type="text/css" href="/stylesheets/demo_table.css" />
+<script type="text/javascript" language="javascript" src="/javascripts/jquery.js"></script>
+<script type="text/javascript" language="javascript" src="/javascripts/jquery.dataTables.js"></script>
+<script type="text/javascript" charset="utf-8">
+    $(document).ready(function() {
+        $('#articles').dataTable({
+            "aaSorting": [[ 2, "desc" ]],
+            'iDisplayLength': 10,
+            "bLengthChange": false
+        });
+    } );
+</script>
+
+<style type="text/css">
+    div{
+        font-size: 25px;
+        font-family: arial;
+
+    }
+    th{
+        font-size: 25px;
+        font-family: arial;
+        font-weight: bold;
+
+    }
+    input{
+        font-size: 24px;
+        font-family: arial;
+
+    }
+    img.icon{
+        height: 40px;
+        width: 40px;
+    }
+</style>
+
+<div style="margin-top: 10px;">
+<table class="display" id='articles' width="100%">
+<thead>
+<tr>
+  <th style="text-align: left">User Name</th>
+  <th style="text-align: left">User Role</th>
+  <th style="text-align: left">Last Updated On</th>
+  <th >&nbsp;</th>
+  <th >&nbsp;</th>
+
+</tr>
+</thead>
+<tbody>
+    <% @user.each do |user| %>
+        <tr class='<%= cycle("even gradeC", "odd gradeX") %>'>
+           <td><%= user.username %></td>
+           <td><%= user.user_role.role.role %></td>
+          <td><%= user.updated_at.to_date %></td>
+          <td style="text-align: center;">
+            <img onmousedown="delete_user(<%= user.id%>)" class="icon" src="/images/close.png" alt="view">
+          </td>
+          <td style="text-align: center;">
+            <img onmousedown="window.location='/user/edit_user?user_id='+ <%= user.id %> " class="icon" src="/images/pencil.png" alt="view">
+          </td>
+        </tr>
+    <% end %>
+</tbody>
+</table>
+</div>
+
+<script type="text/javascript">
+  function delete_user(id)
+  {
+      jConfirm("Are you sure you want to void this user? ","Confirmation Dialog",function(r)
+      {
+        if (r)
+        {
+            jQuery.ajax({
+                url:  "/user/delete?user_id=" + id ,
+                type:"POST",
+                success: function(msg){
+                    jAlert(msg, "User Deletion Outcome")
+                    clear()
+                },
+                error: function(){
+                    jAlert("Could not delete user", "Unsuccessful!");
+                }
+
+            });
+        }
+      })
+  }
+</script>

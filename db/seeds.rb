@@ -17,7 +17,17 @@ roles =[["Administrator", "This is the system administrator who handles all syst
     new_role = Role.create({:role => role[0], :description => role[1]})
 end
 
-puts "creating default user"
+puts "Creating default user"
 
   user = User.create({:username => "admin", :password => "test"})
   UserRole.create({:user_id => user.id, :role_id => 1})
+
+puts "Creating default definitions"
+definitions = [["Prescription", "Describes the number of precriptions"],
+               ["Dispensation", "Describes the number of dispensations"],
+               ["Number of patients", "Number of patients"]
+              ]
+
+(definitions || []).each do |definition|
+  new_definition = Definition.create({:name => definition[0], :description => definition[1]})
+end
