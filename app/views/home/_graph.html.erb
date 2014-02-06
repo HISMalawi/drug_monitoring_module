@@ -6,6 +6,10 @@
 
 <script type="text/javascript">
     <!--
+
+    var data = [];
+    var title = '';
+
     function graph()
     {
         /*
@@ -18,20 +22,113 @@
 
         var graph = parseInt((Math.random() * 10) % 3);
 
-
-
         if (graph == 0)
+        {
+            sort_line();
             line_graph();
+        }
         else if (graph == 1)
+        {
+            sort_line();
             stacked_bar_graph();
+        }
         else
+        {
+            sort_pie();
             pie_chart();
-
-
-
+        }
     };
 
-    function line_graph(title)
+    function sort_line()
+    {
+        var graphs = ["aggregate disp", "aggregate pres", "drug_disp", "drug_pres"];
+        var type = parseInt((Math.random() * 10) % 4);
+        var graph = graphs[type];
+
+        switch (graph)
+        {
+            case "aggregate disp":
+                title = "Drug Dispensation Aggregates Over The Last 7 Days"
+                data = [
+                    <%(@disp_line_data_list || []).each do |key,value|  %>
+                    {data: <%= value.to_json %> , name : '<%= key %>' },
+                    <% end %>
+                ];
+                break;
+            case "aggregate pres":
+                title = "Drug Prescription Aggregates Over The Last 7 Days";
+                data = [
+                    <%(@pres_line_data_list || []).each do |key,value|  %>
+                    {data: <%= value.to_json %> , name : '<%= key %>' },
+                    <% end %>
+                ];
+                break;
+            case "drug_disp":
+                title = "Top 10 Drug Dispensation Aggregates Over The Last 30 Days";
+                data = [
+                    <%(@disp_line_data_list || []).each do |key,value|  %>
+                    {data: <%= value.to_json %> , name : '<%= key %>' },
+                    <% end %>
+                ];
+                break;
+            case "drug_pres" :
+                title = "Top 10 Drug Prescription Aggregates Over The Last 30 Days";
+                data = [
+                    <%(@pres_line_data_list || []).each do |key,value|  %>
+                    {data: <%= value.to_json %> , name : '<%= key %>' },
+                    <% end %>
+                ];
+                break;
+        }
+
+    }
+
+    function sort_pie()
+    {
+        var graphs = ["aggregate disp", "aggregate pres", "drug_disp", "drug_pres"];
+        var type = parseInt((Math.random() * 10) % 4);
+        var graph = graphs[type];
+
+        switch (graph)
+        {
+            case "aggregate disp" :
+                data = [
+                    <% ( @aggregate_disp_pie || [] ).each do |datum| %>
+                    ['<%= datum[0] %>' , <%= datum[1] %> ],
+                    <% end %>
+                ]
+                title = "Drug Dispensation Aggregates Over The Last 7 Days"
+                break;
+            case "aggregate pres" :
+                data =  [
+                    <% ( @aggregate_pres_pie || [] ).each do |datum| %>
+                    ['<%= datum[0] %>' , <%= datum[1] %> ],
+                    <% end %>
+                ]
+                title = "Drug Prescription Aggregates Over The Last 7 Days";
+                break;
+            case "drug_disp" :
+                data =  [
+                    <% ( @aggregate_disp_pie || [] ).each do |datum| %>
+                    ['<%= datum[0] %>' , <%= datum[1] %> ],
+                    <% end %>
+                ]
+                title = "Top 10 Drug Dispensation Aggregates Over The Last 30 Days";
+                break;
+            case "drug_pres" :
+                data =  [
+                    <% ( @aggregate_pres_pie || [] ).each do |datum| %>
+                    ['<%= datum[0] %>' , <%= datum[1] %> ],
+                    <% end %>
+                ]
+                title = "Top 10 Drug Prescription Aggregates Over The Last 30 Days";
+                break;
+            default :
+        }
+
+    }
+
+    function line_graph()
     {
         try{
 
@@ -39,18 +136,16 @@
                 chart: {
                     renderTo: 'graph'
                 },
-                title: {
-                    text:title
-                },
+
                 xAxis: {
-                    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                    categories: [<% (@days || []).each do |day| %> '<%= day %>',<% end %> ]
                 },
-
-                series: [{
-                    data: [29.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4]
-                }]
-
+                title: {
+                  text : title
+                },
+                series: data,
+                exporting: { enabled: false },
+                credits: {enabled: false}
             });
 
 
@@ -61,7 +156,7 @@
         }
     } ;
 
-    function stacked_bar_graph(title)
+    function stacked_bar_graph()
     {
         try{
             var chart = new Highcharts.Chart({
@@ -69,17 +164,11 @@
                     type: 'column',
                     renderTo: 'graph'
                 },
-                title: {
-                    text: 'Stacked column chart'
-                },
                 xAxis: {
-                    categories: ['Apples', 'Oranges', 'Pears', 'Grapes', 'Bananas']
+                    categories: [<% (@days || []).each do |day| %> '<%= day %>',<% end %> ]
                 },
                 yAxis: {
                     min: 0,
-                    title: {
-                        text: title
-                    },
                     stackLabels: {
                         enabled: true,
                         style: {
@@ -115,16 +204,12 @@
                         }
                     }
                 },
-                series: [{
-                    name: 'John',
-                    data: [5, 3, 4, 7, 2]
-                }, {
-                    name: 'Jane',
-                    data: [2, 2, 3, 2, 1]
-                }, {
-                    name: 'Joe',
-                    data: [3, 4, 4, 2, 5]
-                }]
+                title: {
+                    text: title
+                },
+                series: data,
+                exporting: { enabled: false },
+                credits: {enabled: false}
             });
 
         }
@@ -135,9 +220,8 @@
     };
 
 
-    function pie_chart(title)
+    function pie_chart()
     {
-
         try{
 
             // Build the chart
@@ -149,7 +233,7 @@
                     renderTo: 'graph'
                 },
                 title: {
-                    text: 'Browser market shares at a specific website, 2010'
+                    text:title
                 },
                 tooltip: {
                     pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
@@ -163,7 +247,7 @@
                             color: '#000000',
                             connectorColor: '#000000',
                             formatter: function() {
-                                return '<b>'+ this.point.name +'</b>: '+ this.percentage +' %';
+                                return '<b>'+ this.point.name +'</b>: '+ this.percentage.toFixed(2) +' %';
                             }
                         }
                     }
@@ -171,27 +255,19 @@
                 series: [{
                     type: 'pie',
                     name: title,
-                    data: [
-                        ['Firefox',   45.0],
-                        ['IE',       26.8],
-                        {
-                            name: 'Chrome',
-                            y: 12.8,
-                            sliced: false,
-                            selected: true
-                        },
-                        ['Safari',    8.5],
-                        ['Opera',     6.2],
-                        ['Others',   0.7]
-                    ]
-                }]
+                    data: data
+
+
+                }],
+                exporting: { enabled: false },
+                credits: {enabled: false}
             });
 
 
         }
         catch(ex)
         {
-            alert('error in jQuery call:' + ex);
+            alert('PIE error in jQuery call:' + ex);
         }
     };
 
@@ -204,20 +280,37 @@
     //-->
 </script>
 
-<div  id="graph" style="border: 1px solid #000000; border-radius:10px;height: 100%;width: 100%;">
+<div onLoad="graph()"  id="graph" style="border: 1px solid #000000; border-radius:10px;height: 100%;width: 100%;">
 
 </div>
 
 <script type="text/javascript">
     <!--
-    setInterval("graph()", 2000);
+    setTimeout("graph()", 300);
+    setInterval("graph()", 3000);
     //-->
 
 </script>
-
 <script type="text/javascript">
     <!--
-    #setInterval(window.location= "/home/graph", 5000);
+    /*
+    setInterval("update_values()", 2000);
+
+    function update_values()
+    {
+        jQuery.ajax({
+            url:  "/home/graph",
+            type:"POST",
+            success: function(results){
+
+                graph();
+            },
+            error: function(){
+                jAlert("Failed");
+            }
+
+        });
+    } */
     //-->
 
 </script>

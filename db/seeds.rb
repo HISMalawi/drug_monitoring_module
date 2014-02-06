@@ -25,7 +25,9 @@ puts "Creating default user"
 puts "Creating default definitions"
 definitions = [["Prescription", "Describes the number of precriptions"],
                ["Dispensation", "Describes the number of dispensations"],
-               ["Number of patients", "Number of patients"]
+               ["Number of patients", "Number of patients"],
+               ["Patients on ART","Patients on ART" ],
+               ["Patients Alive","Patients Alive" ]
               ]
 
 (definitions || []).each do |definition|

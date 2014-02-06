@@ -32,6 +32,7 @@
       height: 40px;
       width: 40px;
   }
+
 </style>
 
 <div style="margin-top: 10px;">
@@ -54,8 +55,8 @@
             Explorer 4.0</td>
           <td>2012</td>
           <td class="center">
-            <img class="icon" src="/images/view_doc.png" alt="view">
-            <img class="icon" src="/images/download.png" alt="download">
+            <a href= '<%= "/data/#{publication.content_path}"%>' target="_new"><img class="icon" src="/images/view_doc.png" alt="view"></a>
+            <a href= '<%= "/data/#{publication.content_path}"%>' target="_blank"><img class="icon" src="/images/download.png" alt="download"></a>
           </td>
         </tr>
       <% end %>
@@ -75,8 +76,8 @@
             Explorer 5.0</td>
           <td>2013</td>
           <td class="center">
-            <img class="icon" src="/images/view_doc.png" alt="view">
-            <img class="icon" src="/images/download.png" alt="download" onmousedown="window.location='/data/Q4-2013-Overview.pdf'">
+            <a href="/data/Q4-2013-Overview.pdf" target="_blank"><img class="icon" src="/images/view_doc.png" alt="download"></a>
+            <a href="/data/Q4-2013-Overview.pdf" target='modal'><img class="icon" src="/images/download.png" alt="download"></a>
           </td>
         </tr>
 

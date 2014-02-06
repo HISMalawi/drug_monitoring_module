@@ -1,0 +1,61 @@
+<link rel="stylesheet" type="text/css" href="/stylesheets/demo_table.css" />
+<script type="text/javascript" language="javascript" src="/javascripts/jquery.js"></script>
+<script type="text/javascript" language="javascript" src="/javascripts/jquery.dataTables.js"></script>
+<script type="text/javascript" charset="utf-8">
+    $(document).ready(function() {
+        $('#articles').dataTable({
+            "aaSorting": [[ 2, "desc" ]],
+            'iDisplayLength': 10,
+            "bLengthChange": false
+        });
+    } );
+</script>
+
+<style type="text/css">
+    div{
+        font-size: 25px;
+        font-family: arial;
+
+    }
+    th{
+        font-size: 25px;
+        font-family: arial;
+        font-weight: bold;
+
+    }
+    input{
+        font-size: 24px;
+        font-family: arial;
+
+    }
+    img.icon{
+        height: 40px;
+        width: 40px;
+    }
+
+</style>
+
+<div style="margin-top: 10px;">
+  <table class="display" id='articles' width="100%">
+    <thead>
+    <tr>
+      <th style="text-align: left">Site Name</th>
+      <th style="text-align: left">Registered Patients</th>
+      <th style="text-align: left">Patients On ART</th>
+      <th style="text-align: left">Patients Alive</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    <% (@sites || []).each do |site| %>
+        <tr class='<%= cycle("even gradeC", "odd gradeX") %>'>
+          <td><%= site.name  %></td>
+          <td><%= site.number_of_patients %></td>
+          <td><%= site.number_of_art_patients %></td>
+          <td><%= site.patients_alive %></td>
+        </tr>
+    <% end %>
+
+    </tbody>
+  </table>
+</div>

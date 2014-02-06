@@ -45,12 +45,14 @@ DrugMonitoringProgram::Application.routes.draw do
 
   ################### REPORT ############################
   get "report/index"
+  get "report/site_list"
+  get "report/report_menu"
 
   ################### HOME ##############################
 
   match '/home' => "home#index"
   get "home/index"
-  get "home/graph"
+  post "home/graph"
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

@@ -19,14 +19,17 @@
   <link href="/stylesheets/jquery.alerts.css" rel="stylesheet" type="text/css" media="screen" />
 </head>
 
-<body style="width:1050px;" onload="setup()">
-<div  id="header">
-           <span style="font-size: 45px;color: #C0C0C0;font-family:arial;">
+<body  onload="setup()">
+<div class="heading" >
+  <table class="menu" cellspacing="0px">
+    <tr>
+      <td style="width: 60px;"><img src="/images/rails.png" style="float: left;margin-top: 5px;margin-left: 5px;"></td>
+      <td style="text-align: left;vertical-align: text-top;">
+        <span style="font-size: 35px;color: #C0C0C0;font-family:arial;">
             Drug Monitoring Program
           </span>
-  <img src="/images/rails.png" style="float: left;margin-top: 5px;margin-left: 5px;">
-  <table class="menu" cellspacing="0px">
-    <tr id="items">
+      </td>
+
       <td class="link" onmousedown="window.location='/'">Home</td>
       <td class="link" onmousedown="window.location= '/report/index'">Report</td>
       <td class="link" onmousedown="window.location='/publication/index'">Publications</td>
@@ -37,10 +40,10 @@
 
 </div>
 
-<div id="content">
+<div class="content">
   <%= yield %>
 </div>
-<div id="footer">
+<div class="footer">
 
 </div>
 </body>
