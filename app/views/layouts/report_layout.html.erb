@@ -1,0 +1,41 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>DMP</title>
+  <%= javascript_include_tag 'jquery' %>
+  <script language="javascript" type="text/javascript" src="/javascripts/jquery.ui.draggable.js"></script>
+  <script language="javascript" type="text/javascript" src="/javascripts/jquery.alerts.js"></script>
+  <script language="javascript" type="text/javascript" src="/javascripts/application.js"></script>
+  <link rel="stylesheet" type="text/css" href="/stylesheets/application.css" />
+  <link href="/stylesheets/jquery.alerts.css" rel="stylesheet" type="text/css" media="screen" />
+</head>
+
+<body>
+<div class="heading" >
+  <table class="menu" cellspacing="0px">
+    <tr>
+      <td style="width: 60px;"><img src="/images/rails.png" style="float: left;margin-top: 5px;margin-left: 5px;"></td>
+      <td style="text-align: left;vertical-align: text-top;">
+        <span style="font-size: 35px;color: #C0C0C0;font-family:arial;">
+            DMP
+          </span>
+      </td>
+      <td style="text-align: center;vertical-align: text-top;">
+        <span style="font-size: 35px;color: #C0C0C0;font-family:arial;">
+            <%= @title  %>
+          </span>
+      </td>
+      <td class="link" onmousedown="window.location='/administration/index'" >Export</td>
+      <td class="link" onmousedown="window.location= '/'">Return</td>
+    </tr>
+  </table>
+
+</div>
+
+<div style="height: 760px;overflow: auto;">
+  <%= yield %>
+</div>
+
+</body>
+</html>

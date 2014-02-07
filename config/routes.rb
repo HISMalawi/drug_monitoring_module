@@ -47,6 +47,10 @@ DrugMonitoringProgram::Application.routes.draw do
   get "report/index"
   get "report/site_list"
   get "report/report_menu"
+  get "report/drug_report"
+  get "report/site_report"
+  get "report/aggregate_report"
+  post "report/process_report"
 
   ################### HOME ##############################
 

@@ -32,4 +32,8 @@ class Site < ActiveRecord::Base
     return number
   end
 
+  def self.all_sites
+    sites = Site.all.collect{|x| x.name}
+  end
+
 end

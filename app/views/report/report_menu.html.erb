@@ -1,0 +1,106 @@
+<script language="javascript" type="text/javascript" src="/javascripts/calendar.js"></script>
+<style type="text/css">
+    input{
+        width: auto;
+        font-size: 28px;
+    }
+    select{
+        width: 100%;
+        font-size: 28px;
+    }
+    button{
+        width: auto;
+        font-size: 28px;
+    }
+    table.halfpage{
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+    .halfpage tr{
+        height: 80px;
+
+    }
+    .halfpage caption{
+        font-weight:bold;
+    }
+</style>
+
+
+<div class="main_container">
+
+  <table class="halfpage" cellspacing="10px" cellpadding="20px">
+    <form method="post" action="/report/process_report" >
+      <caption style="font-family: arial;font-size:34px;"><%= params[:type].titleize %> Details</caption>
+
+      <% if params[:type] == 'site report' %>
+          <tr>
+            <td id="site_lbl">Select Site</td>
+            <td>
+              <select name="site_name" id='site'>
+                <% (@sites || []).each do |site| %>
+                  <option><%= site %></option>
+                <% end %>
+              </select>
+            </td>
+          </tr>
+      <% elsif params[:type] == 'drug report' %>
+          <tr>
+            <td id="drug_lbl">Select Drug</td>
+            <td>
+              <select name="drug" id='drug'>
+                <% (@drugs || []).each do |drug| %>
+                    <option><%= drug %></option>
+                <% end %>
+              </select>
+            </td>
+          </tr>
+      <% end %>
+      <tr>
+        <td id="start_date_lbl">Start Date</td>
+        <td><input id="start_date" type="date" onclick="var y = (new Date()).getFullYear(); loadCalendar(this.id,y-10, y+1, false); checkDate(this.id)" name="start_date" value=""></td>
+      </tr>
+      <tr>
+        <td id="end_date_lbl">End Date</td>
+        <td><input id="end_date" type="date" onclick="var y = (new Date()).getFullYear(); loadCalendar(this.id,y-10, y+1, false); checkDate(this.id)" name="end_date" value=""></td>
+      </tr>
+      <%= hidden_field_tag("report_type", params[:type])%>
+    </form>
+    <tr>
+      <td colspan="2" style="text-align: center;">
+        <button onclick="verify_form();" style="width: 300px;height:60px;border-radius: 30px;" class="main">Generate</button>
+      </td>
+    </tr>
+  </table>
+
+</div>
+
+<script type="text/javascript">
+    <!--
+    function verify_form()
+    {
+
+      var type = '<%= params[:type]%>';
+      if(document.getElementById(''))
+      {
+
+      }
+      else if(document.getElementById(''))
+      {
+
+      }
+      else if(document.getElementById(''))
+      {
+
+      }
+      else
+      {
+          document.forms[0].submit();
+      }
+
+
+    }
+    //-->
+</script>
+
