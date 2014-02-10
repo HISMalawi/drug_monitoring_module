@@ -50,37 +50,14 @@
 
       <% @publications.each do |publication| %>
         <tr class='<%= cycle("even gradeC", "odd gradeX") %>'>
-          <td>Trident</td>
-          <td>Internet
-            Explorer 4.0</td>
-          <td>2012</td>
+          <td><%= publication.title %></td>
+          <td><%= publication.author %></td>
+          <td><%= publication.publish_year %></td>
           <td class="center">
-            <a href= '<%= "/data/#{publication.content_path}"%>' target="_new"><img class="icon" src="/images/view_doc.png" alt="view"></a>
             <a href= '<%= "/data/#{publication.content_path}"%>' target="_blank"><img class="icon" src="/images/download.png" alt="download"></a>
           </td>
         </tr>
       <% end %>
-    <tr class="odd gradeX">
-          <td>Trident</td>
-          <td>Internet
-            Explorer 4.0</td>
-          <td>2012</td>
-          <td class="center">
-            <img class="icon" src="/images/view_doc.png" alt="view">
-            <img class="icon" src="/images/download.png" alt="download" onmousedown="'/data/Q4-2013-Overview.pdf'">
-          </td>
-        </tr>
-        <tr class="even gradeC">
-          <td>Trident</td>
-          <td>Internet
-            Explorer 5.0</td>
-          <td>2013</td>
-          <td class="center">
-            <a href="/data/Q4-2013-Overview.pdf" target="_blank"><img class="icon" src="/images/view_doc.png" alt="download"></a>
-            <a href="/data/Q4-2013-Overview.pdf" target='modal'><img class="icon" src="/images/download.png" alt="download"></a>
-          </td>
-        </tr>
-
     </tbody>
   </table>
 </div>

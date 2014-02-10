@@ -17,7 +17,11 @@ class PublicationController < ApplicationController
 
   def save
 
-
+    raise params.inspect
+    tmp = params[:publication][:datafile]
+    File.open(Rails.root.join('public', 'uploads', tmp.original_filename), 'wb') do |file|
+      file.write(tmp.read)
+    end
 
   end
 end

@@ -1,26 +1,10 @@
 <script type="text/javascript">
 
-    function siteMenu()
+    function loadIcons()
     {
-        var path = ["/publication/new", "/publication/edit"];
-        var icons = ['view_doc.png','publications.png'];
-        var title = ['ARV Sites', 'Edit Publication'];
-        loadMenu(title,icons,path);
-    }
-
-    function drugMenu()
-    {
-        var path = ["/user/create", "/user/edit"];
-        var icons = ['add_user.png','edit_user.png'];
-        var title = ["", "Edit User"];
-        loadMenu(title,icons,path);
-    }
-
-    function aggregatesMenu()
-    {
-        var path = ["/user/create", "/user/edit"];
-        var icons = ['add_user.png','edit_user.png'];
-        var title = ["Add User", "Edit User"];
+        var path = ["/publication/new", "/publication/edit","administration/add_site","administration/eidt_site","/user/create", "/user/edit"];
+        var icons = ['view_doc.png','publications.png','Hospital-icon.png','Hospital-icon.png','add_user.png','edit_user.png'];
+        var title = ["Add New Publication","Edit Publication","Add Site","Edit Sites","Add User", "Edit User"];
         loadMenu(title,icons,path);
     }
 
@@ -59,7 +43,7 @@
         }
     }
 
-    setTimeout("siteMenu()", 200);
+    setTimeout("loadIcons()", 200);
 </script>
 
 <style type="text/css">
@@ -69,28 +53,11 @@
     }
 </style>
 
-<div style="margin-top: 0px;border: 1px solid #000000; border-width:1px 0px 0px 0px;">
-  <table width="100%" cellspacing="0px" >
-    <tr>
-      <td width="200px">
-        <img class="icons" onmousedown="siteMenu()"  src="/images/Hospital-icon.png" alt="">
-      </td>
-      <td rowspan="3">
-        <div id='panel' style="height:690px;overflow: auto;border: 1px solid #000000;border-width:0px 0px 0px 1px; ">
-          fdg
-        </div>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <img class="icons" onmousedown="drugMenu()" src="/images/pills3.png" alt="">
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <img class="icons" onmousedown="aggregatesMenu()" src="/images/user_management_icon.png" alt="">
-      </td>
-    </tr>
-  </table>
+
+
+<div id='panel' style="height:700px; overflow:auto;">
+
 
 </div>
+
+

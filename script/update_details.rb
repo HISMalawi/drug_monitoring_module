@@ -9,7 +9,7 @@ def start
   (sites || []).each do |key, value|
     puts "Getting Data For Site #{key}"
     date = '2013-09-02'
-    data = JSON.parse(RestClient.post("http://192.168.18.208:3002/drug/art_summary_dispensation", {:date=>date}))
+    data = JSON.parse(RestClient.post("http://#{value}/drug/art_summary_dispensation", {:date=>date}))
     site = Site.where(:name => key).first_or_create
     record(site,date ,data)
   end

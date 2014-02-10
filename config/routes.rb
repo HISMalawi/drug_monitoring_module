@@ -2,6 +2,9 @@ DrugMonitoringProgram::Application.routes.draw do
 
   get "administration/index"
 
+  get "administration/add_site"
+
+  get "administration/edit_site"
   ################### USER ##############################
   match '/login' => "user#login"
 
