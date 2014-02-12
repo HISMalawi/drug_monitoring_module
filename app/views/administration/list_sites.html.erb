@@ -1,0 +1,90 @@
+<link rel="stylesheet" type="text/css" href="/stylesheets/demo_table.css" />
+<script type="text/javascript" language="javascript" src="/javascripts/jquery.js"></script>
+<script type="text/javascript" language="javascript" src="/javascripts/jquery.dataTables.js"></script>
+<script type="text/javascript" charset="utf-8">
+    $(document).ready(function() {
+        $('#articles').dataTable({
+            "aaSorting": [[ 2, "desc" ]],
+            'iDisplayLength': 10,
+            "bLengthChange": false
+        });
+    } );
+</script>
+
+<style type="text/css">
+    div{
+        font-size: 25px;
+        font-family: arial;
+
+    }
+    th{
+        font-size: 25px;
+        font-family: arial;
+        font-weight: bold;
+
+    }
+    input{
+        font-size: 24px;
+        font-family: arial;
+
+    }
+    img.icon{
+        height: 40px;
+        width: 40px;
+    }
+</style>
+
+<div style="margin-top: 10px;">
+  <table class="display" id='articles' width="100%">
+    <thead>
+    <tr>
+      <th style="text-align: left">Site Name</th>
+      <th style="text-align: left">IP Address</th>
+      <th style="text-align: left">Port</th>
+      <th >&nbsp;</th>
+      <th >&nbsp;</th>
+
+    </tr>
+    </thead>
+    <tbody>
+    <% @sites.each do |site, values| %>
+        <tr class='<%= cycle("even gradeC", "odd gradeX") %>'>
+
+          <td><%= site %></td>
+          <td><%= values["address"] %></td>
+          <td><%= values["port"] %></td>
+          <td style="text-align: center;">
+            <img onmousedown="delete_site('<%= site %>')" class="icon" src="/images/close.png" alt="view">
+          </td>
+          <td style="text-align: center;">
+            <img onmousedown="window.location='/administration/edit_site?site=<%= site %>&address=<%= values["address"] %>&port='+ <%= values["port"] %>" class="icon" src="/images/pencil.png" alt="view">
+          </td>
+        </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>
+
+<script type="text/javascript">
+    function delete_site(site)
+    {
+        jConfirm("Are you sure you want to delete this site? ","Confirmation Dialog",function(r)
+        {
+            if (r)
+            {
+                jQuery.ajax({
+                    url:  "/administration/delete_site?site=" + site ,
+                    type:"POST",
+                    success: function(msg){
+                        jAlert(msg, "Site Deletion Outcome")
+                        window.location='list_sites'
+                    },
+                    error: function(){
+                        jAlert("Could not delete site", "Unsuccessful!");
+                    }
+
+                });
+            }
+        })
+    }
+</script>
