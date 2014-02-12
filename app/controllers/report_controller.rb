@@ -31,11 +31,50 @@ class ReportController < ApplicationController
 
   def site_report
     @title = "Site Report For #{params[:site]}  From #{params[:start_date]} To #{params[:end_date]}"
+
+    prescription_id = Definition.where(:name => "prescription").first.id
+    dispensation_id = Definition.where(:name => "dispensation").first.id
+    site = Site.find_by_name(params[:site])
+    defns = [prescription_id,dispensation_id]
+    @values = {}
+    obs = Observation.find(:all,:order => "value_date DESC",
+                           :conditions => ["definition_id in (?) AND site_id = ? AND value_date >= ? AND value_date <= ?",
+                                           defns,site.id,params[:start_date],params[:end_date]])
+    (obs || []).each do |record|
+
+      @values[record.value_date] = {} unless !@values[record.value_date].blank?
+      @values[record.value_date][record.value_drug] = {"prescription" => 0, "dispensation" => 0} unless !@values[record.value_date][record.value_drug].blank?
+      if record.definition_id == prescription_id
+        @values[record.value_date][record.value_drug]["prescription"] = (@values[record.value_date][record.value_drug]["prescription"] + record.value_numeric)
+      else
+        @values[record.value_date][record.value_drug]["dispensation"] = (@values[record.value_date][record.value_drug]["dispensation"] + record.value_numeric)
+      end
+    end
+
+
     render :layout => 'report_layout'
   end
 
   def aggregate_report
     @title = "Aggregate Report From #{params[:start_date]} To #{params[:end_date]}"
+    prescription_id = Definition.where(:name => "prescription").first.id
+    dispensation_id = Definition.where(:name => "dispensation").first.id
+    defns = [prescription_id,dispensation_id]
+    @values = {}
+    obs = Observation.find(:all,:order => "value_date DESC",
+                           :conditions => ["definition_id in (?) AND value_date >= ? AND value_date <= ?",
+                                           defns,params[:start_date],params[:end_date]])
+    (obs || []).each do |record|
+
+      @values[record.value_date] = {} unless !@values[record.value_date].blank?
+      @values[record.value_date][record.value_drug] = {"prescription" => 0, "dispensation" => 0} unless !@values[record.value_date][record.value_drug].blank?
+      if record.definition_id == prescription_id
+        @values[record.value_date][record.value_drug]["prescription"] = (@values[record.value_date][record.value_drug]["prescription"] + record.value_numeric)
+      else
+        @values[record.value_date][record.value_drug]["dispensation"] = (@values[record.value_date][record.value_drug]["dispensation"] + record.value_numeric)
+      end
+    end
+
     render :layout => 'report_layout'
   end
 
