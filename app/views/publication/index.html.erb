@@ -54,7 +54,7 @@
           <td><%= publication.author %></td>
           <td><%= publication.publish_year %></td>
           <td class="center">
-            <a href= '<%= "/data/#{publication.avatar.url}"%>' ><img class="icon" src="/images/download.png" alt="download"></a>
+            <a href= '<%= "/data#{publication.avatar.url}"%>' ><img class="icon" src="/images/download.png" alt="download"></a>
           </td>
         </tr>
       <% end %>

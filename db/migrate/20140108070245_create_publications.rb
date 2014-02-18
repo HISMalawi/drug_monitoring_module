@@ -3,7 +3,7 @@ class CreatePublications < ActiveRecord::Migration
     create_table :publications, :primary_key => :publication_id do |t|
       t.string :author
       t.string :title
-      t.date :publish_year
+      t.integer :publish_year
       t.has_attached_file :avatar
       t.timestamps
     end
