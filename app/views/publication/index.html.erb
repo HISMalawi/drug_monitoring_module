@@ -54,7 +54,7 @@
           <td><%= publication.author %></td>
           <td><%= publication.publish_year %></td>
           <td class="center">
-            <a href= '<%= "/data#{publication.avatar.url}"%>' ><img class="icon" src="/images/download.png" alt="download"></a>
+            <%= link_to image_tag('/images/download.png'), publication.avatar.url(:original, false), :target => "_blank" %>
           </td>
         </tr>
       <% end %>
