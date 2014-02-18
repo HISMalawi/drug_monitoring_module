@@ -4,8 +4,9 @@ class CreatePublications < ActiveRecord::Migration
       t.string :author
       t.string :title
       t.date :publish_year
-      t.string :content_path
+      t.has_attached_file :avatar
       t.timestamps
     end
   end
 end
+

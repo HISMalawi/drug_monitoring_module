@@ -28,29 +28,27 @@
 <div class="main_container">
 
   <table class="halfpage" cellspacing="10px" cellpadding="20px">
-    <form method="post" action="/publication/save" >
+    <%= form_for :publication,:url => "save", :html => { :multipart => true } do |form| %>
       <caption style="font-family: arial;font-size:34px;">New Publication Details</caption>
       <tr>
         <td id="title_lbl">Publication Title</td>
-        <td><input type="text" name="article_name" id='title'></td>
+        <td><%= form.text_field :title %></td>
       </tr>
       <tr>
         <td id='author_lbl'>Author</td>
-        <td><input name="author" type="text" id='name'></td>
+        <td><%= form.text_field :author %></td>
       </tr>
       <tr>
         <td id="pub_date_lbl">Year of Publishing</td>
-        <td><input id="pub_date" type="text" onclick="var y = (new Date()).getFullYear(); loadCalendar(this.id,y-10, y+1, false); checkDate(this.id)" name="publish_date" value=""></td>
+        <td><%= form.text_field :publish_year %></td>
       </tr>
       <tr>
         <td id='path_lbl'>Select File</td>
         <td>
-          <input id="upload_path" type="file" name="publication[datafile]" />
-          <input type="hidden" id="upload_path_url" name="upload_path_url" />
-
+          <%= form.file_field :avatar %><br>
         </td>
       </tr>
-    </form>
+    <% end %>
     <tr>
       <td colspan="2" style="text-align: center;">
         <button onclick="verify_form();" style="width: 300px;height:60px;border-radius: 30px;" class="main">Save</button>
@@ -65,10 +63,11 @@
     function verify_form()
     {
 
-        var title = document.getElementById('title').value;
-        var name = document.getElementById('name').value;
-        var date = document.getElementById('pub_date').value;
-        var path = document.getElementById('upload_path').value;
+        var title = document.getElementById('publication_title').value;
+        var name = document.getElementById('publication_author').value;
+        var date = document.getElementById('publication_publish_year').value;
+        var path = document.getElementById('publication_avatar').value;
+        var rgx = /(\d{4})/;
 
         if (title.trim() == "")
         {
@@ -85,6 +84,11 @@
             jAlert("A publication should always have a publishing date", "Incomplete Information");
             highlight('pub_date_lbl',true);
         }
+        else if (!date.match(rgx))
+        {
+            jAlert("A publication should always have a publishing year", "Incomplete Information");
+            highlight('pub_date_lbl',true);
+        }
         else if (path.trim() == "")
         {
             jAlert("A publication was not uploaded", "Incomplete Information");
@@ -92,7 +96,6 @@
         }
         else
         {
-            __$("upload_path_url").value = __$("upload_path").value;
             document.forms[0].submit();
         }
 
@@ -100,6 +103,11 @@
     }
     //-->
 </script>
+
+
+
+
+
 
 
 
