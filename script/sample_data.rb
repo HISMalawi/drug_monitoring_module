@@ -8,8 +8,9 @@ def start
           ]
 
   new_sites = [['QECH', 'Central Hospital'],['KCH', 'Central Hospital'], ['ZCH', 'Central Hospital']]
-
+  puts "Create sites"
   (new_sites || []).each do |new_site|
+    puts "Creating site #{new_site[0]}"
     Site.create({:name => new_site[0], :description => new_site[1]})
   end
 
