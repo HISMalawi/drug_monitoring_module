@@ -1,0 +1,103 @@
+
+<script language="javascript" type="text/javascript" src="/javascripts/calendar.js"></script>
+<style type="text/css">
+    input{
+        width: auto;
+        font-size: 28px;
+    }
+    button{
+        width: auto;
+        font-size: 28px;
+    }
+    table.halfpage{
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+    .halfpage tr{
+        height: 80px;
+
+    }
+    .halfpage caption{
+        font-weight:bold;
+    }
+</style>
+
+
+<div class="main_container">
+
+  <table class="halfpage" cellspacing="10px" cellpadding="20px">
+    <%= form_for :publication,:url => "save", :html => { :multipart => true } do |form| %>
+        <caption style="font-family: arial;font-size:34px;">Edit Publication Details</caption>
+        <tr>
+          <td id="title_lbl">Publication Title</td>
+          <td><%= form.text_field :title, :placeholder => "Here"  %></td>
+        </tr>
+        <tr>
+          <td id='author_lbl'>Author</td>
+          <td><%= form.text_field :author %></td>
+        </tr>
+        <tr>
+          <td id="pub_date_lbl">Year of Publishing</td>
+          <td><%= form.text_field :publish_year %></td>
+        </tr>
+        <%= hidden_field_tag("pub_id", params[:pub_id])%>
+    <% end %>
+    <tr>
+      <td colspan="2" style="text-align: center;">
+        <button onclick="verify_form();" style="width: 300px;height:60px;border-radius: 30px;" class="main">Save</button>
+      </td>
+    </tr>
+  </table>
+
+</div>
+
+<script type="text/javascript">
+    <!--
+    function verify_form()
+    {
+
+        var title = document.getElementById('publication_title').value;
+        var name = document.getElementById('publication_author').value;
+        var date = document.getElementById('publication_publish_year').value;
+        var rgx = /(\d{4})/;
+
+        if (title.trim() == "")
+        {
+            highlight('title_lbl',true);
+            jAlert("A publication should always have a title", "Incomplete Information");
+        }
+        else if (name.trim() == "")
+        {
+            jAlert("A publication should always have an author", "Incomplete Information");
+            highlight('author_lbl',true);
+        }
+        else if (date.trim() == "")
+        {
+            jAlert("A publication should always have a publishing date", "Incomplete Information");
+            highlight('pub_date_lbl',true);
+        }
+        else if (!date.match(rgx))
+        {
+            jAlert("A publication should always have a publishing year", "Incomplete Information");
+            highlight('pub_date_lbl',true);
+        }
+        else
+        {
+            document.forms[0].submit();
+        }
+
+
+    }
+    //-->
+</script>
+
+
+
+
+
+
+
+
+

@@ -8,7 +8,7 @@ class PublicationController < ApplicationController
   end
 
   def edit
-
+    @publications = Publication.all
   end
 
   def delete
@@ -17,7 +17,12 @@ class PublicationController < ApplicationController
 
   def save
 
-     @publication = Publication.create(params[:publication])
+    if params[:publication][:pub_id].blank?
+      @publication = Publication.create(params[:publication])
+    else
+
+    end
+
     redirect_to "/"
   end
 

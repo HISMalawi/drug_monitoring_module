@@ -2,10 +2,7 @@ def start
 
   prescription_id = Definition.where(:name => "prescription").first.id
   dispensation_id = Definition.where(:name => "Dispensation").first.id
-  drugs = ['Stavudine 30 Lamivudine 150','Stavudine 30 Lamivudine 150 Nevirapine 200','Zidovudine 300 Lamivudine 150',
-          'Cotrimoxazole 480', 'Stavudine Lamivudine Efavirenz','Zidovudine Lamivudine Nevirapine','Zidovudine 300 Lamivudine 150 Nevirapine 200',
-          'Tenofavir 300 Lamivudine 300 and Efavirenz 600'
-          ]
+  drugs = ["1A", "1P", "2A","2P", "3A","3P","4A","4P","5A","6A","7A","8A","9P", "Non-STD" ]
 
   new_sites = [['QECH', 'Central Hospital'],['KCH', 'Central Hospital'], ['ZCH', 'Central Hospital']]
   puts "Create sites"

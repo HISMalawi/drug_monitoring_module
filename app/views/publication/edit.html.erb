@@ -1,0 +1,63 @@
+<link rel="stylesheet" type="text/css" href="/stylesheets/demo_table.css" />
+<script type="text/javascript" language="javascript" src="/javascripts/jquery.js"></script>
+<script type="text/javascript" language="javascript" src="/javascripts/jquery.dataTables.js"></script>
+<script type="text/javascript" charset="utf-8">
+    $(document).ready(function() {
+        $('#articles').dataTable({
+            "aaSorting": [[ 2, "desc" ]],
+            'iDisplayLength': 10,
+            "bLengthChange": false
+        });
+    } );
+</script>
+
+<style type="text/css">
+    div{
+        font-size: 25px;
+        font-family: arial;
+
+    }
+    th{
+        font-size: 25px;
+        font-family: arial;
+        font-weight: bold;
+
+    }
+    input{
+        font-size: 24px;
+        font-family: arial;
+
+    }
+    img.icon{
+        height: 40px;
+        width: 40px;
+    }
+
+</style>
+
+<div style="margin-top: 10px;">
+  <table class="display" id='articles' width="100%">
+    <thead>
+    <tr>
+      <th style="text-align: left">Title</th>
+      <th style="text-align: left">Author</th>
+      <th>Year of Publication</th>
+      <th >&nbsp;</th>
+
+    </tr>
+    </thead>
+    <tbody>
+
+    <% @publications.each do |publication| %>
+        <tr class='<%= cycle("even gradeC", "odd gradeX") %>'>
+          <td><%= publication.title %></td>
+          <td><%= publication.author %></td>
+          <td><%= publication.publish_year %></td>
+          <td class="center">
+            <img onmousedown="window.location='/publication/publication_edit?pub_id=<%= publication.id %>&name=<%= publication.title %>&author= <%= publication.author %>&year= <%= publication.publish_year %>'" class="icon" src="/images/pencil.png" alt="view">
+          </td>
+        </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>

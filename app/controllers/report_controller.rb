@@ -30,7 +30,7 @@ class ReportController < ApplicationController
   end
 
   def site_report
-    @title = "Site Report For #{params[:site]}  From #{params[:start_date]} To #{params[:end_date]}"
+    @title = "Site Report For #{params[:site]}  From #{params[:start_date].to_date.strftime("%d %b %Y")} To #{params[:end_date].to_date.strftime("%d %b %Y")}"
 
     prescription_id = Definition.where(:name => "prescription").first.id
     dispensation_id = Definition.where(:name => "dispensation").first.id
@@ -56,7 +56,7 @@ class ReportController < ApplicationController
   end
 
   def aggregate_report
-    @title = "Aggregate Report From #{params[:start_date]} To #{params[:end_date]}"
+    @title = "Aggregate Report From #{params[:start_date].to_date.strftime("%d %b %Y")} To #{params[:end_date].to_date.strftime("%d %b %Y")}"
     prescription_id = Definition.where(:name => "prescription").first.id
     dispensation_id = Definition.where(:name => "dispensation").first.id
     defns = [prescription_id,dispensation_id]
@@ -79,17 +79,19 @@ class ReportController < ApplicationController
   end
 
   def drug_report
-    @title = "Drug Report For #{params[:drug]} From #{params[:start_date]} To #{params[:end_date]}"
+    @title = "Drug Report For #{params[:drug]} From #{params[:start_date].to_date.strftime("%d %b %Y")} To #{params[:end_date].to_date.strftime("%d %b %Y")}"
     prescription_id = Definition.where(:name => "prescription").first.id
     dispensation_id = Definition.where(:name => "dispensation").first.id
     defns = [prescription_id,dispensation_id]
     @values = {}
     @prescription = 0
     @dispensation = 0
+    @days = []
     obs = Observation.find(:all,:order => "value_date DESC",
                            :conditions => ["definition_id in (?) AND value_drug = ? AND value_date >= ? AND value_date <= ?",defns,params[:drug],params[:start_date],params[:end_date]])
     (obs || []).each do |record|
       @values[record.value_date] = {"prescription" => 0, "dispensation" => 0} unless !@values[record.value_date].blank?
+      @days << record.value_date
        if record.definition_id == prescription_id
          @values[record.value_date]["prescription"] = (@values[record.value_date]["prescription"] + record.value_numeric)
          @prescription += record.value_numeric
@@ -98,7 +100,7 @@ class ReportController < ApplicationController
          @dispensation += record.value_numeric
        end
     end
-
+    @days = @days.uniq!
     render :layout => 'report_layout'
   end
 

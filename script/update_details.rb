@@ -8,7 +8,7 @@ def start
   sites = YAML.load_file("#{Rails.root.to_s}/config/sites.yml")
   (sites || []).each do |key, value|
     puts "Getting Data For Site #{key}"
-    date = '2013-09-02'
+    date = Date.today.strftime("%Y-%m-%d")
     data = JSON.parse(RestClient.post("http://#{value}/drug/art_summary_dispensation", {:date=>date}))
     site = Site.where(:name => key).first_or_create
     record(site,date ,data)

@@ -4,10 +4,16 @@
 <script src="/javascripts/highcharts.js"></script>
 <script src="/javascripts/exporting.js"></script>
 <script src="/javascripts/standalone-framework.src.js"></script>
-
-<div style="width: 100%;text-align: center;">
-
-</div>
+<script type="text/javascript" charset="utf-8">
+    $(document).ready(function() {
+        $('#drugs').dataTable({
+            "aaSorting": [[ 0, "asc" ]],
+            'iDisplayLength': 25,
+            "bLengthChange": false,
+            "bFilter": false
+        });
+    } );
+</script>
 
 <div style="width: 100%;text-align: center;">
   <table class="display" id="drugs" width="100%">

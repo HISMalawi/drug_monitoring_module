@@ -67,7 +67,51 @@
           alert('PIE error in jQuery call:' + ex);
       }
   }
+
+  function trend()
+  {
+      try{
+
+          var prescriptions = [];
+          var dispensations = [];
+
+          <% (@days || []).each do |day| %>
+                prescriptions.push(<%= @values[day]['prescription'] %>);
+                dispensations.push(<%= @values[day]['dispensation'] %>);
+          <% end %>
+
+          var chart = new Highcharts.Chart({
+              chart: {
+                  renderTo: "trends"
+              },
+              xAxis: {
+                  categories: [<% (@days || []).each do |day| %> '<%= day %>',<% end %> ],
+                  title: {
+                      text: 'Days'
+                  }
+              },
+              yAxis: {
+                  title: {
+                      text: 'Dose Amounts'
+                  }
+              },
+              title: {
+                  text : "Drug Prescription and Dispensation Trend"
+              },
+              series: [{name: "Prescriptions", data: prescriptions}, {name: "Dispensations", data: dispensations}],
+              exporting: { enabled: false },
+              credits: {enabled: false}
+          });
+
+
+      }
+      catch(ex)
+      {
+          alert('error in jQuery call:' + ex);
+      }
+  }
   setTimeout("pie_graph()",20);
+  setTimeout("trend()",20);
 </script>
 <style type="text/css">
     div.graph{
@@ -76,7 +120,7 @@
         height: 370px;
     }
 </style>
-<div style="width: 100%;text-align: center;">
+<div style="width: 99.5%;text-align: center;">
     <table  style="width: 100%;">
         <tr>
             <td width="50%">

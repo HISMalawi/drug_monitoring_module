@@ -46,6 +46,8 @@ DrugMonitoringProgram::Application.routes.draw do
 
   get "publication/edit"
 
+  get "publication/publication_edit"
+
   post "publication/delete"
 
   post "publication/save"
