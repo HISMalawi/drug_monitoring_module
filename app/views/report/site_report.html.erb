@@ -8,7 +8,7 @@
     $(document).ready(function() {
         $('#drugs').dataTable({
             "aaSorting": [[ 0, "asc" ]],
-            'iDisplayLength': 25,
+            'iDisplayLength': 20,
             "bLengthChange": false,
             "bFilter": false
         });
@@ -32,9 +32,10 @@
             <tr>
               <td><%= day.strftime('%d %B %Y') %></td>
               <td><%= drug %></td>
-              <td><%= value["prescription"] %></td>
-              <td><%= value["dispensation"] %></td>
-              <td><%= value["prescription"] - value["dispensation"] %></td>
+              <td><%= number_with_delimiter(value["prescription"], :delimeter => ',') %></td>
+              <td><%= number_with_delimiter(value["dispensation"], :delimeter => ',') %></td>
+              <% percent = ((value["prescription"].to_f - value["dispensation"].to_f)/value["prescription"].to_f).round(2) %>
+              <td><%= number_with_delimiter(value["prescription"] - value["dispensation"], :delimeter => ',') %> (<%= percent.abs %>%)</td>
             </tr>
         <% end %>
     <% end %>

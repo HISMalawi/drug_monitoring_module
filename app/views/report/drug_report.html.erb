@@ -1,15 +1,9 @@
-<link rel="stylesheet" type="text/css" href="/stylesheets/demo_table.css" />
-<script type="text/javascript" language="javascript" src="/javascripts/jquery.js"></script>
-<script type="text/javascript" language="javascript" src="/javascripts/jquery.dataTables.js"></script>
-<script src="/javascripts/highcharts.js"></script>
-<script src="/javascripts/exporting.js"></script>
-<script src="/javascripts/standalone-framework.src.js"></script>
 
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function() {
         $('#drugs').dataTable({
             "aaSorting": [[ 0, "asc" ]],
-            'iDisplayLength': 30,
+            'iDisplayLength': 10,
             "bLengthChange": false,
             "bFilter": false
         });
@@ -76,8 +70,8 @@
           var dispensations = [];
 
           <% (@days || []).each do |day| %>
-                prescriptions.push(<%= @values[day]['prescription'] %>);
-                dispensations.push(<%= @values[day]['dispensation'] %>);
+                prescriptions.push([Date.UTC(<%= day.year %>,<%= day.month - 1 %>,<%= day.day %>), <%= @values[day]['prescription'] %>]);
+                dispensations.push([Date.UTC(<%= day.year %>,<%= day.month - 1 %>,<%= day.day %>),<%= @values[day]['dispensation'] %>]);
           <% end %>
 
           var chart = new Highcharts.Chart({
@@ -85,15 +79,28 @@
                   renderTo: "trends"
               },
               xAxis: {
-                  categories: [<% (@days || []).each do |day| %> '<%= day %>',<% end %> ],
+
                   title: {
                       text: 'Days'
+                  },
+                  type:'datetime',
+                  dateTimeLabelFormats: {
+                      month: '%e. %b',
+                      year: '%b'
+                  }
+
+              },
+              tooltip: {
+                  formatter: function() {
+                      return '<b>'+ this.series.name +'</b><br/>'+
+                              Highcharts.dateFormat('%e %b %Y', this.x) +': '+ this.y +' pills';
                   }
               },
               yAxis: {
                   title: {
                       text: 'Dose Amounts'
-                  }
+                  },
+                  min : 0
               },
               title: {
                   text : "Drug Prescription and Dispensation Trend"
@@ -117,47 +124,54 @@
     div.graph{
         border: 1px solid #15191C;
         width: 100%;
-        height: 370px;
     }
 </style>
-<div style="width: 99.5%;text-align: center;">
-    <table  style="width: 100%;">
-        <tr>
-            <td width="50%">
-                <div id="trends" class="graph">
+<div >
+  <div style="text-align: center;">
+    <table  style="width: 99%;margin-left: 0.5%;">
+      <tr>
+        <td width="50%">
+          <div style="height: 100%;" class="graph">
+            <div style="height: 98%;" id="trends">
 
-                </div>
-            </td>
-            <td>
-                <div id="pie" class="graph">
+            </div>
+          </div>
+        </td>
+        <td>
+          <div style="height: 100%;" class="graph">
+            <div  id="pie">
 
-                </div>
-            </td>
-        </tr>
+            </div>
+          </div>
+        </td>
+      </tr>
     </table>
-</div>
-<br>
-<div style="width: 100%;text-align: center;">
-  <table class="display" id="drugs" width="100%">
-    <thead>
-        <tr>
-          <th>Date</th>
-          <th>Amount Prescribed</th>
-          <th>Amount Dispensed</th>
-          <th>Difference</th>
-        </tr>
-    </thead>
-    <tbody>
-    <% (@values || []).each do |day, value|%>
-        <tr>
-          <td><%= day.strftime('%d %B %Y') %></td>
-          <td><%= value["prescription"] %></td>
-          <td><%= value["dispensation"] %></td>
-          <td><%= value["prescription"] - value["dispensation"] %></td>
-        </tr>
-    <% end %>
-    </tbody>
+  </div>
 
-</table>
+  <div style="width: 100%;margin-top:5px; text-align: center;">
+    <table class="display" id="drugs" width="100%">
+      <thead>
+      <tr>
+        <th>Date</th>
+        <th>Amount Prescribed</th>
+        <th>Amount Dispensed</th>
+        <th>Difference</th>
+      </tr>
+      </thead>
+      <tbody>
+      <% (@values || []).each do |day, value|%>
+          <tr>
+            <td><%= day.strftime('%d %B %Y') %></td>
+            <td><%= number_with_delimiter(value["prescription"], :delimeter => ',') %></td>
+            <td><%= number_with_delimiter(value["dispensation"], :delimeter => ',') %></td>
+            <% percent = ((value["prescription"].to_f - value["dispensation"].to_f)/value["prescription"].to_f).round(2) %>
+            <td><%= number_with_delimiter((value["prescription"] - value["dispensation"]), :delimeter => ',' ) %> (<%= percent.abs %>%)</td>
+          </tr>
+      <% end %>
+      </tbody>
+
+    </table>
+
+  </div>
 
 </div>

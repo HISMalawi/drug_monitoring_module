@@ -7,8 +7,23 @@
   <script language="javascript" type="text/javascript" src="/javascripts/jquery.ui.draggable.js"></script>
   <script language="javascript" type="text/javascript" src="/javascripts/jquery.alerts.js"></script>
   <script language="javascript" type="text/javascript" src="/javascripts/application.js"></script>
+  <link rel="stylesheet" type="text/css" href="/stylesheets/demo_table.css" />
+  <script type="text/javascript" language="javascript" src="/javascripts/jquery.js"></script>
+  <script type="text/javascript" language="javascript" src="/javascripts/jquery.dataTables.js"></script>
+  <script src="/javascripts/highcharts.js"></script>
+  <script src="/javascripts/exporting.js"></script>
+  <script src="/javascripts/standalone-framework.src.js"></script>
+
   <link rel="stylesheet" type="text/css" href="/stylesheets/application.css" />
   <link href="/stylesheets/jquery.alerts.css" rel="stylesheet" type="text/css" media="screen" />
+  <style type="text/css">
+     button.link{
+         width: 100px;
+         height: 60px;
+         font-size: 24px;
+         font-family: arial;
+     }
+  </style>
 </head>
 
 <body>
@@ -18,18 +33,18 @@
       <td style="width: 60px;"><img src="/images/app.png" style="float: left;margin-top: 5px;margin-left: 5px;height:60px;"></td>
 
       <td style="text-align: center;vertical-align: text-top;">
-        <span style="font-size: 35px;color: #C0C0C0;font-family:arial;">
+        <span style="font-size: 30px;color: #C0C0C0;font-family:arial;">
             <%= @title  %>
           </span>
       </td>
-      <td class="link" onmousedown="window.location='/administration/index'" >Export</td>
-      <td class="link" onmousedown="window.location= '/'">Return</td>
+      <td><button class="link" onmousedown="window.location='/administration/index'" >Export</button></td>
+      <td><button class="link" onmousedown="window.location= '/'">Return</button></td>
     </tr>
   </table>
 
 </div>
 
-<div style="height: 760px;overflow: auto;">
+<div style="overflow: auto;">
   <%= yield %>
 </div>
 

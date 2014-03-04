@@ -11,15 +11,13 @@ def start
     Site.create({:name => new_site[0], :description => new_site[1]})
   end
 
-  sites = Site.all
+  sites = Site.find(:all, :conditions => ["site_id NOT in (?)",[1,2]])
 
   (sites || []).each do |site|
     puts
     (0..10).each do |i|
 
-      date = Date.today - i.days
-
-      (0..12).each do |p|
+      date = Date.today  - i.days
 
         (drugs || []).each do |drug|
           Observation.create({:site_id => site.id,
@@ -36,9 +34,6 @@ def start
                                 :value_date => date
           })
         end
-
-      end
-
 
     end
 

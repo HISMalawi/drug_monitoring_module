@@ -1,8 +1,7 @@
 class HomeController < ApplicationController
   def index
-    if session[:user_id].blank?
-      render :layout => 'unlogged'
-    end
+    @lastdate = Observation.find_by_sql("SELECT site_id, max(value_date) as max_date FROM drug_mgmt.observations
+                                        group by site_id order by max_date asc ;").first.max_date rescue nil
     graph()
   end
 

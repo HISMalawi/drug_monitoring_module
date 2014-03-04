@@ -46,7 +46,11 @@
   <%= yield %>
 </div>
 <div class="footer">
-
+    <% if !@lastdate.blank? %>
+        <span style="color: silver;float: right;font-family: arial;font-size: 23px;margin-right: 10px;">
+          Data valid as of <%= @lastdate.to_date.strftime("%d %B %Y") %>
+        </span>
+    <% end %>
 </div>
 </body>
 </html>

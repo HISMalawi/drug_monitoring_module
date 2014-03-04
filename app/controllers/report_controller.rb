@@ -1,6 +1,8 @@
 class ReportController < ApplicationController
 
   def index
+    @lastdate = Observation.find_by_sql("SELECT site_id, max(value_date) as max_date FROM drug_mgmt.observations
+                                        group by site_id order by max_date asc ;").first.max_date rescue nil
   end
 
   def site_list
@@ -61,7 +63,11 @@ class ReportController < ApplicationController
     dispensation_id = Definition.where(:name => "dispensation").first.id
     defns = [prescription_id,dispensation_id]
     @values = {}
-    obs = Observation.find(:all,:order => "value_date DESC",
+    @pres_trend = {}
+    @disp_trend = {}
+    @pres_days = []
+    @disp_days = []
+    obs = Observation.find(:all,:order => "value_date ASC",
                            :conditions => ["definition_id in (?) AND value_date >= ? AND value_date <= ?",
                                            defns,params[:start_date],params[:end_date]])
     (obs || []).each do |record|
@@ -70,8 +76,12 @@ class ReportController < ApplicationController
       @values[record.value_date][record.value_drug] = {"prescription" => 0, "dispensation" => 0} unless !@values[record.value_date][record.value_drug].blank?
       if record.definition_id == prescription_id
         @values[record.value_date][record.value_drug]["prescription"] = (@values[record.value_date][record.value_drug]["prescription"] + record.value_numeric)
+        @pres_trend[record.value_drug].blank? ? @pres_trend[record.value_drug] = [[record.value_date,record.value_numeric]] : @pres_trend[record.value_drug] << [record.value_date,record.value_numeric]
+        @pres_days << record.value_date.to_time.utc.to_i
       else
         @values[record.value_date][record.value_drug]["dispensation"] = (@values[record.value_date][record.value_drug]["dispensation"] + record.value_numeric)
+        @disp_trend[record.value_drug].blank? ? @disp_trend[record.value_drug] = [[record.value_date,record.value_numeric]] : @disp_trend[record.value_drug] << [record.value_date,record.value_numeric]
+        @disp_days << record.value_date
       end
     end
 
@@ -87,7 +97,7 @@ class ReportController < ApplicationController
     @prescription = 0
     @dispensation = 0
     @days = []
-    obs = Observation.find(:all,:order => "value_date DESC",
+    obs = Observation.find(:all,:order => "value_date ASC",
                            :conditions => ["definition_id in (?) AND value_drug = ? AND value_date >= ? AND value_date <= ?",defns,params[:drug],params[:start_date],params[:end_date]])
     (obs || []).each do |record|
       @values[record.value_date] = {"prescription" => 0, "dispensation" => 0} unless !@values[record.value_date].blank?
