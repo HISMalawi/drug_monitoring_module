@@ -27,7 +27,8 @@ definitions = [["Prescription", "Describes the number of precriptions"],
                ["Dispensation", "Describes the number of dispensations"],
                ["Number of patients", "Number of patients"],
                ["Patients on ART","Patients on ART" ],
-               ["Patients Alive","Patients Alive" ]
+               ["Patients Alive","Patients Alive" ],
+               ["Stock","Entered stock of drug on a particular day" ]
               ]
 
 (definitions || []).each do |definition|
