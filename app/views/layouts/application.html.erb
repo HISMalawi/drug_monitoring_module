@@ -32,7 +32,6 @@
 
       <td class="link" onmousedown="window.location='/'">Home</td>
       <td class="link" onmousedown="window.location= '/report/index'">Report</td>
-      <td class="link" onmousedown="window.location='/publication/index'">Publications</td>
       <%if User.current.user_role.role.role != 'Other' %>
         <td class="link" onmousedown="window.location='/administration/index'" >Administration</td>
        <% end %>

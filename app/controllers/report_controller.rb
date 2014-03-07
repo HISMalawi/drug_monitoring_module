@@ -16,8 +16,8 @@ class ReportController < ApplicationController
 
   def process_report
 
-    start_date = params[:start_date]
-    end_date = params[:end_date]
+    start_date = params[:start_date].to_date.strftime("%Y-%m-%d")
+    end_date = params[:end_date].to_date.strftime("%Y-%m-%d")
 
     case params[:report_type]
       when "drug report"
@@ -67,9 +67,11 @@ class ReportController < ApplicationController
     @disp_trend = {}
     @pres_days = []
     @disp_days = []
-    obs = Observation.find(:all,:order => "value_date ASC",
-                           :conditions => ["definition_id in (?) AND value_date >= ? AND value_date <= ?",
-                                           defns,params[:start_date],params[:end_date]])
+    obs = Observation.find_by_sql("SELECT value_date, definition_id, value_drug, SUM(value_numeric) AS value_numeric
+                                  FROM observations where definition_id in (#{defns.join(',')}) and value_date >= '#{params[:start_date]}'
+                                  AND value_date <= '#{params[:end_date]}' GROUP BY definition_id, value_date,value_drug
+                                  ORDER BY value_date ASC")
+
     (obs || []).each do |record|
 
       @values[record.value_date] = {} unless !@values[record.value_date].blank?
@@ -123,5 +125,4 @@ class ReportController < ApplicationController
 
     return drug_list
   end
-
 end

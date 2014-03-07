@@ -61,6 +61,7 @@
         var site = document.getElementById('site').value;
         var address = document.getElementById('address').value;
         var port = document.getElementById('port').value;
+        var old_site = '<%= params[:site] %>';
         var ipformat = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
 
 
@@ -82,7 +83,7 @@
         else
         {
             jQuery.ajax({
-                url:  "/administration/save_site?site=" + site + "&address=" + address +"&port=" +port,
+                url:  "/administration/save_site?site=" + site + "&address=" + address +"&port=" +port +"&old_site=" +old_site,
                 type:"POST",
                 success: function(msg){
                     jAlert(msg, "Site Creation Outcome")
