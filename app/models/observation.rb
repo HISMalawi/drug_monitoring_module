@@ -16,13 +16,14 @@ class Observation < ActiveRecord::Base
         GROUP BY site_id, value_drug"
     ).each do |obs|
 
+      result[obs.site_id] = {} if result[obs.site_id].blank?
       if (rates[obs.site_id][obs.drug_name].blank? rescue true) || rates[obs.site_id][obs.drug_name].to_i == 0
-          result[obs.drug_name] = nil
+          result[obs.site_id][obs.drug_name] = nil
           next
       end
       
-      result[obs.drug_name] = (obs.date.to_date + 
-          (obs.stock_level.to_i/rates[obs.site_id][obs.drug_name].to_f).days) 
+      result[obs.site_id][obs.drug_name] = (obs.date.to_date +
+          (obs.stock_level.to_i/rates[obs.site_id][obs.drug_name].to_f).round(0).days) 
     end
   
     return result
