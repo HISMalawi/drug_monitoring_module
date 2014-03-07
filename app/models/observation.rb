@@ -16,7 +16,7 @@ class Observation < ActiveRecord::Base
     self.find_by_sql(
       "SELECT site_id, value_drug AS drug_name, value_date AS date, value_numeric AS stock_level FROM observations
         WHERE definition_id = (SELECT definition_id FROM definitions WHERE name = 'Stock' LIMIT 1)
-        GROUP BY site_id, value_drug"
+        GROUP BY site_id, value_drug ORDER BY date"
     ).each do |obs|
 
       result[obs.site_id] = {} if result[obs.site_id].blank?
