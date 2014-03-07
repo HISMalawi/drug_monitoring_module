@@ -11,7 +11,6 @@ def start
   (sites || []).each do |key, value|
     puts "Getting Data For Site #{key}"
     unless value.blank?
-
       date = Date.today
       data = JSON.parse(RestClient.post("http://#{value}/drug/art_summary_dispensation", {:date=>date}))
       site = Site.where(:name => key).first_or_create

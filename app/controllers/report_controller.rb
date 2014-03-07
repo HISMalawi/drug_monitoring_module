@@ -16,8 +16,8 @@ class ReportController < ApplicationController
 
   def process_report
 
-    start_date = params[:start_date]
-    end_date = params[:end_date]
+    start_date = params[:start_date].to_date.strftime("%Y-%m-%d")
+    end_date = params[:end_date].to_date.strftime("%Y-%m-%d")
 
     case params[:report_type]
       when "drug report"
