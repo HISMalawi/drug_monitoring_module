@@ -1,20 +1,45 @@
+<style type="text/css">
+  div.alerts{
+     text-align: center;
+     font-family:arial;
+     font-weight: bold;
+     font-size: 1.5em;
+     background-color: silver;
+     border: 1px solid #000000;
+     border-radius: 10px 10px 0px 0px;
+  }
+  tr.odd{
+      background-color: #CDBFAC;
+      font-family: arial;
+  }
+  tr.even{
+      background-color: white;
+      font-family: arial;
+  }
+</style>
+
 
 <div style="width: 100%">
   <table style="width: 100%;" cellspacing="15px">
     <tr>
-      <td colspan="2" style="vertical-align: top;text-align:justify;margin-left: 10px;font-family: arial;font-size:30px;">
-        The drug monitoring program (DMP) was designed as a dissemination tool for drug prescription and dispensation
-        information. Data from various sites with electronic medical record systems (EMRs) is collected and various
-        statistics are calculated and made available here. Various reports are also available under our publications section.
-      </td>
-    </tr>
-    <tr>
-      <td style="border: 1px solid #000000;height: 100%;vertical-align: text-top;">
-         <div style="text-align: center;">
-            Notices
-         </div>
-      </td>
+      <td style="vertical-align: text-top;">
 
+         <div class="alerts">
+           NOTIFICATIONS
+         </div>
+         <div style="max-height: 14cm; overflow: auto;">
+           <table>
+             <% (@notices || []).each do |notice| %>
+                 <tr class=<%= cycle('odd','even') %>>
+                    <td>
+                        <%= notice %>
+                    </td>
+                 </tr>
+             <% end %>
+           </table>
+         </div>
+
+      </td>
       <td style="width: 55%;">
         <div>
           <%= render "graph" %>

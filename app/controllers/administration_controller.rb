@@ -25,6 +25,12 @@ class AdministrationController < ApplicationController
   def save_site
     settings = YAML.load_file("#{Rails.root}/config/sites.yml")
     settings[params[:site]] = params[:address]+":"+params[:port]
+    if params[:site] != params[:old_site]
+      settings[params[:old_site]] = nil
+      site = Site.find(:first, :conditions => ["name = ? ", params[:old_site]])
+      site.name = params[:site]
+      site.save!
+    end
     File.open("#{Rails.root}/config/sites.yml",'w'){|f| YAML.dump(settings, f)}
     render :text => "Site details saved successfully"
   end

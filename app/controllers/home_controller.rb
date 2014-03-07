@@ -1,7 +1,9 @@
 class HomeController < ApplicationController
   def index
-    @lastdate = Observation.find_by_sql("SELECT site_id, max(value_date) as max_date FROM drug_mgmt.observations
+    @lastdate = Observation.find_by_sql("SELECT site_id, max(value_date) as max_date FROM observations
                                         group by site_id order by max_date asc ;").first.max_date rescue nil
+    @notices = ReportTool.find_significant_disp_pres_diff((Date.today - 7.days), Date.today)
+    @notices += ReportTool.find_dispensation_without_prescriptions((Date.today - 7.days), Date.today)
     graph()
   end
 
