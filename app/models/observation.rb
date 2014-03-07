@@ -6,6 +6,9 @@ class Observation < ActiveRecord::Base
   validates_presence_of :definition_id
 
   def self.drug_stock_out_predictions
+    # ** This method calculates estimated stock out dates for drugs per each site
+    # ** Based on daily consumption/dispensation rate
+    # ** Developer   : KENNETH KAPUNDI
     
     rates = self.daily_drug_dispensation_rates
 
@@ -30,7 +33,10 @@ class Observation < ActiveRecord::Base
   end
 
   def self.daily_drug_dispensation_rates
-
+    # ** This method calculates average consumption/dispensation rate
+    # ** Of drugs per each site
+    # ** Developer   : KENNETH KAPUNDI
+    
     return  self.find_by_sql(
       "SELECT site_id, value_drug AS drug_name, ROUND(AVG(value_numeric)) AS rate FROM observations
         WHERE definition_id = (SELECT definition_id FROM definitions WHERE name = 'Dispensation' LIMIT 1)
