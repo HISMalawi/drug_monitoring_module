@@ -20,14 +20,14 @@ class ReportController < ApplicationController
     end_date = params[:end_date].to_date.strftime("%Y-%m-%d")
 
     case params[:report_type]
-      when "drug report"
-        drug = params[:drug]
-        redirect_to :action => 'drug_report',:drug => drug, :start_date => start_date, :end_date => end_date
-      when "aggregate report"
-        redirect_to :action => 'aggregate_report', :start_date => start_date, :end_date => end_date
-      when "site report"
-        site = params[:site_name]
-        redirect_to :action => 'site_report', :site => site, :start_date => start_date, :end_date => end_date
+    when "drug report"
+      drug = params[:drug]
+      redirect_to :action => 'drug_report',:drug => drug, :start_date => start_date, :end_date => end_date
+    when "aggregate report"
+      redirect_to :action => 'aggregate_report', :start_date => start_date, :end_date => end_date
+    when "site report"
+      site = params[:site_name]
+      redirect_to :action => 'site_report', :site => site, :start_date => start_date, :end_date => end_date
     end
   end
 
@@ -40,8 +40,8 @@ class ReportController < ApplicationController
     defns = [prescription_id,dispensation_id]
     @values = {}
     obs = Observation.find(:all,:order => "value_date DESC",
-                           :conditions => ["definition_id in (?) AND site_id = ? AND value_date >= ? AND value_date <= ?",
-                                           defns,site.id,params[:start_date],params[:end_date]])
+      :conditions => ["definition_id in (?) AND site_id = ? AND value_date >= ? AND value_date <= ?",
+        defns,site.id,params[:start_date],params[:end_date]])
     (obs || []).each do |record|
 
       @values[record.value_date] = {} unless !@values[record.value_date].blank?
@@ -100,17 +100,17 @@ class ReportController < ApplicationController
     @dispensation = 0
     @days = []
     obs = Observation.find(:all,:order => "value_date ASC",
-                           :conditions => ["definition_id in (?) AND value_drug = ? AND value_date >= ? AND value_date <= ?",defns,params[:drug],params[:start_date],params[:end_date]])
+      :conditions => ["definition_id in (?) AND value_drug = ? AND value_date >= ? AND value_date <= ?",defns,params[:drug],params[:start_date],params[:end_date]])
     (obs || []).each do |record|
       @values[record.value_date] = {"prescription" => 0, "dispensation" => 0} unless !@values[record.value_date].blank?
       @days << record.value_date
-       if record.definition_id == prescription_id
-         @values[record.value_date]["prescription"] = (@values[record.value_date]["prescription"] + record.value_numeric)
-         @prescription += record.value_numeric
-       else
-         @values[record.value_date]["dispensation"] = (@values[record.value_date]["dispensation"] + record.value_numeric)
-         @dispensation += record.value_numeric
-       end
+      if record.definition_id == prescription_id
+        @values[record.value_date]["prescription"] = (@values[record.value_date]["prescription"] + record.value_numeric)
+        @prescription += record.value_numeric
+      else
+        @values[record.value_date]["dispensation"] = (@values[record.value_date]["dispensation"] + record.value_numeric)
+        @dispensation += record.value_numeric
+      end
     end
     @days = @days.uniq!
     render :layout => 'report_layout'
@@ -119,6 +119,7 @@ class ReportController < ApplicationController
   def stock_out_estimates
     
     @stocks = Observation.drug_stock_out_predictions
+    @updates = Observation.site_update_dates
     render :layout => 'report_layout'
   end
 
@@ -127,7 +128,7 @@ class ReportController < ApplicationController
     defns = Definition.where(:name=> ["prescription","dispensation"]).collect{|x| x.definition_id}
 
     drug_list = Observation.find_by_sql("SELECT DISTINCT value_drug FROM observations "+
-                          " WHERE definition_id in (#{defns.join(',')})").collect{|x| x.value_drug}
+        " WHERE definition_id in (#{defns.join(',')})").collect{|x| x.value_drug}
 
     return drug_list
   end

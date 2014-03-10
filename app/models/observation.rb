@@ -53,5 +53,15 @@ class Observation < ActiveRecord::Base
       result[obs.site_id] = {} if result[obs.site_id].blank?; result[obs.site_id][obs.drug_name] = obs.rate; result
     }    
   end
+
+  def self.site_update_dates
+    # ** This method pull dates each site data was updated
+    # ** Developer  : KENNETH KAPUNDI
+
+    return self.find_by_sql(
+    "SELECT site_id, MAX(value_date) AS last_update_date FROM observations GROUP BY site_id"
+    ).inject({}){|result, obs| result[Site.find(obs.site_id).name] = obs.last_update_date.to_date.strftime("%d %B, %Y"); result}
+
+  end
   
 end
