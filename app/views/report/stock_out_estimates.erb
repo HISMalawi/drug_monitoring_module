@@ -25,6 +25,10 @@
 
   .link{
     float: right;
+    position: absolute;
+    z-index: 1;
+    right: 1%;
+    top: 4px;
   }
 
   th{
@@ -42,6 +46,7 @@
   .header {
     position: absolute;
     top: 3%;
+    z-index: 0;
     height: 10%;
     overflow: hidden;
   }
@@ -140,6 +145,7 @@
       table.appendChild(row);
     }
     dateLabel.innerHTML = "Updated on " + update_dates[site];
+    
   }
   function create(divType, type, data){
     var node = document.createElement(divType);
@@ -156,6 +162,7 @@
   }
   
   loadSite(document.getElementById("sites").value);
+  
   //-->
 </script>
 
