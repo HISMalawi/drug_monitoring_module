@@ -18,15 +18,23 @@ class Observation < ActiveRecord::Base
         WHERE definition_id = (SELECT definition_id FROM definitions WHERE name = 'Stock' LIMIT 1)
         GROUP BY site_id, value_drug ORDER BY date"
     ).each do |obs|
-
-      result[obs.site_id] = {} if result[obs.site_id].blank?
-      if (rates[obs.site_id][obs.drug_name].blank? rescue true) || rates[obs.site_id][obs.drug_name].to_i == 0
-          result[obs.site_id][obs.drug_name] = nil
-          next
-      end
       
-      result[obs.site_id][obs.drug_name] = (obs.date.to_date +
-          (obs.stock_level.to_i/rates[obs.site_id][obs.drug_name].to_f).round(0).days) 
+      site_name = Site.find(obs.site_id).name
+      result[site_name] = {} if result[site_name].blank?
+      result[site_name][obs.drug_name] = {}
+      
+      if (rates[obs.site_id][obs.drug_name].blank? rescue true) || rates[obs.site_id][obs.drug_name].to_i == 0
+        
+        result[site_name].delete(obs.drug_name)
+        next
+      end 
+
+      result[site_name][obs.drug_name]["stock_level"] = obs.stock_level.blank? ? "Unknown" : obs.stock_level
+      result[site_name][obs.drug_name]["rate"] = rates[obs.site_id][obs.drug_name].blank? ? "Unknown" :
+        rates[obs.site_id][obs.drug_name]
+      result[site_name][obs.drug_name]["stockout_date"] = result[site_name][obs.drug_name]["stock_level"].to_i == 0 ? "No applicable" :
+        (obs.date.to_date + (obs.stock_level.to_i/rates[obs.site_id][obs.drug_name].to_f).round(0).days).strftime("%d %b, %Y")
+      
     end
   
     return result

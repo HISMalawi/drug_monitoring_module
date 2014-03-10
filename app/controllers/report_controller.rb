@@ -116,6 +116,12 @@ class ReportController < ApplicationController
     render :layout => 'report_layout'
   end
 
+  def stock_out_estimates
+    
+    @stocks = Observation.drug_stock_out_predictions
+    render :layout => 'report_layout'
+  end
+
   def drugs
 
     defns = Definition.where(:name=> ["prescription","dispensation"]).collect{|x| x.definition_id}

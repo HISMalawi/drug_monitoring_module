@@ -1,0 +1,154 @@
+<style type="text/css">
+  input{
+    width: auto;
+    font-size: 28px;
+  }
+  select{
+    width: 100%;
+    font-size: 28px;
+  }
+  button{
+    width: auto;
+    font-size: 28px;
+  }
+  table.fullpage{
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: -1%;
+    width: 100%;
+    margin-bottom: 20px;
+  }
+  .halfpage tr{
+    height: 80px;
+
+  }
+
+  .link{
+    float: right;
+  }
+
+  th{
+    text-align: left;
+    font-size: 18px;
+    background: #66CC66;
+  }
+  #datalist td{
+    text-align: left;
+    font-size: 16px;
+    color: darkslategrey;
+    background-color: azure;
+  }
+
+  .header {
+    position: absolute;
+    top: 3%;
+    height: 10%;
+    overflow: hidden;
+  }
+
+</style>
+
+<div class="stock-data">
+
+  <table  class="fullpage header" width="100" cellspacing="5px" cellpadding="10px">
+
+    <tr>
+      <td style="padding-left: 5%; font-size: 20px;"><span style="color: lightblue;font-weight: bold;">Select Site</span>
+        <select id="sites" style="margin-left: 3%; width: 50%; font-size: 20px;" name="site_name" id='site' onchange="loadSite(this.value)">
+          <% (@stocks.keys || []).each do |site| %>
+            <option><%= site %></option>
+          <% end %>
+        </select>
+      </td>
+      <td>&nbsp</td>
+      <td>&nbsp</td>
+      <td>&nbsp</td>
+    </tr>
+    <tr>
+      <th style="width: 43%">Drug </th>
+      <th style="width: 13%">Stock level</th>
+      <th style="width: 22%">Dispensation rate <sub style="font-size: 12px;">( per day)</sub></th>
+      <th>Stockout date</th>
+    </tr>
+    <tr>
+      <td colspan="4">
+        <div style="height: 520px; overflow: auto;">
+          <table id ="datalist"  style="width: 100%;" width="100" cellspacing="4px" cellpadding="10px">
+
+          </table>
+        </div>
+      </td>
+    </tr>
+
+  </table>
+
+</div>
+
+<script type="text/javascript">
+  <!--
+  var stocks = {}
+
+<%@stocks.keys.each do |key|%>
+  
+    stocks["<%= key %>"] = {}
+  <%@stocks[key].keys.each do |drug|%>
+
+      stocks["<%= key %>"]["<%= drug %>"] = {};
+    <% @stocks[key][drug].each do |k, v| %>
+        stocks["<%= key %>"]["<%= drug %>"]["<%= k %>"] = "<%= v%>";
+    <%end%>
+  <%end%>
+<%end%>
+  
+ 
+  function loadSite(site)
+  {
+    var data = stocks[site]
+    var drugs = Object.keys(data)
+    var table = document.getElementById("datalist")
+    table.innerHTML = "";
+    
+    for (var i = 0; i < drugs.length; i++){
+
+      var row = create("tr", "table-row", "");
+      row.style.width = "100%";
+      
+      var td1 = create("td", "table-data", drugs[i]);
+      td1.style.width = "43%";
+      row.appendChild(td1)
+      
+      var td2 = create("td", "table-data", data[drugs[i]]["stock_level"]);
+      td2.style.width = "13%";
+      td2.style.textAlign = "center";
+      row.appendChild(td2)
+
+      var td3 = create("td", "table-data", data[drugs[i]]["rate"]);
+      td3.style.width = "23%";
+      td3.style.textAlign = "center";
+      row.appendChild(td3)
+
+      var td4 = create("td", "table-data", data[drugs[i]]["stockout_date"]);
+      row.appendChild(td4);
+      
+      table.appendChild(row);
+    }
+
+  }
+  function create(divType, type, data){
+    var node = document.createElement(divType);
+    node.style.diplay = type;
+    if (divType == "tr"){
+      node.style.fontSize = "14px";
+      node.style.padding = "0px";
+      node.style.background = "#FFFFFF";
+    }
+    if (data != ""){
+      node.innerHTML = data;
+    }
+    return node;
+  }
+  
+  loadSite(document.getElementById("sites").value);
+  //-->
+</script>
+

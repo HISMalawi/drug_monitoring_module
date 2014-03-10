@@ -62,6 +62,7 @@ DrugMonitoringProgram::Application.routes.draw do
   get "report/site_report"
   get "report/aggregate_report"
   post "report/process_report"
+  get "report/stock_out_estimates"
 
   ################### HOME ##############################
 
