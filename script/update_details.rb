@@ -42,10 +42,10 @@ def record(site, date,data)
       })
   end
 
-  (data['stock'] || []).each do |key, stock|
+  (data['stock_level'] || []).each do |key, stock|
     Observation.create({:site_id => site.id,
         :definition_id => $stock_id,
-        :value_numeric => stock['level'],
+        :value_numeric => stock,
         :value_drug => key,
         :value_date => date
       })
