@@ -3,7 +3,6 @@ require 'rest-client'
 
 $prescription_id = Definition.where(:name => "prescription").first.id
 $dispensation_id = Definition.where(:name => "dispensation").first.id
-$stock_id = Definition.where(:name => "stock").first.id
  
 def start
 
@@ -23,7 +22,6 @@ end
 
 def record(site, date,data)
 
-
   (data['prescriptions'] || []).each do |key,prescription|
     Observation.create({:site_id => site.id,
         :definition_id => $prescription_id,
@@ -42,13 +40,31 @@ def record(site, date,data)
       })
   end
 
-  (data['stock_level'] || []).each do |key, stock|
-    Observation.create({:site_id => site.id,
-        :definition_id => $stock_id,
-        :value_numeric => stock,
-        :value_drug => key,
-        :value_date => date
-      })
+  (data['stock_level'].keys || []).each do |drug|
+
+    data['stock_level'][drug].each do |key, value|
+      $definition_id = Definition.where(:name => key).first.id
+      if value.class.to_s == "Array"
+        
+        pills = value[0]
+        date_of_count = value[1]
+        next if date_of_count.blank?
+        Observation.create({:site_id => site.id,
+            :definition_id => $definition_id,
+            :value_numeric => pills,
+            :value_drug => drug,          
+            :value_date => date_of_count
+          })
+      else
+
+        Observation.create({:site_id => site.id,
+            :definition_id => $definition_id,
+            :value_numeric => value,
+            :value_drug => drug,
+            :value_date => date
+          })
+      end
+    end
   end
 
 end
