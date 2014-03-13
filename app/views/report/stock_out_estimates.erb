@@ -66,7 +66,7 @@
         </select>
       </td>
       <td>&nbsp</td>
-      <td colspan="2" id ="date" style="color: lightblue; font-weight: bold;">&nbsp</td>
+      <td colspan="2" id ="date" style="padding-left: 0px; color: lightblue; font-weight: bold;">&nbsp</td>
 
     </tr>
     <tr>
@@ -77,7 +77,7 @@
     </tr>
     <tr>
       <td colspan="4">
-        <div style="height: 535px; overflow: auto;">
+        <div id ="data-holder" style="height: 535px; overflow: auto;">
           <table id ="datalist"  style="width: 100%;" width="100" cellspacing="4px" cellpadding="10px">
 
           </table>
@@ -106,10 +106,13 @@
   <%end%>
 <%end%>
 
-<%@updates.each do |key, value|%>
-    update_dates["<%= key %>"] = "<%= value %>";
+<%@updates.each do |key, hash|%>
+    update_dates["<%= key %>"] = {}
+  <%hash.each do |k, v|%>
+      update_dates["<%= key %>"]["<%= k%>"] = "<%= v%>";
+  <%end%>
 <%end%>
-  
+
  
   function loadSite(site)
   {
@@ -117,7 +120,7 @@
     var drugs = Object.keys(data);
     var table = document.getElementById("datalist");
     var dateLabel = document.getElementById("date");
-    dateLabel.innerHTML = ""
+    dateLabel.innerHTML = "";
     table.innerHTML = "";
     
     for (var i = 0; i < drugs.length; i++){
@@ -132,7 +135,7 @@
       var td2 = create("td", "table-data", data[drugs[i]]["stock_level"]);
       td2.style.width = "13%";
       td2.style.textAlign = "center";
-      row.appendChild(td2)
+      row.appendChild(td2);
 
       var td3 = create("td", "table-data", data[drugs[i]]["rate"]);
       td3.style.width = "23%";
@@ -144,8 +147,11 @@
       
       table.appendChild(row);
     }
-    dateLabel.innerHTML = "Updated on " + update_dates[site];
-    
+<% if params[:type] == 'calculated' %>
+      dateLabel.innerHTML = "Raw data updated on " + update_dates[site]["calculated"];
+<%else%>
+      dateLabel.innerHTML = "Figures <%= params[:type].humanize.downcase %> done " + update_dates[site]["<%= params[:type].match(/clinic|supervision/)[0]%>"];
+<%end%>
   }
   function create(divType, type, data){
     var node = document.createElement(divType);
@@ -162,6 +168,9 @@
   }
   
   loadSite(document.getElementById("sites").value);
+  holder = document.getElementById("data-holder")
+  holder.style.height = screen.width * 0.39 + "px";
+
   
   //-->
 </script>

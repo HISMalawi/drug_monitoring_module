@@ -117,8 +117,8 @@ class ReportController < ApplicationController
   end
 
   def stock_out_estimates
-    
-    @stocks = Observation.drug_stock_out_predictions
+ 
+    @stocks = Observation.drug_stock_out_predictions(params[:type])
     @updates = Observation.site_update_dates
     render :layout => 'report_layout'
   end
