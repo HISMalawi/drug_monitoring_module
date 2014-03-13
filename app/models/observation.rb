@@ -55,7 +55,7 @@ class Observation < ActiveRecord::Base
                       AND ob.site_id = obs.site_id AND ob.definition_id = obs.definition_id)
                   AND definition_id = (SELECT definition_id FROM definitions WHERE name = 'Total delivered' LIMIT 1)
                   GROUP BY site_id, value_drug")
-     
+    
     else
       
       definition = (type == 'verified_by_clinic') ? "Clinic verification" : "Supervision verification"
@@ -72,7 +72,8 @@ class Observation < ActiveRecord::Base
                       AND ob.definition_id = obs.definition_id)                     
                   AND definition_id = (SELECT definition_id FROM definitions WHERE name = '#{definition}' LIMIT 1)
                   GROUP BY site_id, value_drug"
-      )     
+      )
+
     end
    
     main_query.each do |obs|
