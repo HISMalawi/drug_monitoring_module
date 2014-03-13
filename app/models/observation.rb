@@ -13,14 +13,22 @@ class Observation < ActiveRecord::Base
     rates = self.daily_drug_dispensation_rates
 
     result = {}
-    if type == 'calculated'
 
-      query_for_dispensed = "SELECT o1.value_numeric FROM observations o1 WHERE o1.definition_id =
+    query_for_prescribed = "SELECT o1.value_numeric FROM observations o1 WHERE o1.definition_id =
+                                      (SELECT definition_id FROM definitions WHERE name = 'Total prescribed' LIMIT 1)
+                                      AND o1.site_id = obs.site_id
+                                      AND o1.value_drug = obs.value_drug
+                                      AND o1.value_date = obs.value_date
+                             ORDER BY observation_id DESC LIMIT 1"
+
+    query_for_dispensed = "SELECT o1.value_numeric FROM observations o1 WHERE o1.definition_id =
                                       (SELECT definition_id FROM definitions WHERE name = 'Total dispensed' LIMIT 1)
                                       AND o1.site_id = obs.site_id
                                       AND o1.value_drug = obs.value_drug
                                       AND o1.value_date = obs.value_date
                              ORDER BY observation_id DESC LIMIT 1"
+    
+    if type == 'calculated'
       
       query_for_removed = "SELECT o2.value_numeric FROM observations o2 WHERE o2.definition_id =
                                       (SELECT definition_id FROM definitions WHERE name = 'Total removed' LIMIT 1)
@@ -37,7 +45,8 @@ class Observation < ActiveRecord::Base
                                       ORDER BY observation_id DESC LIMIT 1"
 
       main_query = self.find_by_sql(
-        "SELECT obs.site_id, obs.value_drug AS drug_name, obs.value_date AS date,
+        "SELECT obs.site_id, obs.value_drug AS drug_name, obs.value_date AS date, 
+                  (#{query_for_prescribed}) AS prescribed, (#{query_for_dispensed}) AS dispensed,
                   (SELECT ((#{query_for_delivered}) - COALESCE((#{query_for_dispensed}) + (#{query_for_removed}), 0))) AS stock_level
         FROM observations obs
                   WHERE obs.value_date =
