@@ -14,11 +14,11 @@ class Observation < ActiveRecord::Base
 
     result = {}
 
-    query_for_prescribed = "SELECT o1.value_numeric FROM observations o1 WHERE o1.definition_id =
+    query_for_prescribed = "SELECT o0.value_numeric FROM observations o0 WHERE o0.definition_id =
                                       (SELECT definition_id FROM definitions WHERE name = 'Total prescribed' LIMIT 1)
-                                      AND o1.site_id = obs.site_id
-                                      AND o1.value_drug = obs.value_drug
-                                      AND o1.value_date = obs.value_date
+                                      AND o0.site_id = obs.site_id
+                                      AND o0.value_drug = obs.value_drug
+                                      AND o0.value_date = obs.value_date
                              ORDER BY observation_id DESC LIMIT 1"
 
     query_for_dispensed = "SELECT o1.value_numeric FROM observations o1 WHERE o1.definition_id =
@@ -61,7 +61,10 @@ class Observation < ActiveRecord::Base
       definition = (type == 'verified_by_clinic') ? "Clinic verification" : "Supervision verification"
 
       main_query = self.find_by_sql(
-        "SELECT obs.site_id, obs.value_drug AS drug_name, obs.value_date AS date, obs.value_numeric AS stock_level FROM observations obs
+        "SELECT obs.site_id, obs.value_drug AS drug_name, obs.value_date AS date,
+                  (#{query_for_prescribed}) AS prescribed, (#{query_for_dispensed}) AS dispensed,
+                  obs.value_numeric AS stock_level
+        FROM observations obs
                   WHERE obs.value_date =
                       (SELECT MAX(ob.value_date) FROM observations ob
                     WHERE ob.value_drug = obs.value_drug
@@ -85,6 +88,8 @@ class Observation < ActiveRecord::Base
       end
 
       result[site_name][obs.drug_name]["date"] = obs.date.to_date
+      result[site_name][obs.drug_name]["prescribed"] = obs.prescribed.blank? ? "Unknown" : obs.prescribed
+      result[site_name][obs.drug_name]["dispensed"] = obs.dispensed.blank? ? "Unknown" : obs.dispensed
       result[site_name][obs.drug_name]["stock_level"] = obs.stock_level.blank? ? "Unknown" : obs.stock_level
       result[site_name][obs.drug_name]["rate"] = rates[obs.site_id][obs.drug_name].blank? ? "Unknown" :
         rates[obs.site_id][obs.drug_name]

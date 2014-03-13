@@ -33,8 +33,12 @@
 
   th{
     text-align: left;
-    font-size: 18px;
+    font-size: 16px;
     background: #66CC66;
+    padding: 0px;
+    padding-top: 2px;
+    padding-bottom: 4px;
+    color: black;
   }
   #datalist td{
     text-align: left;
@@ -70,10 +74,12 @@
 
     </tr>
     <tr>
-      <th style="width: 43%">Drug </th>
-      <th style="width: 13%">Stock level</th>
-      <th style="width: 22%">Consumption rate <sub style="font-size: 12px;">( per day)</sub></th>
-      <th>Stockout date <sub style="font-size: 12px;">(estimate)</sub></th>
+      <th style="width: 38%">Drug </th>
+      <th style="width: 13%">Total Prescribed</th>
+      <th style="width: 13%">Total Dispensed</th>
+      <th style="width: 13%">Consumption rate <br /><sub style="font-size: 12px;">( per day)</sub></th>
+      <th style="width: 13%">Stock level<br /><sub style="font-size: 12px;">( pills)</sub></th>
+      <th>Stockout date <br /><sub style="font-size: 12px;">( estimate)</sub></th>
     </tr>
     <tr>
       <td colspan="4">
@@ -129,21 +135,31 @@
       row.style.width = "100%";
       
       var td1 = create("td", "table-data", drugs[i]);
-      td1.style.width = "43%";
-      row.appendChild(td1)
-      
-      var td2 = create("td", "table-data", data[drugs[i]]["stock_level"]);
+      td1.style.width = "38%";
+      row.appendChild(td1);
+
+      var td2 = create("td", "table-data", data[drugs[i]]["prescribed"]);
       td2.style.width = "13%";
       td2.style.textAlign = "center";
-      row.appendChild(td2);
+      row.appendChild(td2)
 
-      var td3 = create("td", "table-data", data[drugs[i]]["rate"]);
-      td3.style.width = "23%";
+      var td3 = create("td", "table-data", data[drugs[i]]["dispensed"]);
+      td3.style.width = "13%";
       td3.style.textAlign = "center";
       row.appendChild(td3)
 
-      var td4 = create("td", "table-data", data[drugs[i]]["stockout_date"]);
-      row.appendChild(td4);
+      var td4 = create("td", "table-data", data[drugs[i]]["rate"]);
+      td4.style.width = "13%";
+      td4.style.textAlign = "center";
+      row.appendChild(td4)
+      
+      var td5 = create("td", "table-data", data[drugs[i]]["stock_level"]);
+      td5.style.width = "13%";
+      td5.style.textAlign = "center";
+      row.appendChild(td5);
+
+      var td6 = create("td", "table-data", data[drugs[i]]["stockout_date"]);
+      row.appendChild(td6);
       
       table.appendChild(row);
     }
@@ -157,7 +173,7 @@
     var node = document.createElement(divType);
     node.style.diplay = type;
     if (divType == "tr"){
-      node.style.fontSize = "14px";
+      node.style.fontSize = "12px";
       node.style.padding = "0px";
       node.style.background = "#FFFFFF";
     }

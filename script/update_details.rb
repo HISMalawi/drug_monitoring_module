@@ -10,9 +10,10 @@ def start
   (sites || []).each do |key, value|
     puts "Getting Data For Site #{key}"
     unless value.blank?
-      date = "2014-01-03"
+      date = "Date.today"
       data = JSON.parse(RestClient.post("http://#{value}/drug/art_summary_dispensation", {:date=>date})) rescue
           (puts "****Crashed while pulling data for site #{key}****")
+          raise data.to_yaml
       site = Site.where(:name => key).first_or_create
       record(site,date ,data)
     end
