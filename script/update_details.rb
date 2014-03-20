@@ -10,7 +10,7 @@ def start
   (sites || []).each do |key, value|
     puts "Getting Data For Site #{key}"
     unless value.blank?
-      date = (3.days.ago).to_date
+      date = Date.today
       url = "http://#{value}/drug/art_summary_dispensation?date=#{date}"
       data = JSON.parse(RestClient::Request.execute(:method => :post, :url => url, :timeout => 100000000)) rescue (
         puts "**** Error when pulling data from site #{key}"
