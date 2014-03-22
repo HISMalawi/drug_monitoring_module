@@ -124,22 +124,23 @@
     div.graph{
         border: 1px solid #15191C;
         width: 100%;
+        height: 45vh;
     }
 </style>
-<div >
+<div style="height: 90vh; overflow: auto;">
   <div style="text-align: center;">
     <table  style="width: 99%;margin-left: 0.5%;">
       <tr>
         <td width="50%">
-          <div style="height: 100%;" class="graph">
+          <div  class="graph">
             <div style="height: 98%;" id="trends">
 
             </div>
           </div>
         </td>
         <td>
-          <div style="height: 100%;" class="graph">
-            <div  id="pie">
+          <div  class="graph">
+            <div style="height: 98%;" id="pie">
 
             </div>
           </div>
@@ -155,6 +156,7 @@
         <th>Date</th>
         <th>Amount Prescribed</th>
         <th>Amount Dispensed</th>
+        <th>People Who Received Drugs</th>
         <th>Difference</th>
       </tr>
       </thead>
@@ -164,8 +166,9 @@
             <td><%= day.strftime('%d %B %Y') %></td>
             <td><%= number_with_delimiter(value["prescription"], :delimeter => ',') %></td>
             <td><%= number_with_delimiter(value["dispensation"], :delimeter => ',') %></td>
+            <td>&nbsp</td>
             <% percent = ((value["prescription"].to_f - value["dispensation"].to_f)/value["prescription"].to_f).round(2) %>
-            <td><%= number_with_delimiter((value["prescription"] - value["dispensation"]), :delimeter => ',' ) %> (<%= percent.abs %>%)</td>
+            <td><%= number_with_delimiter((value["prescription"] - value["dispensation"]), :delimeter => ',' ) %> (<%= percent.abs * 100 %>%)</td>
           </tr>
       <% end %>
       </tbody>

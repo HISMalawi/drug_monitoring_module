@@ -3,7 +3,7 @@ class UserController < ApplicationController
   end
 
   def login
-    render :layout => 'unlogged'
+    render :layout => false
   end
 
   def logout

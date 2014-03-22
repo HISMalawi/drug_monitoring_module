@@ -47,6 +47,8 @@ div.content {
     top:100px;
     bottom:50px;
     width: 100%;
+    height: 83vh;
+    overflow: auto;
 }
 
 td.link{
