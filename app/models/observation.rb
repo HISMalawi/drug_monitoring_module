@@ -14,20 +14,17 @@ class Observation < ActiveRecord::Base
 
     result = {}
 
-    query_for_prescribed = "SELECT o0.value_numeric FROM observations o0 WHERE o0.definition_id =
+    query_for_prescribed = "SELECT MAX(f.value_numeric) FROM observations f WHERE f.definition_id =
                                       (SELECT definition_id FROM definitions WHERE name = 'Total prescribed' LIMIT 1)
-                                      AND o0.site_id = obs.site_id
-                                      AND o0.value_drug = obs.value_drug
-                                      AND o0.value_date = obs.value_date
+                                      AND f.site_id = obs.site_id
+                                      AND f.value_drug = obs.value_drug                                      
                              ORDER BY observation_id DESC LIMIT 1"
 
-    query_for_dispensed = "SELECT o1.value_numeric FROM observations o1 WHERE o1.definition_id =
+    query_for_dispensed = "SELECT MAX(o1.value_numeric) FROM observations o1 WHERE o1.definition_id =
                                       (SELECT definition_id FROM definitions WHERE name = 'Total dispensed' LIMIT 1)
                                       AND o1.site_id = obs.site_id
                                       AND o1.value_drug = obs.value_drug
-                                      AND o1.value_date = obs.value_date
-                             ORDER BY observation_id DESC LIMIT 1"
-    
+                            ORDER BY observation_id DESC LIMIT 1"
     if type == 'calculated'
       
       query_for_removed = "SELECT o2.value_numeric FROM observations o2 WHERE o2.definition_id =
@@ -94,7 +91,7 @@ class Observation < ActiveRecord::Base
       result[site_name][obs.drug_name]["stock_level"] = obs.stock_level.blank? ? "Unknown" : obs.stock_level
       result[site_name][obs.drug_name]["rate"] = rates[obs.site_id][obs.drug_name].blank? ? "Unknown" :
         rates[obs.site_id][obs.drug_name]
-      result[site_name][obs.drug_name]["stockout_date"] = result[site_name][obs.drug_name]["stock_level"].to_i == 0 ? "Not applicable" :
+      result[site_name][obs.drug_name]["stockout_date"] = result[site_name][obs.drug_name]["stock_level"].to_i == 0 ? "No stock" :
         (obs.date.to_date + (obs.stock_level.to_i/rates[obs.site_id][obs.drug_name].to_f).round(0).days).strftime("%d %b, %Y")
       
     end

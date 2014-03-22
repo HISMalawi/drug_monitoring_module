@@ -73,7 +73,7 @@
 
     </tr>
     <tr>
-      <th style="width: 38%">Drug </th>
+      <th style="width: 37%">Drug </th>
       <th style="width: 13%">Total Prescribed</th>
       <th style="width: 13%">Total Dispensed</th>
       <th style="width: 13%">Consumption rate <br /><sub style="font-size: 12px;">( per day)</sub></th>
@@ -134,7 +134,8 @@
       row.style.width = "100%";
       
       var td1 = create("td", "table-data", drugs[i]);
-      td1.style.width = "38%";
+      td1.style.width = "37%";
+      td1.style.paddingLeft = "0px";
       row.appendChild(td1);
 
       var td2 = create("td", "table-data", data[drugs[i]]["prescribed"]);
