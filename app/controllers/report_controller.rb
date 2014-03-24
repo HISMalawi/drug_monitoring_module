@@ -117,12 +117,57 @@ class ReportController < ApplicationController
   end
 
   def stock_out_estimates
- 
-    @stocks = Observation.drug_stock_out_predictions(params[:type])
+    @stocks = {}
+    unless params[:name] && params[:name] == "months_of_stock"
+      @stocks = Observation.drug_stock_out_predictions(params[:type])      
+    end
+    @sites = Site.all.map(&:name) 
     @updates = Observation.site_update_dates
     render :layout => 'report_layout'
   end
 
+  def months_of_stock
+    
+    @site = params[:site_name]
+    @stocks = Observation.drug_stock_out_predictions(params[:type])
+    
+    @stocks_for_high_charts = filter(@stocks)
+        
+    @site_names = @stocks_for_high_charts.keys
+    @updates = Observation.site_update_dates
+    render :partial => "months_of_stock" and return
+  end
+
+  def filter(stocks)
+    result = {}
+    sites = stocks.keys
+    
+    drugs = []
+    sites.each do |site|
+      arr = []
+      
+      result[site] = stocks[site].keys.each do|drug|
+       
+        expected = (stocks[site][drug]["stock_level"].to_i/60)  rescue 0
+       
+        consumption_rate = ((stocks[site][drug]["rate"].to_i * 0.5) rescue 0)
+        months_of_stock = (expected/consumption_rate)  rescue 0
+        months_of_stock = months_of_stock.blank? ? 0 : (months_of_stock > 9 ? 9 : months_of_stock)
+
+        drugs << drug
+        arr << ["#{drug}", months_of_stock]
+      end
+      site_id = Site.find_by_name(site).id
+      Observation.find_by_sql("SELECT DISTINCT value_drug FROM observations WHERE value_numeric != 0 AND site_id = #{site_id}").map(&:value_drug).each do |drg|
+        next if  drg.blank? || drugs.include?(drg) #|| drg.match(/other|unknown/i)
+        arr << ["#{drg}", 0.9]
+      end
+      result[site] = arr
+    end
+    
+    return result
+  end
+  
   def drugs
 
     defns = Definition.where(:name=> ["prescription","dispensation"]).collect{|x| x.definition_id}
