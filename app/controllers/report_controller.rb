@@ -160,7 +160,7 @@ class ReportController < ApplicationController
       site_id = Site.find_by_name(site).id
       Observation.find_by_sql("SELECT DISTINCT value_drug FROM observations WHERE value_numeric != 0 AND site_id = #{site_id}").map(&:value_drug).each do |drg|
         next if  drg.blank? || drugs.include?(drg) #|| drg.match(/other|unknown/i)
-        arr << ["#{drg}", 0.9]
+        arr << ["#{drg}", 0]
       end
       result[site] = arr
     end
