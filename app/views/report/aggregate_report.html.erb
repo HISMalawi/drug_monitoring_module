@@ -16,6 +16,7 @@
 
             var prescriptions = [];
             var dispensations = [];
+            var relocations = [];
         <% (@disp_trend || []).each do |drug, values| %>
             var amounts = [];
         <% (values || []).each do |day,value|%>
@@ -30,6 +31,14 @@
             amounts.push([Date.UTC(<%= day.year %>,<%= day.month - 1 %>,<%= day.day %>),<%= value %>])
         <% end%>
             prescriptions.push({name:'<%= drug %>', data: amounts});
+        <% end %>
+
+        <% (@rel_trend || []).each do |drug, values| %>
+            var amounts = [];
+        <% (values || []).each do |day,value|%>
+            amounts.push([Date.UTC(<%= day.year %>,<%= day.month - 1 %>,<%= day.day %>),<%= value %>])
+        <% end%>
+            relocations.push({name:'<%= drug %>', data: amounts});
         <% end %>
 
             var chart = new Highcharts.Chart({
@@ -105,6 +114,42 @@
                 credits: {enabled: false}
             });
 
+            var chart = new Highcharts.Chart({
+                chart: {
+                    renderTo: "rel_trends"
+                },
+                xAxis: {
+
+                    title: {
+                        text: 'Days'
+                    },
+                    type:'datetime',
+                    dateTimeLabelFormats: { // don't display the dummy year
+                        month: '%e. %b',
+                        year: '%b'
+                    }
+
+                },
+                tooltip: {
+                    formatter: function() {
+                        return '<b>'+ this.series.name +'</b><br/>'+
+                                Highcharts.dateFormat('%e %b %Y', this.x) +': '+ this.y +' pills';
+                    }
+                },
+                yAxis: {
+                    title: {
+                        text: 'Dose Amounts'
+                    },
+                    min : 0
+                },
+                title: {
+                    text : "Drug Relocation Trend"
+                },
+                series: relocations,
+                exporting: { enabled: false },
+                credits: {enabled: false}
+            });
+
         }
         catch(ex)
         {
@@ -125,16 +170,23 @@
 <div style="text-align: center;">
   <table  style="width: 99%;margin-left: 0.5%;">
     <tr>
-      <td width="50%">
-        <div style="height: 100%;" class="graph">
+      <td width="35%">
+        <div style="height: 40vh;" class="graph">
           <div style="height: 98%;" id="pres_trends">
 
           </div>
         </div>
       </td>
       <td>
-        <div style="height: 100%;" class="graph">
-          <div  id="disp_trends">
+        <div style="height: 40vh;" class="graph">
+          <div style="height: 98%;" id="disp_trends">
+
+          </div>
+        </div>
+      </td>
+      <td width="30%">
+        <div style="height: 40vh;" class="graph">
+          <div style="height: 98%;" id="rel_trends">
 
           </div>
         </div>
@@ -147,11 +199,13 @@
   <table class="display" id="drugs" width="100%">
     <thead>
     <tr>
-      <th>Date</th>
-      <th>Drug</th>
-      <th>Amount Prescribed</th>
-      <th>Amount Dispensed</th>
-      <th>Difference</th>
+      <th style="width: 10%">Date</th>
+      <th style="width: 20%">Drug</th>
+      <th style="width: 15%">Amount Prescribed</th>
+      <th style="width: 15%">Amount Dispensed</th>
+      <th style="width: 15%">Amount Relocated</th>
+      <th style="width: 15%">People Who Received Drugs</th>
+      <th style="width: 10%">Difference</th>
     </tr>
     </thead>
     <tbody>
@@ -162,7 +216,10 @@
               <td><%= drug %></td>
               <td><%= number_with_delimiter(value["prescription"], :delimeter => ',') %></td>
               <td><%= number_with_delimiter(value["dispensation"], :delimeter => ',') %></td>
-              <td><%= number_with_delimiter(value["prescription"] - value["dispensation"], :delimeter => ',') %></td>
+              <td><%= number_with_delimiter(value["relocation"], :delimeter => ',') %></td>
+              <td><%= number_with_delimiter(value["ppo_who_received_drugs"], :delimeter => ',') %></td>
+              <% percent = ((value["prescription"].to_f - value["dispensation"].to_f)/value["prescription"].to_f).round(2) rescue 0 %>
+              <td><%= number_with_delimiter((value["prescription"] - value["dispensation"]), :delimeter => ',' ) %> (<%= percent.abs * 100 %>%)</td>
             </tr>
         <% end %>
     <% end %>

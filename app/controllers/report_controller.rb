@@ -12,6 +12,7 @@ class ReportController < ApplicationController
   def report_menu
     @sites = Site.all_sites
     @drugs = drugs
+
   end
 
   def process_report
@@ -36,8 +37,11 @@ class ReportController < ApplicationController
 
     prescription_id = Definition.where(:name => "prescription").first.id
     dispensation_id = Definition.where(:name => "dispensation").first.id
+    relocation_id = Definition.where(:name => "relocation").first.id
+    drug_given_to_id = Definition.where(:name => "People who received drugs").first.id
+    defns = [prescription_id,dispensation_id, relocation_id, drug_given_to_id]
     site = Site.find_by_name(params[:site])
-    defns = [prescription_id,dispensation_id]
+
     @values = {}
     obs = Observation.find(:all,:order => "value_date DESC",
       :conditions => ["definition_id in (?) AND site_id = ? AND value_date >= ? AND value_date <= ?",
@@ -45,11 +49,15 @@ class ReportController < ApplicationController
     (obs || []).each do |record|
 
       @values[record.value_date] = {} unless !@values[record.value_date].blank?
-      @values[record.value_date][record.value_drug] = {"prescription" => 0, "dispensation" => 0} unless !@values[record.value_date][record.value_drug].blank?
+      @values[record.value_date][record.value_drug] = {"prescription" => 0, "dispensation" => 0, "relocation" => 0, "ppo_who_received_drugs" => 0} unless !@values[record.value_date][record.value_drug].blank?
       if record.definition_id == prescription_id
         @values[record.value_date][record.value_drug]["prescription"] = (@values[record.value_date][record.value_drug]["prescription"] + record.value_numeric)
-      else
+      elsif record.definition_id == dispensation_id
         @values[record.value_date][record.value_drug]["dispensation"] = (@values[record.value_date][record.value_drug]["dispensation"] + record.value_numeric)
+      elsif record.definition_id == relocation_id
+        @values[record.value_date][record.value_drug]["relocation"] = (@values[record.value_date][record.value_drug]["relocation"] + record.value_numeric)
+      elsif record.definition_id == drug_given_to_id
+        @values[record.value_date][record.value_drug]["ppo_who_received_drugs"] = (@values[record.value_date][record.value_drug]["ppo_who_received_drugs"] + record.value_numeric)
       end
     end
 
@@ -61,12 +69,14 @@ class ReportController < ApplicationController
     @title = "Aggregate Report From #{params[:start_date].to_date.strftime("%d %b %Y")} To #{params[:end_date].to_date.strftime("%d %b %Y")}"
     prescription_id = Definition.where(:name => "prescription").first.id
     dispensation_id = Definition.where(:name => "dispensation").first.id
-    defns = [prescription_id,dispensation_id]
+    relocation_id = Definition.where(:name => "relocation").first.id
+    drug_given_to_id = Definition.where(:name => "People who received drugs").first.id
+    defns = [prescription_id,dispensation_id, relocation_id, drug_given_to_id]
     @values = {}
     @pres_trend = {}
     @disp_trend = {}
-    @pres_days = []
-    @disp_days = []
+    @rel_trend = {}
+
     obs = Observation.find_by_sql("SELECT value_date, definition_id, value_drug, SUM(value_numeric) AS value_numeric
                                   FROM observations where definition_id in (#{defns.join(',')}) and value_date >= '#{params[:start_date]}'
                                   AND value_date <= '#{params[:end_date]}' GROUP BY definition_id, value_date,value_drug
@@ -75,15 +85,21 @@ class ReportController < ApplicationController
     (obs || []).each do |record|
 
       @values[record.value_date] = {} unless !@values[record.value_date].blank?
-      @values[record.value_date][record.value_drug] = {"prescription" => 0, "dispensation" => 0} unless !@values[record.value_date][record.value_drug].blank?
+      @values[record.value_date][record.value_drug] = {"prescription" => 0, "dispensation" => 0, "relocation" => 0, "ppo_who_received_drugs" => 0} unless !@values[record.value_date][record.value_drug].blank?
       if record.definition_id == prescription_id
         @values[record.value_date][record.value_drug]["prescription"] = (@values[record.value_date][record.value_drug]["prescription"] + record.value_numeric)
         @pres_trend[record.value_drug].blank? ? @pres_trend[record.value_drug] = [[record.value_date,record.value_numeric]] : @pres_trend[record.value_drug] << [record.value_date,record.value_numeric]
-        @pres_days << record.value_date.to_time.utc.to_i
-      else
+
+      elsif record.definition_id == dispensation_id
         @values[record.value_date][record.value_drug]["dispensation"] = (@values[record.value_date][record.value_drug]["dispensation"] + record.value_numeric)
         @disp_trend[record.value_drug].blank? ? @disp_trend[record.value_drug] = [[record.value_date,record.value_numeric]] : @disp_trend[record.value_drug] << [record.value_date,record.value_numeric]
-        @disp_days << record.value_date
+
+      elsif record.definition_id == relocation_id
+        @values[record.value_date][record.value_drug]["relocation"] = (@values[record.value_date][record.value_drug]["relocation"] + record.value_numeric)
+        @rel_trend[record.value_drug].blank? ? @rel_trend[record.value_drug] = [[record.value_date,record.value_numeric]] : @rel_trend[record.value_drug] << [record.value_date,record.value_numeric]
+
+      elsif record.definition_id == drug_given_to_id
+        @values[record.value_date][record.value_drug]["ppo_who_received_drugs"] = (@values[record.value_date][record.value_drug]["ppo_who_received_drugs"] + record.value_numeric)
       end
     end
 
@@ -94,25 +110,33 @@ class ReportController < ApplicationController
     @title = "Drug Report For #{params[:drug]} From #{params[:start_date].to_date.strftime("%d %b %Y")} To #{params[:end_date].to_date.strftime("%d %b %Y")}"
     prescription_id = Definition.where(:name => "prescription").first.id
     dispensation_id = Definition.where(:name => "dispensation").first.id
-    defns = [prescription_id,dispensation_id]
+    relocation_id = Definition.where(:name => "relocation").first.id
+    drug_given_to_id = Definition.where(:name => "People who received drugs").first.id
+    defns = [prescription_id,dispensation_id, relocation_id, drug_given_to_id]
     @values = {}
     @prescription = 0
     @dispensation = 0
-    @days = []
+    @relocation = 0
+
     obs = Observation.find(:all,:order => "value_date ASC",
       :conditions => ["definition_id in (?) AND value_drug = ? AND value_date >= ? AND value_date <= ?",defns,params[:drug],params[:start_date],params[:end_date]])
     (obs || []).each do |record|
-      @values[record.value_date] = {"prescription" => 0, "dispensation" => 0} unless !@values[record.value_date].blank?
-      @days << record.value_date
+      @values[record.value_date] = {"prescription" => 0, "dispensation" => 0, "relocation" => 0, "ppo_who_received_drugs" => 0} unless !@values[record.value_date].blank?
       if record.definition_id == prescription_id
         @values[record.value_date]["prescription"] = (@values[record.value_date]["prescription"] + record.value_numeric)
         @prescription += record.value_numeric
-      else
+      elsif record.definition_id == dispensation_id
         @values[record.value_date]["dispensation"] = (@values[record.value_date]["dispensation"] + record.value_numeric)
         @dispensation += record.value_numeric
+      elsif record.definition_id == relocation_id
+        @values[record.value_date]["relocation"] = (@values[record.value_date]["relocation"] + record.value_numeric)
+        @relocation += record.value_numeric
+      else
+        @values[record.value_date]["ppo_who_received_drugs"] = (@values[record.value_date]["ppo_who_received_drugs"] + record.value_numeric)
       end
     end
-    @days = @days.uniq!
+    @days = @values.keys
+
     render :layout => 'report_layout'
   end
 
@@ -125,10 +149,8 @@ class ReportController < ApplicationController
 
   def drugs
 
-    defns = Definition.where(:name=> ["prescription","dispensation"]).collect{|x| x.definition_id}
 
-    drug_list = Observation.find_by_sql("SELECT DISTINCT value_drug FROM observations "+
-        " WHERE definition_id in (#{defns.join(',')})").collect{|x| x.value_drug}
+    drug_list = Observation.find_by_sql("SELECT DISTINCT value_drug FROM observations ").collect{|x| x.value_drug}
 
     return drug_list
   end
