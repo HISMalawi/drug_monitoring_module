@@ -12,31 +12,10 @@
 
     function graph()
     {
-        /*
-         var image = document.getElementById('pic');
-         var data = image.getAttribute('src');
-         var pics = ['/images/view_doc.png','/images/rails.png', '/images/download.png']
-         var i = pics.indexOf(data);
-         image.setAttribute("src", pics[((i+1)%3)])
-         */
 
-        var graph = parseInt((Math.random() * 10) % 2);
+       sort_line();
+       line_graph();
 
-        if (graph == 0)
-        {
-            sort_line();
-            line_graph();
-        }
-        else if (graph == 1)
-        {
-            sort_pie();
-            pie_chart()
-        }
-        else
-        {
-            sort_line();
-            stacked_bar_graph();
-        }
     };
 
     function sort_line()

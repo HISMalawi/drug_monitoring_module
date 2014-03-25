@@ -108,17 +108,30 @@ class HomeController < ApplicationController
 
     prescription_id = Definition.where(:name => "prescription").first.id
     dispensation_id = Definition.where(:name => "dispensation").first.id
+    relocation_id = Definition.where(:name => "relocation").first.id
+    defns = [prescription_id,dispensation_id, relocation_id]
 
-    start = Date.today - 6.days
-    end_date = Date.today
-    prescriptions = Observation.where(:definition_id => prescription_id, :value_date => start..end_date).order("value_date asc")
-    dispensations = Observation.where(:definition_id => dispensation_id,:value_date => start..end_date).order("value_date asc")
+    @pres_trend = {}
+    @disp_trend = {}
+    @rel_trend = {}
 
-    disp_line,pres_line,disp_pie,pres_pie = graph_data_sorter(dispensations,prescriptions,days)
+    obs = Observation.find_by_sql("SELECT value_date, definition_id, value_drug, SUM(value_numeric) AS value_numeric
+                                  FROM observations where definition_id in (#{defns.join(',')}) and value_date IN (#{days.join(',')})
+                                  GROUP BY definition_id, value_date,value_drug ORDER BY value_date ASC")
 
-    data = {"dispensation_line" => disp_line,"dispensation_pie" => disp_pie,
-            "prescription_line" => pres_line,"prescription_pie" => pres_pie}
-    return data
+    (obs || []).each do |record|
+
+
+      if record.definition_id == prescription_id
+        @pres_trend[record.value_drug].blank? ? @pres_trend[record.value_drug] = [[record.value_date,record.value_numeric]] : @pres_trend[record.value_drug] << [record.value_date,record.value_numeric]
+
+      elsif record.definition_id == dispensation_id
+        @disp_trend[record.value_drug].blank? ? @disp_trend[record.value_drug] = [[record.value_date,record.value_numeric]] : @disp_trend[record.value_drug] << [record.value_date,record.value_numeric]
+
+      elsif record.definition_id == relocation_id
+        @rel_trend[record.value_drug].blank? ? @rel_trend[record.value_drug] = [[record.value_date,record.value_numeric]] : @rel_trend[record.value_drug] << [record.value_date,record.value_numeric]
+      end
+    end
   end
 
   def graph_data_sorter(dispensations, prescriptions, days = nil)
