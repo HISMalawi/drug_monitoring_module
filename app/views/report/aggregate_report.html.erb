@@ -22,7 +22,7 @@
         <% (values || []).each do |day,value|%>
             amounts.push([Date.UTC(<%= day.year %>,<%= day.month - 1 %>,<%= day.day %>),<%= value %>])
         <% end%>
-            dispensations.push({name:'<%= drug %>', data: amounts});
+            dispensations.push({name:'<%= drug %>', data: amounts, visible:false});
         <% end %>
 
         <% (@pres_trend || []).each do |drug, values| %>
@@ -30,7 +30,7 @@
         <% (values || []).each do |day,value|%>
             amounts.push([Date.UTC(<%= day.year %>,<%= day.month - 1 %>,<%= day.day %>),<%= value %>])
         <% end%>
-            prescriptions.push({name:'<%= drug %>', data: amounts});
+            prescriptions.push({name:'<%= drug %>', data: amounts, visible:false});
         <% end %>
 
         <% (@rel_trend || []).each do |drug, values| %>
@@ -38,7 +38,7 @@
         <% (values || []).each do |day,value|%>
             amounts.push([Date.UTC(<%= day.year %>,<%= day.month - 1 %>,<%= day.day %>),<%= value %>])
         <% end%>
-            relocations.push({name:'<%= drug %>', data: amounts});
+            relocations.push({name:'<%= drug %>', data: amounts, visible:false});
         <% end %>
 
             var chart = new Highcharts.Chart({

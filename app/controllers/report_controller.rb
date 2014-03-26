@@ -135,7 +135,7 @@ class ReportController < ApplicationController
         @values[record.value_date]["ppo_who_received_drugs"] = (@values[record.value_date]["ppo_who_received_drugs"] + record.value_numeric)
       end
     end
-    @days = @values.keys
+    @days = @values.keys.sort!
 
     render :layout => 'report_layout'
   end

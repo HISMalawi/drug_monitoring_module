@@ -70,8 +70,8 @@
           var dispensations = [];
           var relocations = [];
 
-          <% (@days || []).each do |day| %>
-                prescriptions.push([Date.UTC(<%= day.year %>,<%= day.month - 1 %>,<%= day.day %>), <%= @values[day]['prescription'] %>]);
+        <% (@days || []).each do |day|%>
+                prescriptions.push([Date.UTC(<%= day.strftime('%Y') %>,<%= day.strftime('%m').to_i - 1 %>,<%= day.strftime('%d') %>), <%= @values[day]['prescription'] %>]);
                 dispensations.push([Date.UTC(<%= day.year %>,<%= day.month - 1 %>,<%= day.day %>),<%= @values[day]['dispensation'] %>]);
                 relocations.push([Date.UTC(<%= day.year %>,<%= day.month - 1 %>,<%= day.day %>),<%= @values[day]['relocation'] %>]);
           <% end %>
