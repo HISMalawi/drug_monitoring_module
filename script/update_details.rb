@@ -3,6 +3,9 @@ require 'rest-client'
 
 $prescription_id = Definition.where(:name => "prescription").first.id
 $dispensation_id = Definition.where(:name => "dispensation").first.id
+$relocation_id = Definition.where(:name => "relocation").first.id
+$drug_given_to_id = Definition.where(:name => "People who received drugs").first.id
+$drug_prescribed_id = Definition.where(:name => "People prescribed drug").first.id
  
 def start
 
@@ -11,6 +14,7 @@ def start
     puts "Getting Data For Site #{key}"
     unless value.blank?
       date = Date.today
+
       url = "http://#{value}/drug/art_summary_dispensation?date=#{date}"
       data = JSON.parse(RestClient::Request.execute(:method => :post, :url => url, :timeout => 100000000)) rescue (
         puts "**** Error when pulling data from site #{key}"
@@ -32,6 +36,12 @@ def record(site, date,data)
         :value_drug => key,
         :value_date => date
       })
+    Observation.create({:site_id => site.id,
+                        :definition_id => $drug_prescribed_id,
+                        :value_numeric => prescription['total_patients'],
+                        :value_drug => key,
+                        :value_date => date
+                       })
   end
 
   (data['dispensations'] || []).each do |key,dispensation|
@@ -41,6 +51,23 @@ def record(site, date,data)
         :value_drug => key,
         :value_date => date
       })
+    Observation.create({:site_id => site.id,
+                        :definition_id => $drug_given_to_id,
+                        :value_numeric => dispensation['total_patients'],
+                        :value_drug => key,
+                        :value_date => date
+                       })
+  end
+
+  (data['relocations'] || []).each do |key,relocation|
+    next if relocation["relocated"] == 0
+    Observation.create({:site_id => site.id,
+                        :definition_id => $relocation_id,
+                        :value_numeric => relocation['relocated'],
+                        :value_drug => key,
+                        :value_date => date
+                       })
+
   end
 
   (data['stock_level'].keys || []).each do |drug|

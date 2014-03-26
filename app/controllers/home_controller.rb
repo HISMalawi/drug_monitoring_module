@@ -14,35 +14,8 @@ class HomeController < ApplicationController
     (0..6).each do |i|
       @days << (start + i.days ).strftime('%A')
     end
-    aggregates = aggregate(@days)
-    drugs = drug()
-
-    @disp_line_data_list = aggregates["dispensation_line"]
-    @pres_line_data_list = aggregates["prescription_line"]
-
-    @aggregate_pres_pie = []
-    @aggregate_disp_pie = []
-
-    (aggregates["prescription_pie"] || []).each do |drug, value|
-      @aggregate_pres_pie << [drug,value]
-    end
-    (aggregates["dispensation_pie"] || []).each do |drug, value|
-      @aggregate_disp_pie << [drug,value]
-    end
-
-    @drug_disp_line_data_list = drugs["dispensation_line"]
-    @drug_pres_line_data_list = drugs["prescription_line"]
-
-    @drug_pres_pie = []
-    @drug_disp_pie = []
-
-    (drugs["prescription_pie"] || []).each do |drug, value|
-      @drug_pres_pie << [drug,value]
-    end
-    (drugs["dispensation_pie"] || []).each do |drug, value|
-      @drug_disp_pie << [drug,value]
-    end
-
+    @pres_trend, @disp_trend, @rel_trend = aggregate()
+    @drug_pres_trend, @drug_disp_trend, @drug_rel_trend = drug()
 
   end
 
@@ -79,46 +52,73 @@ class HomeController < ApplicationController
 
     prescription_id = Definition.where(:name => "prescription").first.id
     dispensation_id = Definition.where(:name => "dispensation").first.id
-    start = Date.today - 6.days
+    relocation_id = Definition.where(:name => "relocation").first.id
+    defns = [prescription_id,dispensation_id, relocation_id]
+    start = Date.today - 30.days
     end_date = Date.today
+    pres_trend = {}
+    disp_trend = {}
+    rel_trend = {}
 
     highest_frequencies = Observation.find_by_sql("SELECT DISTINCT value_drug, SUM(value_numeric) AS amounts FROM observations "+
-                                      " WHERE definition_id in (#{prescription_id}, #{dispensation_id}) AND value_date BETWEEN #{start} AND "+
-                                      "  #{end_date} order by amounts DESC LIMIT 10").collect{|x| x.value_drug}
+                                      " WHERE definition_id in (#{prescription_id}) AND value_date BETWEEN '#{start}' AND "+
+                                      "  '#{end_date}' GROUP BY value_drug ORDER BY amounts DESC LIMIT 10").collect{|x| x.value_drug}
 
 
-    dispensations = Observation.where(:definition_id => dispensation_id,
-                                      :value_drug => highest_frequencies,
-                                      :value_date => start..end_date).order("value_date asc")
+    obs = Observation.find(:all, :conditions => ["definition_id in (?) AND value_drug in (?) AND value_date >= ? AND value_date <= ?",
+                                          defns,highest_frequencies, start, end_date], :order =>"value_date asc")
 
-    prescriptions = Observation.where(:definition_id => prescription_id,
-                                      :value_drug => highest_frequencies,
-                                      :value_date => start..end_date).order("value_date asc")
+    (obs || []).each do |record|
 
-    disp_line,pres_line,disp_pie,pres_pie = graph_data_sorter(dispensations,prescriptions)
 
-    data = {"dispensation_line" => disp_line,"dispensation_pie" => disp_pie,
-            "prescription_line" => pres_line,"prescription_pie" => pres_pie}
+      if record.definition_id == prescription_id
+        pres_trend[record.value_drug].blank? ? pres_trend[record.value_drug] = [[record.value_date,record.value_numeric]] : pres_trend[record.value_drug] << [record.value_date,record.value_numeric]
 
-    return data
+      elsif record.definition_id == dispensation_id
+        disp_trend[record.value_drug].blank? ? disp_trend[record.value_drug] = [[record.value_date,record.value_numeric]] : disp_trend[record.value_drug] << [record.value_date,record.value_numeric]
+
+      elsif record.definition_id == relocation_id
+        rel_trend[record.value_drug].blank? ? rel_trend[record.value_drug] = [[record.value_date,record.value_numeric]] : rel_trend[record.value_drug] << [record.value_date,record.value_numeric]
+      end
+    end
+
+    return pres_trend, disp_trend, rel_trend
+
 
   end
 
-  def aggregate(days)
+  def aggregate()
 
     prescription_id = Definition.where(:name => "prescription").first.id
     dispensation_id = Definition.where(:name => "dispensation").first.id
-
+    relocation_id = Definition.where(:name => "relocation").first.id
+    defns = [prescription_id,dispensation_id, relocation_id]
     start = Date.today - 6.days
     end_date = Date.today
-    prescriptions = Observation.where(:definition_id => prescription_id, :value_date => start..end_date).order("value_date asc")
-    dispensations = Observation.where(:definition_id => dispensation_id,:value_date => start..end_date).order("value_date asc")
+    pres_trend = {}
+    disp_trend = {}
+    rel_trend = {}
 
-    disp_line,pres_line,disp_pie,pres_pie = graph_data_sorter(dispensations,prescriptions,days)
+    obs = Observation.find_by_sql("SELECT value_date, definition_id, value_drug, SUM(value_numeric) AS value_numeric
+                                  FROM observations where definition_id in (#{defns.join(',')}) and value_date >= '#{start}'
+                                  AND value_date <= '#{end_date}' GROUP BY definition_id, value_date,value_drug
+                                  ORDER BY value_date ASC")
 
-    data = {"dispensation_line" => disp_line,"dispensation_pie" => disp_pie,
-            "prescription_line" => pres_line,"prescription_pie" => pres_pie}
-    return data
+    (obs || []).each do |record|
+
+
+      if record.definition_id == prescription_id
+        pres_trend[record.value_drug].blank? ? pres_trend[record.value_drug] = [[record.value_date,record.value_numeric]] : pres_trend[record.value_drug] << [record.value_date,record.value_numeric]
+
+      elsif record.definition_id == dispensation_id
+        disp_trend[record.value_drug].blank? ? disp_trend[record.value_drug] = [[record.value_date,record.value_numeric]] : disp_trend[record.value_drug] << [record.value_date,record.value_numeric]
+
+      elsif record.definition_id == relocation_id
+        rel_trend[record.value_drug].blank? ? rel_trend[record.value_drug] = [[record.value_date,record.value_numeric]] : rel_trend[record.value_drug] << [record.value_date,record.value_numeric]
+      end
+    end
+
+    return pres_trend, disp_trend, rel_trend
   end
 
   def graph_data_sorter(dispensations, prescriptions, days = nil)

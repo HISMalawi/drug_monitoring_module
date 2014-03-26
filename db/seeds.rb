@@ -33,7 +33,10 @@ definitions = [["Prescription", "Describes the number of precriptions"],
   ["Total dispensed","Dispensations ever" ],
   ["Total removed","Total pills removed [cumulative]" ],
   ["Clinic verification","Physically counted at clinic level" ],
-  ["Supervision verification","Physically counted at supervision level" ]
+  ["Supervision verification","Physically counted at supervision level" ],
+  ["People who received drugs", "Number of people to whom a drug was dispensed"],
+  ["People prescribed drug", "Number of people to whom a drug was prescribed"],
+  ["Relocation", "Drugs that expired, damaged or were transferred to other locations"]
 ]
 
 (definitions || []).each do |definition|

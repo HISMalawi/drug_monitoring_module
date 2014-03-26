@@ -19,11 +19,13 @@
   <table class="display" id="drugs" width="100%">
     <thead>
     <tr>
-      <th>Date</th>
-      <th>Drug</th>
-      <th>Amount Prescribed</th>
-      <th>Amount Dispensed</th>
-      <th>Difference</th>
+      <th style="width: 10%">Date</th>
+      <th style="width: 20%">Drug</th>
+      <th style="width: 15%">Amount Prescribed</th>
+      <th style="width: 15%">Amount Dispensed</th>
+      <th style="width: 15%">Amount Relocated</th>
+      <th style="width: 15%">People Who Received Drugs</th>
+      <th style="width: 10%">Difference</th>
     </tr>
     </thead>
     <tbody>
@@ -34,7 +36,9 @@
               <td><%= drug %></td>
               <td><%= number_with_delimiter(value["prescription"], :delimeter => ',') %></td>
               <td><%= number_with_delimiter(value["dispensation"], :delimeter => ',') %></td>
-              <% percent = ((value["prescription"].to_f - value["dispensation"].to_f)/value["prescription"].to_f).round(2) %>
+              <td><%= number_with_delimiter(value["relocation"], :delimeter => ',') %></td>
+              <td><%= number_with_delimiter(value["ppo_who_received_drugs"], :delimeter => ',') %></td>
+              <% percent = ((value["prescription"].to_f - value["dispensation"].to_f)/value["prescription"].to_f).round(2) rescue 0 %>
               <td><%= number_with_delimiter(value["prescription"] - value["dispensation"], :delimeter => ',') %> (<%= percent.abs %>%)</td>
             </tr>
         <% end %>

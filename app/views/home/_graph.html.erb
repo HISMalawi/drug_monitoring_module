@@ -9,39 +9,72 @@
 
     var data = [];
     var title = '';
+    var prescriptions = [];
+    var dispensations = [];
+    var relocations = [];
+    var drug_prescriptions = [];
+    var drug_dispensations = [];
+    var drug_relocations = [];
+    <% (@disp_trend || []).each do |drug, values| %>
+    var amounts = [];
+    <% (values || []).each do |day,value|%>
+    amounts.push([Date.UTC(<%= day.year %>,<%= day.month - 1 %>,<%= day.day %>),<%= value %>])
+    <% end%>
+    dispensations.push({name:'<%= drug %>', data: amounts});
+    <% end %>
+
+    <% (@pres_trend || []).each do |drug, values| %>
+    var amounts = [];
+    <% (values || []).each do |day,value|%>
+    amounts.push([Date.UTC(<%= day.year %>,<%= day.month - 1 %>,<%= day.day %>),<%= value %>])
+    <% end%>
+    prescriptions.push({name:'<%= drug %>', data: amounts});
+    <% end %>
+
+    <% (@rel_trend || []).each do |drug, values| %>
+    var amounts = [];
+    <% (values || []).each do |day,value|%>
+    amounts.push([Date.UTC(<%= day.year %>,<%= day.month - 1 %>,<%= day.day %>),<%= value %>])
+    <% end%>
+    relocations.push({name:'<%= drug %>', data: amounts});
+    <% end %>
+
+    <% (@drug_disp_trend || []).each do |drug, values| %>
+    var amounts = [];
+    <% (values || []).each do |day,value|%>
+    amounts.push([Date.UTC(<%= day.year %>,<%= day.month - 1 %>,<%= day.day %>),<%= value %>])
+    <% end%>
+    drug_dispensations.push({name:'<%= drug %>', data: amounts});
+    <% end %>
+
+    <% (@drug_pres_trend || []).each do |drug, values| %>
+    var amounts = [];
+    <% (values || []).each do |day,value|%>
+    amounts.push([Date.UTC(<%= day.year %>,<%= day.month - 1 %>,<%= day.day %>),<%= value %>])
+    <% end%>
+    drug_prescriptions.push({name:'<%= drug %>', data: amounts});
+    <% end %>
+
+    <% (@drug_rel_trend || []).each do |drug, values| %>
+    var amounts = [];
+    <% (values || []).each do |day,value|%>
+    amounts.push([Date.UTC(<%= day.year %>,<%= day.month - 1 %>,<%= day.day %>),<%= value %>])
+    <% end%>
+    drug_relocations.push({name:'<%= drug %>', data: amounts});
+    <% end %>
+
 
     function graph()
     {
-        /*
-         var image = document.getElementById('pic');
-         var data = image.getAttribute('src');
-         var pics = ['/images/view_doc.png','/images/rails.png', '/images/download.png']
-         var i = pics.indexOf(data);
-         image.setAttribute("src", pics[((i+1)%3)])
-         */
 
-        var graph = parseInt((Math.random() * 10) % 2);
+       sort_line();
+       line_graph();
 
-        if (graph == 0)
-        {
-            sort_line();
-            line_graph();
-        }
-        else if (graph == 1)
-        {
-            sort_pie();
-            pie_chart()
-        }
-        else
-        {
-            sort_line();
-            stacked_bar_graph();
-        }
     };
 
     function sort_line()
     {
-        var graphs = ["aggregate disp", "aggregate pres", "drug_disp", "drug_pres"];
+        var graphs = ["aggregate disp", "aggregate pres","aggregate rel" ,"drug_disp", "drug_pres", "drug_rel"];
         var type = parseInt((Math.random() * 10) % 4);
         var graph = graphs[type];
 
@@ -49,35 +82,27 @@
         {
             case "aggregate disp":
                 title = "Drug Dispensation Aggregates Over The Last 7 Days"
-                data = [
-                    <%(@disp_line_data_list || []).each do |key,value|  %>
-                    {data: <%= value.to_json %> , name : '<%= key %>' },
-                    <% end %>
-                ];
+                data = dispensations;
                 break;
             case "aggregate pres":
                 title = "Drug Prescription Aggregates Over The Last 7 Days";
-                data = [
-                    <%(@pres_line_data_list || []).each do |key,value|  %>
-                    {data: <%= value.to_json %> , name : '<%= key %>' },
-                    <% end %>
-                ];
+                data = prescriptions;
+                break;
+            case "aggregate rel":
+                title = "Drug Relocation Aggregates Over The Last 7 Days";
+                data = relocations;
                 break;
             case "drug_disp":
                 title = "Top 10 Drug Dispensation Aggregates Over The Last 30 Days";
-                data = [
-                    <%(@disp_line_data_list || []).each do |key,value|  %>
-                    {data: <%= value.to_json %> , name : '<%= key %>' },
-                    <% end %>
-                ];
+                data = drug_dispensations;
+                break;
+            case "drug_rel" :
+                title = "Top 10 Drug Relocation Aggregates Over The Last 30 Days";
+                data = drug_relocations;
                 break;
             case "drug_pres" :
                 title = "Top 10 Drug Prescription Aggregates Over The Last 30 Days";
-                data = [
-                    <%(@pres_line_data_list || []).each do |key,value|  %>
-                    {data: <%= value.to_json %> , name : '<%= key %>' },
-                    <% end %>
-                ];
+                data = drug_prescriptions;
                 break;
         }
 
@@ -138,7 +163,14 @@
                 },
 
                 xAxis: {
-                    categories: [<% (@days || []).each do |day| %> '<%= day %>',<% end %> ]
+                    type:'datetime',
+                    dateTimeLabelFormats: { // don't display the dummy year
+                        month: '%e. %b',
+                        year: '%b'
+                    }
+                },
+                yAxis: {
+                    min: 0
                 },
                 title: {
                   text : title
@@ -280,7 +312,8 @@
     //-->
 </script>
 
-<div onLoad="graph()"  id="graph" style="border: 1.5px solid #000000; border-radius:10px;height: 15cm;width: 100%;">
+
+<div onLoad="graph()"  id="graph" style="height: 100%;border: 1px solid #000000;border-radius: 5px;">
 
 
 </div>
