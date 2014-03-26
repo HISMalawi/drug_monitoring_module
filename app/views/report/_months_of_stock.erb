@@ -10,10 +10,10 @@
       }
 
     </style>
-<%#= javascript_include_tag "Highcharts/js/jquery.min.js" %>
+
     <script type="text/javascript">
-      var site = "<%= @site%>"
       
+      var site = "<%= @site%>";
       var stocks = {};
 <%@site_names.each do |site|%>
     stocks["<%= site%>"] = []
@@ -24,13 +24,17 @@
  
   function getDates() {
     dates = [];
+    min = <%= params[:min] %>
+    max = <%= params[:max] %>
+    
     for(var i = 0; i < stocks[site].length; i++) {
-      dates.push(stocks[site][i][0]);
+      if (i >= min && i <= max){
+        dates.push(stocks[site][i][0]);
+      }
       
     }
     return dates;
   }
-
 
   $(function () {
     $('#container').highcharts({
@@ -125,19 +129,28 @@
   function dataG() {
     var correctedWeights = [];
     for(var i = 0; i < stocks[site].length; i++) {
+      if (i >= min && i <= max){
+        correctedWeights.push(parseFloat(stocks[site][i][1]));
+      }
     
-      correctedWeights.push(parseFloat(stocks[site][i][1]));
-     
     }
     
     return [{name: 'Month(s)', showInLegend: true, data: correctedWeights, Color: 'red', pointWidth: 25}];
   }
-  
+ 
     </script>
   </head>
   <body>
+    <div style="margin-left: 50%;">
+      <% if params[:min].to_i > 0 %>
+        <button  onclick='loadSiteChart(site, (min - 10), (max - 10))'>Back</button>
+      <%end%>
 
-    <div id="container" style="width: 100%; height: 100%; margin: 0 auto">
+      <% if params[:max].to_i < @stocks_for_high_charts[@site].length - 1 %>
+        <button  onclick='loadSiteChart(site, (min + 10), (max + 10))'>Next</button>
+      <%end%>
+    </div>
+    <div id="container" style="width: 100%; height: 90%; margin: 0 auto">
     </div>
   <style>
     path {

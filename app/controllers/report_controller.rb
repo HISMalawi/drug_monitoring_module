@@ -118,7 +118,7 @@ class ReportController < ApplicationController
 
   def stock_out_estimates
     @stocks = {}
-    unless params[:name] && params[:name] == "months_of_stock"
+    unless params[:name] && params[:name] == "months_of_stock" || params[:name] == "stock_movement"
       @stocks = Observation.drug_stock_out_predictions(params[:type])      
     end
     @sites = Site.all.map(&:name) 
@@ -148,10 +148,10 @@ class ReportController < ApplicationController
       
       result[site] = stocks[site].keys.each do|drug|
        
-        expected = (stocks[site][drug]["stock_level"].to_i/60)  rescue 0
+        expected = (stocks[site][drug]["stock_level"].to_i/60.0)  rescue 0
        
         consumption_rate = ((stocks[site][drug]["rate"].to_i * 0.5) rescue 0)
-        months_of_stock = (expected/consumption_rate)  rescue 0
+        months_of_stock = (consumption_rate == 0 && expected > 0) ? 9 : (expected/consumption_rate)  rescue 0
         months_of_stock = months_of_stock.blank? ? 0 : (months_of_stock > 9 ? 9 : months_of_stock)
 
         drugs << drug
@@ -162,10 +162,15 @@ class ReportController < ApplicationController
         next if  drg.blank? || drugs.include?(drg) #|| drg.match(/other|unknown/i)
         arr << ["#{drg}", 0]
       end
-      result[site] = arr
+      result[site] = (arr || []).sort {|a,b| a[1] <=> b[1]}.reverse
     end
     
     return result
+  end
+
+  def stock_chart
+
+    
   end
   
   def drugs

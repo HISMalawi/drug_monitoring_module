@@ -64,7 +64,7 @@
 
       <td style="padding-left: 5%; font-size: 20px;"><span style="color: lightblue;font-weight: bold;">Select Site</span>
         <select id="sites" style="margin-left: 3%; width: <%= (@stocks.blank? ? "25%" : "50%")%>; font-size: 20px;" name="site_name" id='site'
-                onchange="loadSiteChart(this.value)">
+                onchange="loadSiteChart(this.value, 0, 9)">
                   <% (@sites || []).each do |site| %>
             <option><%= site %></option>
           <% end %>
@@ -97,9 +97,9 @@
   <%else%>
     <tr>
       <td id="chart" style="width: 100%; height: 585px;">
-         &nbsp;
+        &nbsp;
       </td>
-     
+
     </tr>
   <%end%>
 
@@ -128,11 +128,23 @@
       update_dates["<%= key %>"]["<%= k%>"] = "<%= v%>";
   <%end%>
 <%end%>
-
-  function loadSiteChart(site){
-   
+  try{
+    if (min > 0){
+  //Proceed
+  }
+  }catch(e){
+    min = 0;
+    max = 9;
+  }
+  
+  function loadSiteChart(site, min, max){
+    
     jQuery('#chart').empty();
-    jQuery('#chart').load('/report/months_of_stock?site_name=' + site);   
+<% if params[:name] == "months_of_stock" %>
+      jQuery('#chart').load('/report/months_of_stock?site_name=' + site + "&min=" + min + "&max=" + max);
+<% elsif params[:name] == "stock_movement" %>
+      jQuery('#chart').load('/report/months_of_stock?site_name=' + site + "&min=" + min + "&max=" + max);
+<%end%>
   }
  
   function loadSite(site)
@@ -199,7 +211,7 @@
     return node;
   }
 
-  loadSiteChart(document.getElementById("sites").value);
+  loadSiteChart(document.getElementById("sites").value, 0, 9);
   
   // loadSite(document.getElementById("sites").value);
   //holder = document.getElementById("data-holder")
