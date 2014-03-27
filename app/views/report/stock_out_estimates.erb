@@ -62,13 +62,22 @@
 
     <tr>
 
-      <td style="padding-left: 5%; font-size: 20px;"><span style="color: lightblue;font-weight: bold;">Select Site</span>
-        <select id="sites" style="margin-left: 3%; width: <%= (@stocks.blank? ? "25%" : "50%")%>; font-size: 20px;" name="site_name" id='site'
-                onchange="loadSiteChart(this.value, 0, 9)">
-                  <% (@sites || []).each do |site| %>
-            <option><%= site %></option>
-          <% end %>
-        </select>
+      <td style="padding-left: 5%; font-size: 20px;"><span style="color: lightblue;font-weight: bold;">Display results for :</span>
+        <%if params[:name] == "months_of_stock"%>
+          <select id="sites" style="margin-left: 3%; width: <%= (@stocks.blank? ? "25%" : "50%")%>; font-size: 20px;" name="site_name" id='site'
+                  onchange="loadSiteChart(this.value, 0, 9)">
+                    <% (@sites || []).each do |site| %>
+              <option><%= site %></option>
+            <% end %>
+          </select>
+        <%else%>
+          <select id="sites" style="margin-left: 3%; width: <%= (@stocks.blank? ? "25%" : "50%")%>; font-size: 20px;" name="site_name" id='site'
+                  onchange="loadSiteChart(this.value, 0, 9)">
+                    <% (@drugs || []).each do |site| %>
+              <option><%= site %></option>
+            <% end %>
+          </select>
+        <%end%>
       </td>
       <td>&nbsp</td>
       <td colspan="4" id ="date" style="padding-left: 0px; color: lightblue; font-weight: bold;">&nbsp</td>
@@ -127,23 +136,14 @@
   <%hash.each do |k, v|%>
       update_dates["<%= key %>"]["<%= k%>"] = "<%= v%>";
   <%end%>
-<%end%>
-  try{
-    if (min > 0){
-  //Proceed
-  }
-  }catch(e){
-    min = 0;
-    max = 9;
-  }
+<%end%>  
   
-  function loadSiteChart(site, min, max){
-    
-    jQuery('#chart').empty();
+  function loadSiteChart(site, min, max, drg){
+
 <% if params[:name] == "months_of_stock" %>
-      jQuery('#chart').load('/report/months_of_stock?site_name=' + site + "&min=" + min + "&max=" + max);
+      jQuery('#chart').empty().load('/report/months_of_stock?site_name=' + site + "&min=" + min + "&max=" + max);
 <% elsif params[:name] == "stock_movement" %>
-      jQuery('#chart').load('/report/months_of_stock?site_name=' + site + "&min=" + min + "&max=" + max);
+      jQuery('#chart').empty().load('/report/stock_movement?start_date=<%= params[:start_date] %>&end_date=<%= params[:end_date] %>&site_name=<%= params[:site_name] %>&drug_name=' + escape(site));
 <%end%>
   }
  
