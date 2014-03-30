@@ -184,8 +184,8 @@ class ReportController < ApplicationController
     
     drugs = []
     sites.each do |site|
-      arr = []
-      
+
+      arr = []      
       result[site] = stocks[site].keys.each do|drug|
        
         expected = (stocks[site][drug]["stock_level"].to_i/60.0)  rescue 0
@@ -229,8 +229,8 @@ class ReportController < ApplicationController
     data = Observation.find(:all,
       :select => ["value_drug, value_numeric, value_date"],
       :order => ["value_date"],
-      :conditions => ["site_id = ? AND definition_id = ? AND value_date BETWEEN ? AND ?",
-        site_id, definition_id, start_date, end_date])
+      :conditions => ["value_drug = ? AND site_id = ? AND definition_id = ? AND value_date BETWEEN ? AND ?",
+        params[:drug_name], site_id, definition_id, start_date, end_date])
     
     @drugs = data.map(&:value_drug).uniq
     data.each do |data|
