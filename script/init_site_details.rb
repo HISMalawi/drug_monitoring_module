@@ -9,7 +9,7 @@ $drug_prescribed_id = Definition.where(:name => "People prescribed drug").first.
 
 def get_dates
   dates = [] ; curr_date = Date.today
-  1.upto(30).collect do |n|
+  1.upto(90).collect do |n|
     dates << curr_date
     curr_date -= 1.day
   end
@@ -24,7 +24,6 @@ def start
     (dates || []).each do |date|
       puts "Getting Data For Site #{key}, Date: #{date.strftime('%A, %d %B %Y')}"
       unless value.blank?
-        date = Date.today
 
         url = "http://#{value}/drug/art_summary_dispensation?date=#{date}"
         data = JSON.parse(RestClient::Request.execute(:method => :post, :url => url, :timeout => 100000000)) rescue (
