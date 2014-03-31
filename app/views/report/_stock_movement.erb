@@ -73,7 +73,7 @@
         plotOptions: {
           area: {
             stacking: 'normal',
-            lineColor: '#666666',
+            lineColor: '#666666',            
             lineWidth: 2,
             marker: {
               lineWidth: 100,
@@ -95,7 +95,7 @@
    
       start_point = stocks[drug][0][0].split('-')
    
-      return [{name: 'Time', data: correctedWeights, pointStart: Date.UTC(start_point[0], (start_point[1] - 1), start_point[2]), pointInterval: 24 * 3600 * 1000}];
+      return [{name: 'Time', data: correctedWeights, negativeColor: 'red', pointStart: Date.UTC(start_point[0], (start_point[1] - 1), start_point[2]), pointInterval: 24 * 3600 * 1000}];
     }else{
       jQuery('#chart').empty().html("<span style='padding-left: 20.5%; width: 100%; text-align: center; font-size: 30px;'> \n\
     No stock details found for specified time range </span>")

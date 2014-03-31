@@ -192,7 +192,7 @@ class ReportController < ApplicationController
        
         consumption_rate = ((stocks[site][drug]["rate"].to_i * 0.5) rescue 0)
         months_of_stock = (consumption_rate == 0 && expected > 0) ? 9 : (expected/consumption_rate)  rescue 0
-        months_of_stock = months_of_stock.blank? ? 0 : (months_of_stock > 9 ? 9 : months_of_stock)
+        months_of_stock = (months_of_stock.blank? ? 0 : (months_of_stock > 9 ? 9 : months_of_stock)).to_f.round(2)
 
         drugs << drug
         arr << ["#{drug}", months_of_stock]
