@@ -5,6 +5,10 @@ class Observation < ActiveRecord::Base
   validates_presence_of :site_id
   validates_presence_of :definition_id
 
+  def get_short_form
+    DrugMap.where(:full_name => self.value_drug).first.short_name rescue self.value_drug
+  end
+
   def self.drug_stock_out_predictions(type = 'calculated')
     # ** This method calculates estimated stock out dates for drugs per each site
     # ** Based on daily consumption/dispensation rate
@@ -134,5 +138,6 @@ class Observation < ActiveRecord::Base
     }
     return result
   end
-  
+
+
 end

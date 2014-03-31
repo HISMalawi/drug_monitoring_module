@@ -49,15 +49,15 @@ class ReportController < ApplicationController
     (obs || []).each do |record|
 
       @values[record.value_date] = {} unless !@values[record.value_date].blank?
-      @values[record.value_date][record.value_drug] = {"prescription" => 0, "dispensation" => 0, "relocation" => 0, "ppo_who_received_drugs" => 0} unless !@values[record.value_date][record.value_drug].blank?
+      @values[record.value_date][record.get_short_form] = {"prescription" => 0, "dispensation" => 0, "relocation" => 0, "ppo_who_received_drugs" => 0} unless !@values[record.value_date][record.get_short_form].blank?
       if record.definition_id == prescription_id
-        @values[record.value_date][record.value_drug]["prescription"] = (@values[record.value_date][record.value_drug]["prescription"] + record.value_numeric)
+        @values[record.value_date][record.get_short_form]["prescription"] = (@values[record.value_date][record.get_short_form]["prescription"] + record.value_numeric)
       elsif record.definition_id == dispensation_id
-        @values[record.value_date][record.value_drug]["dispensation"] = (@values[record.value_date][record.value_drug]["dispensation"] + record.value_numeric)
+        @values[record.value_date][record.get_short_form]["dispensation"] = (@values[record.value_date][record.get_short_form]["dispensation"] + record.value_numeric)
       elsif record.definition_id == relocation_id
-        @values[record.value_date][record.value_drug]["relocation"] = (@values[record.value_date][record.value_drug]["relocation"] + record.value_numeric)
+        @values[record.value_date][record.get_short_form]["relocation"] = (@values[record.value_date][record.get_short_form]["relocation"] + record.value_numeric)
       elsif record.definition_id == drug_given_to_id
-        @values[record.value_date][record.value_drug]["ppo_who_received_drugs"] = (@values[record.value_date][record.value_drug]["ppo_who_received_drugs"] + record.value_numeric)
+        @values[record.value_date][record.get_short_form]["ppo_who_received_drugs"] = (@values[record.value_date][record.get_short_form]["ppo_who_received_drugs"] + record.value_numeric)
       end
     end
 

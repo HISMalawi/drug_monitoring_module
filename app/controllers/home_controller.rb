@@ -72,13 +72,13 @@ class HomeController < ApplicationController
 
 
       if record.definition_id == prescription_id
-        pres_trend[record.value_drug].blank? ? pres_trend[record.value_drug] = [[record.value_date,record.value_numeric]] : pres_trend[record.value_drug] << [record.value_date,record.value_numeric]
+        pres_trend[record.get_short_form].blank? ? pres_trend[record.get_short_form] = [[record.value_date,record.value_numeric]] : pres_trend[record.get_short_form] << [record.value_date,record.value_numeric]
 
       elsif record.definition_id == dispensation_id
-        disp_trend[record.value_drug].blank? ? disp_trend[record.value_drug] = [[record.value_date,record.value_numeric]] : disp_trend[record.value_drug] << [record.value_date,record.value_numeric]
+        disp_trend[record.get_short_form].blank? ? disp_trend[record.get_short_form] = [[record.value_date,record.value_numeric]] : disp_trend[record.get_short_form] << [record.value_date,record.value_numeric]
 
       elsif record.definition_id == relocation_id
-        rel_trend[record.value_drug].blank? ? rel_trend[record.value_drug] = [[record.value_date,record.value_numeric]] : rel_trend[record.value_drug] << [record.value_date,record.value_numeric]
+        rel_trend[record.get_short_form].blank? ? rel_trend[record.get_short_form] = [[record.value_date,record.value_numeric]] : rel_trend[record.get_short_form] << [record.value_date,record.value_numeric]
       end
     end
 
@@ -108,13 +108,13 @@ class HomeController < ApplicationController
 
 
       if record.definition_id == prescription_id
-        pres_trend[record.value_drug].blank? ? pres_trend[record.value_drug] = [[record.value_date,record.value_numeric]] : pres_trend[record.value_drug] << [record.value_date,record.value_numeric]
+        pres_trend[record.get_short_form].blank? ? pres_trend[record.get_short_form] = [[record.value_date,record.value_numeric]] : pres_trend[record.get_short_form] << [record.value_date,record.value_numeric]
 
       elsif record.definition_id == dispensation_id
-        disp_trend[record.value_drug].blank? ? disp_trend[record.value_drug] = [[record.value_date,record.value_numeric]] : disp_trend[record.value_drug] << [record.value_date,record.value_numeric]
+        disp_trend[record.get_short_form].blank? ? disp_trend[record.get_short_form] = [[record.value_date,record.value_numeric]] : disp_trend[record.get_short_form] << [record.value_date,record.value_numeric]
 
       elsif record.definition_id == relocation_id
-        rel_trend[record.value_drug].blank? ? rel_trend[record.value_drug] = [[record.value_date,record.value_numeric]] : rel_trend[record.value_drug] << [record.value_date,record.value_numeric]
+        rel_trend[record.get_short_form].blank? ? rel_trend[record.get_short_form] = [[record.value_date,record.value_numeric]] : rel_trend[record.get_short_form] << [record.value_date,record.value_numeric]
       end
     end
 

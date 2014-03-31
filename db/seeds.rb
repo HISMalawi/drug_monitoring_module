@@ -42,3 +42,6 @@ definitions = [["Prescription", "Describes the number of precriptions"],
 (definitions || []).each do |definition|
   new_definition = Definition.create({:name => definition[0], :description => definition[1]})
 end
+
+puts 'loading drug mappings'
+`rails runner #{Rails.root}/script/load_drug_maps.rb`
