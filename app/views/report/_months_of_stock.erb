@@ -1,0 +1,181 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Stock chart</title>
+    <style>
+
+      .highcharts-button {
+        display: none;
+      }
+
+    </style>
+
+    <script type="text/javascript">
+      
+      var site = "<%= @site%>";
+      var stocks = {};
+<%@site_names.each do |site|%>
+    stocks["<%= site%>"] = []
+  <%@stocks_for_high_charts[site].each do |drug|%>
+      stocks["<%= site%>"].push(["<%=  drug[0]%>", "<%=  drug[1]%>"])
+  <%end%>
+<%end%>
+ 
+  function getDates() {
+    dates = [];
+    min = <%= params[:min] %>
+    max = <%= params[:max] %>
+    
+    for(var i = 0; i < stocks[site].length; i++) {
+      if (i >= min && i <= max){
+        dates.push(stocks[site][i][0]);
+      }
+      
+    }
+    return dates;
+  }
+
+  $(function () {
+    $('#container').highcharts({
+      chart: {
+        type: 'bar'
+      },
+      title: {
+        text: 'ARV Stock/Consumption for <b>' + site + "</b>"
+      },
+      subtitle: {
+        text: ''
+      },
+      xAxis: {
+        categories:  getDates(),
+        labels: {
+          formatter: false,
+          overflow: 'justify',
+          rotation: false,
+          lineColor: 'black',
+          formatter: function() {
+            return this.value
+          },
+          style: {
+            color: 'black',
+            fontSize: '13px'
+          },
+          staggerLines: 2
+        },
+        reversed: true
+      },
+      yAxis: {
+        align: 'left',
+        plotBands: [{ // mark the weekend
+            color: '#66CDAA',
+            from: 2,
+            to: 5
+          },
+          { 
+            color: 'rgb(225, 225, 225)',
+            from: 0,
+            to: 2
+          },
+          {
+            color: 'rgb(225, 225, 225)',
+            from: 5,
+            to: 9
+          }],
+        tickInterval: 1,
+        startOnTick: false,
+        endOnTick: false,
+        min: 0,
+        max: 9,
+        title: {
+          enabled: false
+        },
+        labels: {
+          formatter: function() {
+
+            return this.value;
+          },
+          style: {
+            color: 'black',
+            fontSize: '20px'
+          },
+          align: 'center'
+        }
+      },
+      tooltip: {
+        shared: true,
+        valueSuffix: ' '
+      },
+      plotOptions: {
+        area: {
+          pointStart: 1940,
+          marker: {
+            enabled: false,
+            symbol: 'circle',
+            radius: 2,
+            states: {
+              hover: {
+                enabled: true
+              }
+            }
+          }
+        }
+      },
+      series: dataG()            
+                
+    });
+  });
+
+  function dataG() {
+    var correctedWeights = [];
+    for(var i = 0; i < stocks[site].length; i++) {
+      if (i >= min && i <= max){
+        correctedWeights.push(parseFloat(stocks[site][i][1]));
+      }    
+    }
+    
+    return [{name: 'Month(s) of stock', showInLegend: true, data: correctedWeights, color: 'blue', pointWidth: 25}];
+  }
+ 
+    </script>
+  </head>
+  <body>
+    <div style="margin-left: 50%;">
+      <% if params[:min].to_i > 0 %>
+        <button  onclick='loadSiteChart(site, (min - 10), (max - 10))'>Back</button>
+      <%end%>
+
+      <% if params[:max].to_i < @stocks_for_high_charts[@site].length - 1 %>
+        <button  onclick='loadSiteChart(site, (min + 10), (max + 10))'>Next</button>
+      <%end%>
+    </div>
+    <div id="container" style="width: 100%; height: 90%; margin: 0 auto">
+    </div>
+  <style>
+    path {
+      stroke: "" ! important;
+    }
+
+  </style>
+  <script>
+    function removeHighcharts() {
+
+      tspan = document.getElementsByTagName('tspan');
+      for(var i = 0; i < tspan.length; i++){
+        if(tspan[i].innerHTML == 'Highcharts.com'){
+          tspan[i].innerHTML = null;
+          break;
+        }
+      }
+
+    }
+
+    setInterval("removeHighcharts();",300);
+  </script>
+
+</body>
+</html>
+
+
+
+

@@ -61,36 +61,56 @@
   <table  class="fullpage header" width="100" cellspacing="5px" cellpadding="10px">
 
     <tr>
-      <td style="padding-left: 5%; font-size: 20px;"><span style="color: lightblue;font-weight: bold;">Select Site</span>
-        <select id="sites" style="margin-left: 3%; width: 50%; font-size: 20px;" name="site_name" id='site' onchange="loadSite(this.value)">
-          <% (@stocks.keys || []).each do |site| %>
-            <option><%= site %></option>
-          <% end %>
-        </select>
+
+      <td style="padding-left: 5%; font-size: 20px;"><span style="color: lightblue;font-weight: bold;">Display results for :</span>
+        <%if params[:name] == "months_of_stock"%>
+          <select id="sites" style="margin-left: 3%; width: <%= (@stocks.blank? ? "25%" : "50%")%>; font-size: 20px;" name="site_name" id='site'
+                  onchange="loadSiteChart(this.value, 0, 9)">
+                    <% (@sites || []).each do |site| %>
+              <option><%= site %></option>
+            <% end %>
+          </select>
+        <%else%>
+          <select id="sites" style="margin-left: 3%; width: <%= (@stocks.blank? ? "25%" : "50%")%>; font-size: 20px;" name="site_name" id='site'
+                  onchange="loadSiteChart(this.value, 0, 9)">
+                    <% (@drugs || []).each do |site| %>
+              <option><%= site %></option>
+            <% end %>
+          </select>
+        <%end%>
       </td>
       <td>&nbsp</td>
       <td colspan="4" id ="date" style="padding-left: 0px; color: lightblue; font-weight: bold;">&nbsp</td>
 
     </tr>
-    <tr>
-      <th style="width: 37%">Drug </th>
-      <th style="width: 13%">Total Prescribed</th>
-      <th style="width: 13%">Total Dispensed</th>
-      <th style="width: 13%">Consumption rate <br /><sub style="font-size: 12px;">( per day)</sub></th>
-      <th style="width: 13%">Stock level<br /><sub style="font-size: 12px;">( pills)</sub></th>
-      <th>Stockout date <br /><sub style="font-size: 12px;">( estimated)</sub></th>
-    </tr>
-    <tr>
-      <td colspan="6">
-        <div id ="data-holder" style="height: 535px; overflow: auto;">
-          <table id ="datalist"  style="width: 100%;" width="100" cellspacing="4px" cellpadding="10px">
+    <%  unless @stocks.blank? %>
+      <tr>
+        <th style="width: 37%">Drug </th>
+        <th style="width: 13%">Total Prescribed</th>
+        <th style="width: 13%">Total Dispensed</th>
+        <th style="width: 13%">Consumption rate <br /><sub style="font-size: 12px;">( per day)</sub></th>
+        <th style="width: 13%">Stock level<br /><sub style="font-size: 12px;">( pills)</sub></th>
+        <th>Stockout date <br /><sub style="font-size: 12px;">( estimated)</sub></th>
+      </tr>
+      <tr>
+        <td colspan="6">
+          <div id ="data-holder" style="height: 535px; overflow: auto;">
+            <table id ="datalist"  style="width: 100%;" width="100" cellspacing="4px" cellpadding="10px">
 
-          </table>
-        </div>
+            </table>
+          </div>
+        </td>
+      </tr>
+
+    </table>
+  <%else%>
+    <tr>
+      <td id="chart" style="width: 100%; height: 585px;">
+        &nbsp;
       </td>
-    </tr>
 
-  </table>
+    </tr>
+  <%end%>
 
 </div>
 
@@ -116,8 +136,21 @@
   <%hash.each do |k, v|%>
       update_dates["<%= key %>"]["<%= k%>"] = "<%= v%>";
   <%end%>
-<%end%>
+<%end%>  
+  
+  function loadSiteChart(site, min, max, drg){
 
+<% if params[:name] == "months_of_stock" %>
+      jQuery('#chart').empty().html("<span style='padding-left: 43.5%; width: 100%; text-align: center; font-size: 30px;'>Loading...</span>").load('/report/months_of_stock?site_name=' + site + "&min=" + min + "&max=" + max);
+<% elsif params[:name] == "stock_movement" %>
+  <%if @drugs.blank?%>
+        jQuery('#chart').empty().html("<span style='padding-left: 20.5%; width: 100%; text-align: center; font-size: 30px;'> \n\
+    No stock details found for specified time range </span>")
+  <%else%>
+        jQuery('#chart').empty().html("<span style='padding-left: 43.5%; width: 100%; text-align: center; font-size: 30px;'>Loading...</span>").load('/report/stock_movement?start_date=<%= params[:start_date] %>&end_date=<%= params[:end_date] %>&site_name=<%= params[:site_name] %>&drug_name=' + escape(site));
+  <%end%>
+<%end%>
+  }
  
   function loadSite(site)
   {
@@ -182,10 +215,12 @@
     }
     return node;
   }
+
+  loadSiteChart(document.getElementById("sites").value, 0, 9);
   
-  loadSite(document.getElementById("sites").value);
-  holder = document.getElementById("data-holder")
-  holder.style.height = screen.width * 0.39 + "px";
+  // loadSite(document.getElementById("sites").value);
+  //holder = document.getElementById("data-holder")
+  //holder.style.height = screen.width * 0.39 + "px";
 
   
   //-->

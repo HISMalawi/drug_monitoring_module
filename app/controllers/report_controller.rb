@@ -29,6 +29,9 @@ class ReportController < ApplicationController
     when "site report"
       site = params[:site_name]
       redirect_to :action => 'site_report', :site => site, :start_date => start_date, :end_date => end_date
+    when "stock movement"
+      redirect_to :action => 'stock_out_estimates', :start_date => start_date, :end_date => end_date, 
+        :type => "verified_by_supervision", :name => "stock_movement", :site_name => params[:site_name]
     end
   end
 
@@ -141,14 +144,130 @@ class ReportController < ApplicationController
   end
 
   def stock_out_estimates
- 
-    @stocks = Observation.drug_stock_out_predictions(params[:type])
+    @stocks = {}
+    
+    unless params[:name] && ["stock_movement", "months_of_stock"].include?(params[:name])
+      @stocks = Observation.drug_stock_out_predictions(params[:type])      
+    end
+
+    @sites = Site.all.map(&:name)
+    @drugs = []
+    if params[:name] == "stock_movement"
+      definition_id = Definition.where(:name => "Supervision verification").first.id
+      site_id = Site.find_by_name(params[:site_name]).id
+      @drugs = Observation.find(:all,
+        :select => ["value_drug"],
+        :order => ["value_date"],
+        :conditions => ["site_id = ? AND definition_id = ? AND value_date < ?",
+          site_id, definition_id, params[:end_date].to_date]).map(&:value_drug).uniq
+    end
+   
     @updates = Observation.site_update_dates
     render :layout => 'report_layout'
   end
 
-  def drugs
+  def months_of_stock
+    
+    @site = params[:site_name]
+    @stocks = Observation.drug_stock_out_predictions(params[:type])
+    
+    @stocks_for_high_charts = filter(@stocks)
+        
+    @site_names = @stocks_for_high_charts.keys
+    @updates = Observation.site_update_dates
+    render :partial => "months_of_stock" and return
+  end
 
+  def filter(stocks)
+    result = {}
+    sites = stocks.keys
+    
+    drugs = []
+    sites.each do |site|
+
+      arr = []      
+      result[site] = stocks[site].keys.each do|drug|
+       
+        expected = (stocks[site][drug]["stock_level"].to_i/60.0)  rescue 0
+       
+        consumption_rate = ((stocks[site][drug]["rate"].to_i * 0.5) rescue 0)
+        months_of_stock = (consumption_rate == 0 && expected > 0) ? 9 : (expected/consumption_rate)  rescue 0
+        months_of_stock = (months_of_stock.blank? ? 0 : (months_of_stock > 9 ? 9 : months_of_stock)).to_f.round(2)
+
+        drugs << drug
+        arr << ["#{drug}", months_of_stock]
+      end
+      site_id = Site.find_by_name(site).id
+      Observation.find_by_sql("SELECT DISTINCT value_drug FROM observations WHERE value_numeric != 0 AND site_id = #{site_id}").map(&:value_drug).each do |drg|
+        next if  drg.blank? || drugs.include?(drg) #|| drg.match(/other|unknown/i)
+        arr << ["#{drg}", 0]
+      end
+      result[site] = (arr || []).sort {|a,b| a[1] <=> b[1]}.reverse
+    end
+    
+    return result
+  end
+
+  def stock_movement
+
+    start_date = params[:start_date].to_date
+    end_date = params[:end_date].to_date
+
+    definition_id = Definition.where(:name => "Supervision verification").first.id
+    site_id = Site.find_by_name(params[:site_name]).id
+    
+    stocks = {}
+   
+    controlled_bound = (Observation.find(:last, :order => ["value_date ASC"],
+        :select => ["value_date"],
+        :conditions => ["value_drug = ? AND site_id = ? AND definition_id = ? AND DATE(value_date) < ?",
+          params[:drug_name], site_id, definition_id, start_date]).value_date.to_date rescue nil) || start_date
+   
+    data = Observation.find(:all,
+      :select => ["value_drug, value_numeric, value_date"],
+      :order => ["value_date"],
+      :conditions => ["value_drug = ? AND site_id = ? AND definition_id = ? AND value_date BETWEEN ? AND ?",
+        params[:drug_name], site_id, definition_id, controlled_bound, end_date])
+    
+    @drugs = data.map(&:value_drug).uniq
+    data.each do |data|
+    
+      stocks[data.value_drug] = {} unless stocks.keys.include?(data.value_drug)
+      value = data.value_numeric/60 rescue 0
+      
+      stocks[data.value_drug][data.value_date.to_date] = value 
+    end
+
+    n = controlled_bound
+    @stocks = {}
+    stocks.each do |drug, data|
+
+      @stocks[drug] = [] unless @stocks.keys.include?(drug)
+
+      latestcount = 0
+      while n <= params[:end_date].to_date
+      
+        if !data[n.to_date].blank? && data[n.to_date].to_i > 0
+          latestcount = data[n.to_date]
+        else
+          latestcount = latestcount - Observation.dispensed(drug, (n.to_date - 1.days))
+        end
+        @stocks[drug] << [n, latestcount] unless n.to_date < start_date.to_date
+        n = n + 1.day
+      end
+      n = controlled_bound
+    end
+   
+    @stocks.each{|k, arr|
+      @stocks[k] = arr.sort{|a,b|a[0].to_date <=> b[0].to_date}
+    }
+
+    puts "#{params[:drug_name]}"
+    
+    render :partial => "stock_movement" and return
+  end
+  
+  def drugs
 
     drug_list = Observation.find_by_sql("SELECT DISTINCT value_drug FROM observations ").collect{|x| x.value_drug}
 
