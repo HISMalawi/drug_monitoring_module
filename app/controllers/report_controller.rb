@@ -158,8 +158,8 @@ class ReportController < ApplicationController
       @drugs = Observation.find(:all,
         :select => ["value_drug"],
         :order => ["value_date"],
-        :conditions => ["site_id = ? AND definition_id = ? AND value_date BETWEEN ? AND ?",
-          site_id, definition_id, params[:start_date].to_date, params[:end_date].to_date]).map(&:value_drug).uniq
+        :conditions => ["site_id = ? AND definition_id = ? AND value_date < ?",
+          site_id, definition_id, params[:end_date].to_date]).map(&:value_drug).uniq
     end
    
     @updates = Observation.site_update_dates
@@ -210,27 +210,24 @@ class ReportController < ApplicationController
 
   def stock_movement
 
-    @drugs = drugs
     start_date = params[:start_date].to_date
     end_date = params[:end_date].to_date
 
-    @start_year = start_date.year
-    @start_month = start_date.to_date.month
-    @start_day = start_date.to_date.day
-
-    @end_year = end_date.to_date.year
-    @end_month = end_date.to_date.month
-    @end_day = end_date.to_date.day
-    
     definition_id = Definition.where(:name => "Supervision verification").first.id
     site_id = Site.find_by_name(params[:site_name]).id
     
     stocks = {}
+   
+    controlled_bound = (Observation.find(:last, :order => ["value_date ASC"],
+        :select => ["value_date"],
+        :conditions => ["value_drug = ? AND site_id = ? AND definition_id = ? AND DATE(value_date) < ?",
+          params[:drug_name], site_id, definition_id, start_date]).value_date.to_date rescue nil) || start_date
+   
     data = Observation.find(:all,
       :select => ["value_drug, value_numeric, value_date"],
       :order => ["value_date"],
       :conditions => ["value_drug = ? AND site_id = ? AND definition_id = ? AND value_date BETWEEN ? AND ?",
-        params[:drug_name], site_id, definition_id, start_date, end_date])
+        params[:drug_name], site_id, definition_id, controlled_bound, end_date])
     
     @drugs = data.map(&:value_drug).uniq
     data.each do |data|
@@ -241,20 +238,26 @@ class ReportController < ApplicationController
       stocks[data.value_drug][data.value_date.to_date] = value 
     end
 
-    n = end_date
+    n = controlled_bound
     @stocks = {}
     stocks.each do |drug, data|
 
       @stocks[drug] = [] unless @stocks.keys.include?(drug)
-      while n >= params[:start_date].to_date
-        
-        val = data[n.to_date].blank? ? 0 : data[n.to_date]
-        @stocks[drug] << [n, val]
-        n = n - 1.day
+
+      latestcount = 0
+      while n <= params[:end_date].to_date
+      
+        if !data[n.to_date].blank? && data[n.to_date].to_i > 0
+          latestcount = data[n.to_date]
+        else
+          latestcount = latestcount - Observation.dispensed(drug, (n.to_date - 1.days))
+        end
+        @stocks[drug] << [n, latestcount] unless n.to_date < start_date.to_date
+        n = n + 1.day
       end
-      n = end_date
+      n = controlled_bound
     end
-        
+   
     @stocks.each{|k, arr|
       @stocks[k] = arr.sort{|a,b|a[0].to_date <=> b[0].to_date}
     }

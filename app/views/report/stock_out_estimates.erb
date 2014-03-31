@@ -141,9 +141,14 @@
   function loadSiteChart(site, min, max, drg){
 
 <% if params[:name] == "months_of_stock" %>
-      jQuery('#chart').empty().load('/report/months_of_stock?site_name=' + site + "&min=" + min + "&max=" + max);
+      jQuery('#chart').empty().html("<span style='padding-left: 43.5%; width: 100%; text-align: center; font-size: 30px;'>Loading...</span>").load('/report/months_of_stock?site_name=' + site + "&min=" + min + "&max=" + max);
 <% elsif params[:name] == "stock_movement" %>
-      jQuery('#chart').empty().load('/report/stock_movement?start_date=<%= params[:start_date] %>&end_date=<%= params[:end_date] %>&site_name=<%= params[:site_name] %>&drug_name=' + escape(site));
+  <%if @drugs.blank?%>
+        jQuery('#chart').empty().html("<span style='padding-left: 20.5%; width: 100%; text-align: center; font-size: 30px;'> \n\
+    No stock details found for specified time range </span>")
+  <%else%>
+        jQuery('#chart').empty().html("<span style='padding-left: 43.5%; width: 100%; text-align: center; font-size: 30px;'>Loading...</span>").load('/report/stock_movement?start_date=<%= params[:start_date] %>&end_date=<%= params[:end_date] %>&site_name=<%= params[:site_name] %>&drug_name=' + escape(site));
+  <%end%>
 <%end%>
   }
  

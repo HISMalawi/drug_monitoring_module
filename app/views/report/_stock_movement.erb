@@ -88,14 +88,19 @@
   plotGraph();
   function dataG() {
     var correctedWeights = [];
-
-    for(var i = 0; i < stocks[drug].length; i++) {
-      correctedWeights.push(parseInt(stocks[drug][i][1]));
+    if (stocks[drug]){
+      for(var i = 0; i < stocks[drug].length; i++) {
+        correctedWeights.push(parseInt(stocks[drug][i][1]));
+      }
+   
+      start_point = stocks[drug][0][0].split('-')
+   
+      return [{name: 'Time', data: correctedWeights, pointStart: Date.UTC(start_point[0], (start_point[1] - 1), start_point[2]), pointInterval: 24 * 3600 * 1000}];
+    }else{
+      jQuery('#chart').empty().html("<span style='padding-left: 20.5%; width: 100%; text-align: center; font-size: 30px;'> \n\
+    No stock details found for specified time range </span>")
+     
     }
-   
-    start_point = stocks[drug][0][0].split('-')
-   
-    return [{name: 'Time', data: correctedWeights, pointStart: Date.UTC(start_point[0], (start_point[1] - 1), start_point[2]), pointInterval: 24 * 3600 * 1000}];
   }
     </script>
   </head>

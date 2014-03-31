@@ -134,5 +134,16 @@ class Observation < ActiveRecord::Base
     }
     return result
   end
+
+  def self.dispensed(drug_name, date)
+
+    definition_id = Definition.find_by_name("Dispensation").id
+    d = Observation.find(:last,
+      :select => ["value_numeric"],
+      :conditions => ["definition_id = ? AND value_drug = ? AND value_date = ?",
+        definition_id, drug_name, date]).value_numeric.to_i rescue 0
+    puts (d/60).to_yaml if (d/60) > 0
+    return (d/60)
+  end
   
 end
