@@ -157,11 +157,11 @@
       <thead>
       <tr>
         <th>Date</th>
-        <th>Amount Prescribed</th>
-        <th>Amount Dispensed</th>
-        <th>Amount Relocated</th>
+        <th>Prescribed</th>
+        <th>Dispensed</th>
+        <th>Difference (Pres - Disp)</th>
+        <th>Relocated</th>
         <th>People Who Received Drugs</th>
-        <th>Difference</th>
       </tr>
       </thead>
       <tbody>
@@ -170,10 +170,10 @@
             <td><%= day.strftime('%d %B %Y') %></td>
             <td><%= number_with_delimiter(value["prescription"], :delimeter => ',') %></td>
             <td><%= number_with_delimiter(value["dispensation"], :delimeter => ',') %></td>
-            <td><%= number_with_delimiter(value["relocation"], :delimeter => ',') %></td>
-            <td><%= number_with_delimiter(value["ppo_who_received_drugs"], :delimeter => ',') %></td>
             <% percent = ((value["prescription"].to_f - value["dispensation"].to_f)/value["prescription"].to_f).round(2) rescue 0 %>
             <td><%= number_with_delimiter((value["prescription"] - value["dispensation"]), :delimeter => ',' ) %> (<%= percent.abs * 100 %>%)</td>
+            <td><%= number_with_delimiter(value["relocation"], :delimeter => ',') %></td>
+            <td><%= number_with_delimiter(value["ppo_who_received_drugs"], :delimeter => ',') %></td>
           </tr>
       <% end %>
       </tbody>
