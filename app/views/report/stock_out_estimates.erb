@@ -85,11 +85,13 @@
                     <% (@drugs || []).each do |dg| %>
               <option value="<%= dg%>"><%= @d_map[dg] %></option>
             <% end %>
-          </select>
-        <%end%>
+          </select>&nbsp&nbsp&nbsp&nbsp&nbsp&nbs<span style="color: lightblue; font-size: 16px;"><%=  params[:start_date].to_date.strftime("%d-%b-%Y") %></span>
+          <span style="color: rosybrown; font-size: 14px"> To </ span>
+            <span style="color: lightblue; font-size: 16px;"><%=   params[:end_date].to_date.strftime("%d-%b- %Y") rescue ("") %></span>
+          <%end%>
       </td>
       <td>&nbsp</td>
-      <td colspan="4" id ="date" style="padding-left: 0px; color: lightblue; font-weight: bold;">&nbsp</td>
+      <td id ="date" style="padding-left: 0px; color: lightblue; font-weight: bold;">&nbsp</td>
 
     </tr>
     <%  unless @stocks.blank? %>
@@ -153,7 +155,7 @@
 <% elsif params[:name] == "stock_movement" %>
   <%if @drugs.blank?%>
         jQuery('#chart').empty().html("<span style='padding-left: 20.5%; width: 100%; text-align: center; font-size: 30px;'> \n\
-                                                                    No stock details found for specified time range </span>")
+                                                                            No stock details found for specified time range </span>")
   <%else%>
         jQuery('#chart').empty().html("<span style='padding-left: 43.5%; width: 100%; text-align: center; font-size: 30px;'>Loading...</span>").load('/report/stock_movement?start_date=<%= params[:start_date] %>&end_date=<%= params[:end_date] %>&site_name=<%= params[:site_name] %>&drug_name=' + escape(site));
   <%end%>
