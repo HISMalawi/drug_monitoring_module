@@ -130,11 +130,13 @@
     var correctedWeights = [];
     for(var i = 0; i < stocks[site].length; i++) {
       if (i >= min && i <= max){
-        correctedWeights.push(parseFloat(stocks[site][i][1]));
+        var val = parseFloat(stocks[site][i][1]);
+        var col = (val <= 2) ? 'red' : (val >= 5 ? 'green' : 'yellow');
+        correctedWeights.push({y: val, color: col});
       }    
     }
     
-    return [{name: 'Month(s) of stock', showInLegend: true, data: correctedWeights, color: 'blue', pointWidth: 25}];
+    return [{name: 'Month(s) of stock', showInLegend: true, data: correctedWeights, pointWidth: 25}];
   }
  
     </script>
