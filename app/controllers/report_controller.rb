@@ -161,7 +161,8 @@ class ReportController < ApplicationController
         :conditions => ["site_id = ? AND definition_id = ? AND value_date < ?",
           site_id, definition_id, params[:end_date].to_date]).map(&:value_drug).uniq
     end
-   
+
+    @drug_map = drug_map    
     @updates = Observation.site_update_dates
     render :layout => 'report_layout'
   end
@@ -270,6 +271,13 @@ class ReportController < ApplicationController
   def drugs
 
     drug_list = Observation.find_by_sql("SELECT DISTINCT value_drug FROM observations ").collect{|x| x.value_drug}
+
+    return drug_list
+  end
+
+  def drug_map
+    
+    drug_list = Observation.find_by_sql("SELECT DISTINCT value_drug FROM observations ").collect{|x| [x.value_drug, x.get_short_form]}.uniq
 
     return drug_list
   end

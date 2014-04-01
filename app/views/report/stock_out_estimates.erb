@@ -55,6 +55,15 @@
   }
 
 </style>
+<script>
+  var drug_map = {}
+<%@drug_map.each do |map|%>
+    drug_map["<%= map[0]%>"] = "<%= map[1] %>"
+<%end
+
+@d_map = @drug_map.inject({}){|h, arr|next if arr.blank?;  h[arr[0]] = arr[1]; h}
+%>
+</script>
 
 <div class="stock-data">
 
@@ -64,17 +73,17 @@
 
       <td style="padding-left: 5%; font-size: 20px;"><span style="color: lightblue;font-weight: bold;">Display results for :</span>
         <%if params[:name] == "months_of_stock"%>
-          <select id="sites" style="margin-left: 3%; width: <%= (@stocks.blank? ? "25%" : "50%")%>; font-size: 20px;" name="site_name" id='site'
+          <select id="sites" style="margin-left: 3%; width: <%= (@stocks.blank? ? "25%" : "50%")%>; font-size: 20px;" name="site_name"
                   onchange="loadSiteChart(this.value, 0, 9)">
                     <% (@sites || []).each do |site| %>
               <option><%= site %></option>
             <% end %>
           </select>
         <%else%>
-          <select id="sites" style="margin-left: 3%; width: <%= (@stocks.blank? ? "25%" : "50%")%>; font-size: 20px;" name="site_name" id='site'
+          <select id="sites" style="margin-left: 3%; width: <%= (@stocks.blank? ? "25%" : "50%")%>; font-size: 20px;" name="site_name"
                   onchange="loadSiteChart(this.value, 0, 9)">
-                    <% (@drugs || []).each do |site| %>
-              <option><%= site %></option>
+                    <% (@drugs || []).each do |dg| %>
+              <option value="<%= dg%>"><%= @d_map[dg] %></option>
             <% end %>
           </select>
         <%end%>
@@ -118,7 +127,6 @@
   <!--
   var stocks = {};
   var update_dates = {};
-
 <%@stocks.keys.each do |key|%>
   
     stocks["<%= key %>"] = {};
@@ -145,7 +153,7 @@
 <% elsif params[:name] == "stock_movement" %>
   <%if @drugs.blank?%>
         jQuery('#chart').empty().html("<span style='padding-left: 20.5%; width: 100%; text-align: center; font-size: 30px;'> \n\
-    No stock details found for specified time range </span>")
+                                                                    No stock details found for specified time range </span>")
   <%else%>
         jQuery('#chart').empty().html("<span style='padding-left: 43.5%; width: 100%; text-align: center; font-size: 30px;'>Loading...</span>").load('/report/stock_movement?start_date=<%= params[:start_date] %>&end_date=<%= params[:end_date] %>&site_name=<%= params[:site_name] %>&drug_name=' + escape(site));
   <%end%>
