@@ -16,12 +16,15 @@
       var site = "<%= @site%>";
       var stocks = {};
       var current_level = {}
+      var consumption_rate = {}
 <%@site_names.each do |site|%>
     stocks["<%= site%>"] = []
     current_level["<%= site%>"] = {}
+    consumption_rate["<%= site%>"] = {}
   <%@stocks_for_high_charts[site].each do |drug|%>
       stocks["<%= site%>"].push(["<%=  drug[0]%>", "<%=  drug[1]%>"])
       current_level["<%= site%>"]["<%=  drug[0]%>"] = "<%=  drug[2]%>"
+      consumption_rate["<%= site%>"]["<%=  drug[0]%>"] = "<%=  drug[3]%>"
   <%end%>
 <%end%>
  
@@ -58,7 +61,7 @@
           rotation: false,
           lineColor: 'black',
           formatter: function() {
-            return (drug_map[this.value] + "<b>  - " + current_level[site][this.value] + " tins</b>")
+            return drug_map[this.value]
           },
           style: {
             color: 'black',
@@ -107,7 +110,19 @@
       },
       tooltip: {
         shared: true,
-        valueSuffix: ' '
+        useHTML: true,
+        valueSuffix: ' ',
+        formatter: function() {
+          
+          var stock_level_string = (this.y == 0) ? ' 0' : ' ' + 
+            ((parseInt(this.y) == 0) ? '' :  parseInt(this.y) + (parseInt(this.y) == 1 ? ' month ': ' months ')) +
+            parseInt((this.y*30 % 30)) + ( parseInt((this.y*30 % 30)) == 1 ? " day" :  " days");
+          
+          return '<span  style= "font-weight: bold; font-size : 12px;">' +
+            'Months of stock:  &nbsp&nbsp&nbsp<span style="color: #097054; " >' + stock_level_string + '</span> <br />' +
+            'Stock level:  &nbsp&nbsp&nbsp<span style="color: #097054; ">' + current_level[site][this.x] + ' tins</span><br />' +
+            'Consumption rate:  &nbsp&nbsp&nbsp<span style="color: #097054; ">' + parseInt(consumption_rate[site][this.x]) + ' tins/month</span> </span>';
+        }
       },
       plotOptions: {
         area: {

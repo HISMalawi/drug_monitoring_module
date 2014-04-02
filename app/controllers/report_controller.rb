@@ -191,17 +191,17 @@ class ReportController < ApplicationController
        
         expected = (stocks[site][drug]["stock_level"].to_i/60.0)  rescue 0
        
-        consumption_rate = ((stocks[site][drug]["rate"].to_i * 0.5) rescue 0)
+        consumption_rate = ((stocks[site][drug]["rate"].to_i * 0.5) rescue 0) # x pills/days == 0.5 tins of 60  per month
         months_of_stock = (consumption_rate == 0 && expected > 0) ? 9 : (expected/consumption_rate)  rescue 0
-        months_of_stock = (months_of_stock.blank? ? 0 : (months_of_stock > 9 ? 9 : months_of_stock)).to_f.round(2)
+        months_of_stock = (months_of_stock.blank? ? 0 :  months_of_stock).to_f.round(2)
 
         drugs << drug
-        arr << ["#{drug}", months_of_stock, expected.round]
+        arr << ["#{drug}", months_of_stock, expected.round, consumption_rate]
       end
       site_id = Site.find_by_name(site).id
       Observation.find_by_sql("SELECT DISTINCT value_drug FROM observations WHERE value_numeric != 0 AND site_id = #{site_id}").map(&:value_drug).each do |drg|
-        next if  drg.blank? || drugs.include?(drg) #|| drg.match(/other|unknown/i)
-        arr << ["#{drg}", 0, 0]
+        next if  drg.blank? || drugs.include?(drg) 
+        arr << ["#{drg}", 0, 0, 0]
       end
       result[site] = (arr || []).sort {|a,b| a[1] <=> b[1]}.reverse
     end
