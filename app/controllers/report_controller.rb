@@ -196,12 +196,12 @@ class ReportController < ApplicationController
         months_of_stock = (months_of_stock.blank? ? 0 : (months_of_stock > 9 ? 9 : months_of_stock)).to_f.round(2)
 
         drugs << drug
-        arr << ["#{drug}", months_of_stock]
+        arr << ["#{drug}", months_of_stock, expected.round]
       end
       site_id = Site.find_by_name(site).id
       Observation.find_by_sql("SELECT DISTINCT value_drug FROM observations WHERE value_numeric != 0 AND site_id = #{site_id}").map(&:value_drug).each do |drg|
         next if  drg.blank? || drugs.include?(drg) #|| drg.match(/other|unknown/i)
-        arr << ["#{drg}", 0]
+        arr << ["#{drg}", 0, 0]
       end
       result[site] = (arr || []).sort {|a,b| a[1] <=> b[1]}.reverse
     end

@@ -29,6 +29,18 @@ class Observation < ActiveRecord::Base
                                       AND o1.site_id = obs.site_id
                                       AND o1.value_drug = obs.value_drug
                             ORDER BY observation_id DESC LIMIT 1"
+
+    total_dispensed_daily = "SELECT SUM(od.value_numeric) FROM observations od WHERE od.definition_id =
+                                      (SELECT definition_id FROM definitions WHERE name = 'Dispensation' LIMIT 1)
+                                      AND od.site_id = obs.site_id
+                                      AND od.value_drug = obs.value_drug
+                                      AND od.value_date >= od.value_date"
+
+    later_supervisions = "SELECT SUM(od.value_numeric) FROM observations od WHERE od.definition_id =
+                                      (SELECT definition_id FROM definitions WHERE name = 'Supervision verification' LIMIT 1)
+                                      AND od.site_id = obs.site_id
+                                      AND od.value_drug = obs.value_drug
+                                      AND od.value_date >= od.value_date"
     if type == 'calculated'
       
       query_for_removed = "SELECT o2.value_numeric FROM observations o2 WHERE o2.definition_id =
@@ -63,8 +75,8 @@ class Observation < ActiveRecord::Base
 
       main_query = self.find_by_sql(
         "SELECT obs.site_id, obs.value_drug AS drug_name, obs.value_date AS date,
-                  (#{query_for_prescribed}) AS prescribed, (#{query_for_dispensed}) AS dispensed,
-                  obs.value_numeric AS stock_level
+                  (#{query_for_prescribed}) AS prescribed,
+                  (obs.value_numeric - (#{total_dispensed_daily})) AS stock_level
         FROM observations obs
                   WHERE obs.value_date =
                       (SELECT MAX(ob.value_date) FROM observations ob
@@ -90,8 +102,8 @@ class Observation < ActiveRecord::Base
       end
 
       result[site_name][obs.drug_name]["date"] = obs.date.to_date
-      result[site_name][obs.drug_name]["prescribed"] = obs.prescribed.blank? ? "Unknown" : obs.prescribed
-      result[site_name][obs.drug_name]["dispensed"] = obs.dispensed.blank? ? "Unknown" : obs.dispensed
+      #result[site_name][obs.drug_name]["prescribed"] = obs.prescribed.blank? ? "Unknown" : obs.prescribed
+      #result[site_name][obs.drug_name]["dispensed"] = (obs.dispensed.blank? ? "Unknown" : obs.dispensed)
       result[site_name][obs.drug_name]["stock_level"] = obs.stock_level.blank? ? "Unknown" : obs.stock_level
       result[site_name][obs.drug_name]["rate"] = rates[obs.site_id][obs.drug_name].blank? ? "Unknown" :
         rates[obs.site_id][obs.drug_name]

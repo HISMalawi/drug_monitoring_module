@@ -15,10 +15,13 @@
       
       var site = "<%= @site%>";
       var stocks = {};
+      var current_level = {}
 <%@site_names.each do |site|%>
     stocks["<%= site%>"] = []
+    current_level["<%= site%>"] = {}
   <%@stocks_for_high_charts[site].each do |drug|%>
       stocks["<%= site%>"].push(["<%=  drug[0]%>", "<%=  drug[1]%>"])
+      current_level["<%= site%>"]["<%=  drug[0]%>"] = "<%=  drug[2]%>"
   <%end%>
 <%end%>
  
@@ -55,7 +58,7 @@
           rotation: false,
           lineColor: 'black',
           formatter: function() {
-            return drug_map[this.value]
+            return (drug_map[this.value] + "<b>  - " + current_level[site][this.value] + " tins</b>")
           },
           style: {
             color: 'black',
