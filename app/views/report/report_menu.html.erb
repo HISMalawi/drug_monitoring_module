@@ -51,7 +51,7 @@
       <caption style="font-family: arial;font-size:34px;"><%= params[:type].titleize %> Details</caption>
 
 
-      <tr style="display:<%= ['site report', 'stock movement'].include?(params[:type]) ? '' : 'none' %> ">
+      <tr style="display:<%= ['site report', 'stock movement', 'delivery report'].include?(params[:type]) ? '' : 'none' %> ">
         <td id="site_lbl">Select Site</td>
         <td>
           <select name="site_name" id='site'>
@@ -81,7 +81,7 @@
       </tr>
 
       <tr style="display:<%= params[:type].eql?('delivery report') ? '' : 'none' %>" >
-        <td colspan="2" style="text-align: center;">OR <br />Enter Delivery Code Below</td>
+        <td colspan="2" style="text-align: center;">Or Enter Delivery Code Used</td>
       </tr>
       <tr style="display:<%= params[:type].eql?('delivery report') ? '' : 'none' %>" >
         <td id="delivery_code">Delivery Code</td>
