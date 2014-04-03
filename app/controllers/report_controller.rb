@@ -17,8 +17,8 @@ class ReportController < ApplicationController
 
   def process_report
 
-    start_date = params[:start_date].to_date.strftime("%Y-%m-%d")
-    end_date = params[:end_date].to_date.strftime("%Y-%m-%d")
+    start_date = params[:start_date].to_date.strftime("%Y-%m-%d") rescue "nil"
+    end_date = params[:end_date].to_date.strftime("%Y-%m-%d") rescue nil
 
     case params[:report_type]
     when "drug report"
@@ -32,6 +32,9 @@ class ReportController < ApplicationController
     when "stock movement"
       redirect_to :action => 'stock_out_estimates', :start_date => start_date, :end_date => end_date, 
         :type => "verified_by_supervision", :name => "stock_movement", :site_name => params[:site_name]
+    when "delivery report"
+      redirect_to :action => 'delivery_report', :start_date => start_date, :end_date => end_date,
+        :name => "delivery_report", :site_name => params[:site_name], :delivery_code => params[:delivery_code]
     end
   end
 
@@ -147,7 +150,7 @@ class ReportController < ApplicationController
     @stocks = {}
     
     unless params[:name] && ["stock_movement", "months_of_stock"].include?(params[:name])
-      @stocks = Observation.drug_stock_out_predictions(params[:type])      
+      @stocks = Observation.drug_stock_out_predictions(params[:type])
     end
 
     @sites = Site.all.map(&:name)
@@ -162,7 +165,7 @@ class ReportController < ApplicationController
           site_id, definition_id, params[:end_date].to_date]).map(&:value_drug).uniq
     end
 
-    @drug_map = drug_map    
+    @drug_map = drug_map
     @updates = Observation.site_update_dates
     render :layout => 'report_layout'
   end
@@ -186,7 +189,7 @@ class ReportController < ApplicationController
     drugs = []
     sites.each do |site|
 
-      arr = []      
+      arr = []
       result[site] = stocks[site].keys.each do|drug|
        
         expected = (stocks[site][drug]["stock_level"].to_i/60.0)  rescue 0
@@ -200,7 +203,7 @@ class ReportController < ApplicationController
       end
       site_id = Site.find_by_name(site).id
       Observation.find_by_sql("SELECT DISTINCT value_drug FROM observations WHERE value_numeric != 0 AND site_id = #{site_id}").map(&:value_drug).each do |drg|
-        next if  drg.blank? || drugs.include?(drg) 
+        next if  drg.blank? || drugs.include?(drg)
         arr << ["#{drg}", 0, 0, 0]
       end
       result[site] = (arr || []).sort {|a,b| a[1] <=> b[1]}.reverse
@@ -236,7 +239,7 @@ class ReportController < ApplicationController
       stocks[data.value_drug] = {} unless stocks.keys.include?(data.value_drug)
       value = data.value_numeric/60 rescue 0
       
-      stocks[data.value_drug][data.value_date.to_date] = value 
+      stocks[data.value_drug][data.value_date.to_date] = value
     end
 
     n = controlled_bound
@@ -280,5 +283,19 @@ class ReportController < ApplicationController
     drug_list = Observation.find_by_sql("SELECT DISTINCT value_drug FROM observations ").collect{|x| [x.value_drug, x.get_short_form]}.uniq
 
     return drug_list
+  end
+
+  def delivery_report
+
+    site = Site.find_by_name(params[:site_name])
+    return {} if site.blank?
+    site_id = site.id
+    start_date = params[:start_date] || nil
+    end_date = params[:end_date] || nil
+    delivery_code = params[:delivery_code] || nil
+    
+    data = Observation.deliveries(site_id, start_date, end_date, delivery_code)
+   # raise data.to_yaml
+    render :partial => "stock_movement" and return
   end
 end
