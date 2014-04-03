@@ -13,6 +13,7 @@
     <script type="text/javascript">
 
       var drug = "<%= params[:drug_name] %>";
+      
       var stocks = {};
 <%@stocks.keys.each do |drug|%>
     stocks["<%= drug%>"] = []
@@ -88,7 +89,7 @@
   plotGraph();
   function dataG() {
     var correctedWeights = [];
-    if (stocks[drug]){
+    try{
       for(var i = 0; i < stocks[drug].length; i++) {
         correctedWeights.push(parseInt(stocks[drug][i][1]));
       }
@@ -96,12 +97,12 @@
       start_point = stocks[drug][0][0].split('-')
    
       return [{name: 'Time', data: correctedWeights, negativeColor: 'red', pointStart: Date.UTC(start_point[0], (start_point[1] - 1), start_point[2]), pointInterval: 24 * 3600 * 1000}];
-    }else{
-      jQuery('#chart').empty().html("<span style='padding-left: 20.5%; width: 100%; text-align: center; font-size: 30px;'> \n\
+    }catch(e){
+        jQuery('#chart').empty().html("<span style='padding-left: 20.5%; width: 100%; text-align: center; font-size: 30px;'> \n\
     No stock details found for specified time range </span>")
      
+      }
     }
-  }
     </script>
   </head>
   <body>
@@ -110,22 +111,22 @@
     </div>
 
     <script>
-      function removeHighcharts() {
-        /*    try {
+        function removeHighcharts() {
+          /*    try {
           document.getElementsByClassName('highcharts-button')[0].innerHTML = null;
         }catch(e){}
-         */
-        tspan = document.getElementsByTagName('tspan');
-        for(var i = 0; i < tspan.length; i++){
-          if(tspan[i].innerHTML == 'Highcharts.com'){
-            tspan[i].innerHTML = null;
-            break;
+           */
+          tspan = document.getElementsByTagName('tspan');
+          for(var i = 0; i < tspan.length; i++){
+            if(tspan[i].innerHTML == 'Highcharts.com'){
+              tspan[i].innerHTML = null;
+              break;
+            }
           }
+
         }
 
-      }
-
-      setInterval("removeHighcharts();",300);
+        setInterval("removeHighcharts();",300);
     </script>
 
   </body>
