@@ -61,7 +61,7 @@
           </select>
         </td>
       </tr>
-      <tr style="display:<%= params[:type].eql?('drug report') ? '' : 'none' %> ">
+      <tr style="display:<%= (params[:type].eql?('drug report') || params[:type].eql?('drug utilization report') ) ? '' : 'none' %> ">
         <td id="drug_lbl">Select Drug</td>
         <td>
           <select name="drug" id='drug'>
@@ -105,7 +105,7 @@
         {
             jAlert("Please provide site name", "Incomplete Information");
         }
-        else if((type= "drug report") && (document.getElementById('drug').value.trim() == ""))
+        else if(((type= "drug report") || (type= "drug utilization report")) && (document.getElementById('drug').value.trim() == ""))
         {
             jAlert("Please provide drug name", "Incomplete Information");
         }
