@@ -116,35 +116,44 @@ class ReportController < ApplicationController
   end
 
   def drug_report
-    @title = "Drug Report For #{params[:drug]} From #{params[:start_date].to_date.strftime("%d %b %Y")} To #{params[:end_date].to_date.strftime("%d %b %Y")}"
-    prescription_id = Definition.where(:name => "prescription").first.id
-    dispensation_id = Definition.where(:name => "dispensation").first.id
-    relocation_id = Definition.where(:name => "relocation").first.id
-    drug_given_to_id = Definition.where(:name => "People who received drugs").first.id
-    defns = [prescription_id,dispensation_id, relocation_id, drug_given_to_id]
-    @values = {}
-    @prescription = 0
-    @dispensation = 0
-    @relocation = 0
+    @title = "Drug Stock Report For #{params[:drug]} From #{params[:start_date].to_date.strftime("%d %b %Y")}
+              To #{params[:end_date].to_date.strftime("%d %b %Y")}"
+    defns = Definition.where(:name => ["Supervision verification", "People who received drugs",
+                                       "Clinic verification","People prescribed drug"]).collect{|x| x.definition_id}
+
+    @values = Hash.new()
+    @values["All"] = {}
 
     obs = Observation.find(:all,:order => "value_date ASC",
-      :conditions => ["definition_id in (?) AND value_drug = ? AND value_date >= ? AND value_date <= ?",defns,params[:drug],params[:start_date],params[:end_date]])
+                           :conditions => ["definition_id in (?) AND value_drug = ? AND value_date >= ? AND value_date <= ?",
+                                           defns,params[:drug],params[:start_date],params[:end_date]])
+
     (obs || []).each do |record|
-      @values[record.value_date] = {"prescription" => 0, "dispensation" => 0, "relocation" => 0, "ppo_who_received_drugs" => 0} unless !@values[record.value_date].blank?
-      if record.definition_id == prescription_id
-        @values[record.value_date]["prescription"] = (@values[record.value_date]["prescription"] + record.value_numeric)
-        @prescription += record.value_numeric
-      elsif record.definition_id == dispensation_id
-        @values[record.value_date]["dispensation"] = (@values[record.value_date]["dispensation"] + record.value_numeric)
-        @dispensation += record.value_numeric
-      elsif record.definition_id == relocation_id
-        @values[record.value_date]["relocation"] = (@values[record.value_date]["relocation"] + record.value_numeric)
-        @relocation += record.value_numeric
-      else
-        @values[record.value_date]["ppo_who_received_drugs"] = (@values[record.value_date]["ppo_who_received_drugs"] + record.value_numeric)
+      @values[record.site.name] = {} unless !@values[record.site.name].blank?
+      @values[record.site.name][record.value_date] = {"supervision_count" => 0,"clinic_count" => 0,
+                                                      "ppo_who_received_drugs" => 0, "ppo_prescribed_drugs" => 0} unless !@values[record.site.name][record.value_date].blank?
+      @values["All"][record.value_date] = {"supervision_count" => 0,"clinic_count" => 0,
+                                           "ppo_who_received_drugs" => 0, "ppo_prescribed_drugs" => 0} unless !@values["All"][record.value_date].blank?
+
+      case (record.definition_name.downcase)
+        when "supervision verification" :
+          @values[record.site.name][record.value_date]["supervision_count"] = record.value_numeric
+          @values["All"][record.value_date]["supervision_count"] += record.value_numeric
+        when "clinic verification":
+          @values[record.site.name][record.value_date]["clinic_count"] = record.value_numeric
+          @values["All"][record.value_date]["clinic_count"] += record.value_numeric
+        when "people who received drugs":
+          @values[record.site.name][record.value_date]["ppo_who_received_drugs"] = record.value_numeric
+          @values["All"][record.value_date]["ppo_who_received_drugs"] += record.value_numeric
+        when "people prescribed drug":
+          @values[record.site.name][record.value_date]["ppo_prescribed_drugs"] = record.value_numeric
+          @values["All"][record.value_date]["ppo_prescribed_drugs"] += record.value_numeric
       end
+
     end
-    @days = @values.keys.sort!
+    @days = obs.collect{|x| x.value_date}.uniq.sort.reverse
+
+    @sites = @values.keys.sort!
 
     render :layout => 'report_layout'
   end
@@ -154,8 +163,7 @@ class ReportController < ApplicationController
               To #{params[:end_date].to_date.strftime("%d %b %Y")}"
     defns = Definition.where(:name => ["prescription","dispensation","relocation", "People who received drugs",
                                        "People prescribed drug"]).collect{|x| x.definition_id}
-    day = {"prescription" => 0, "dispensation" => 0, "relocation" => 0,
-           "ppo_who_received_drugs" => 0, "ppo_prescribed_drugs" => 0}
+
     @values = Hash.new()
     @values["All"] = {}
 
