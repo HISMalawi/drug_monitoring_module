@@ -166,18 +166,18 @@ class Observation < ActiveRecord::Base
     return (d/60)
   end
 
-  def self.deliveries(site_id, start_date = Date.today, end_date = Date.today, delivery_code = nil)
+  def self.deliveries(site_id = 1, start_date = Date.today, end_date = Date.today, delivery_code = nil)
 
     definition_id = Definition.find_by_name("New Delivery").id    
     result = {}
     if delivery_code.blank?
       
       result = Observation.find_by_sql(["SELECT value_date d, value_drug dr, value_numeric n, value_text t FROM observations
-                                    WHERE site_id = #{site_id} AND definition_id = #{definition_id} AND value_date BETWEEN ? AND ?'
+                                    WHERE site_id = #{site_id} AND definition_id = #{definition_id} AND (value_date BETWEEN (?) AND (?))
                                     GROUP BY value_drug, value_date", start_date.to_date, end_date.to_date]).inject({}){|r, o|
         r[o.d] = {} if !r.keys.include?(o.d); r[o.d][o.dr] = {} if !r[o.d].keys.include?(o.dr); r[o.d][o.dr]["value"] = o.n; r[o.d][o.dr]["code"] = o.t; r}
-    else
-      
+    else      
+     
       result = Observation.find_by_sql(["SELECT value_date d, value_drug dr, value_numeric n, value_text t FROM observations
                                     WHERE site_id = #{site_id} AND definition_id = #{definition_id} AND value_text = '#{delivery_code}'
                                     GROUP BY value_drug, value_date"]).inject({}){|r, o|
@@ -185,6 +185,12 @@ class Observation < ActiveRecord::Base
     end
     
     return result
-  end  
+  end
+
+  def self.site_by_code(code)
+    check = Observation.find_by_value_text(code)
+    site_id = check.present? ? check.site_id : -1
+    return site_id
+  end
 
 end

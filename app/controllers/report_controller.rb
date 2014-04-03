@@ -153,39 +153,39 @@ class ReportController < ApplicationController
     @title = "Drug Utilization Report For #{params[:drug]} From #{params[:start_date].to_date.strftime("%d %b %Y")}
               To #{params[:end_date].to_date.strftime("%d %b %Y")}"
     defns = Definition.where(:name => ["prescription","dispensation","relocation", "People who received drugs",
-                                       "People prescribed drug"]).collect{|x| x.definition_id}
+        "People prescribed drug"]).collect{|x| x.definition_id}
     day = {"prescription" => 0, "dispensation" => 0, "relocation" => 0,
-           "ppo_who_received_drugs" => 0, "ppo_prescribed_drugs" => 0}
+      "ppo_who_received_drugs" => 0, "ppo_prescribed_drugs" => 0}
     @values = Hash.new()
     @values["All"] = {}
 
     obs = Observation.find(:all,:order => "value_date ASC",
-                           :conditions => ["definition_id in (?) AND value_drug = ? AND value_date >= ? AND value_date <= ?",
-                                           defns,params[:drug],params[:start_date],params[:end_date]])
+      :conditions => ["definition_id in (?) AND value_drug = ? AND value_date >= ? AND value_date <= ?",
+        defns,params[:drug],params[:start_date],params[:end_date]])
 
     (obs || []).each do |record|
       @values[record.site.name] = {} unless !@values[record.site.name].blank?
       @values[record.site.name][record.value_date] = {"prescription" => 0, "dispensation" => 0, "relocation" => 0,
-                                                      "ppo_who_received_drugs" => 0, "ppo_prescribed_drugs" => 0} unless !@values[record.site.name][record.value_date].blank?
+        "ppo_who_received_drugs" => 0, "ppo_prescribed_drugs" => 0} unless !@values[record.site.name][record.value_date].blank?
       @values["All"][record.value_date] = {"prescription" => 0, "dispensation" => 0, "relocation" => 0,
-                                           "ppo_who_received_drugs" => 0, "ppo_prescribed_drugs" => 0} unless !@values["All"][record.value_date].blank?
+        "ppo_who_received_drugs" => 0, "ppo_prescribed_drugs" => 0} unless !@values["All"][record.value_date].blank?
 
       case (record.definition_name.downcase)
-        when "prescription" :
+      when "prescription" :
           @values[record.site.name][record.value_date]["prescription"] = record.value_numeric
-          @values["All"][record.value_date]["prescription"] += record.value_numeric
-        when "dispensation":
+        @values["All"][record.value_date]["prescription"] += record.value_numeric
+      when "dispensation":
           @values[record.site.name][record.value_date]["dispensation"] = record.value_numeric
-          @values["All"][record.value_date]["dispensation"] += record.value_numeric
-        when "relocation":
+        @values["All"][record.value_date]["dispensation"] += record.value_numeric
+      when "relocation":
           @values[record.site.name][record.value_date]["relocation"] =  record.value_numeric
-          @values["All"][record.value_date]["relocation"] += record.value_numeric
-        when "people who received drugs":
+        @values["All"][record.value_date]["relocation"] += record.value_numeric
+      when "people who received drugs":
           @values[record.site.name][record.value_date]["ppo_who_received_drugs"] = record.value_numeric
-          @values["All"][record.value_date]["ppo_who_received_drugs"] += record.value_numeric
-        when "people prescribed drug":
+        @values["All"][record.value_date]["ppo_who_received_drugs"] += record.value_numeric
+      when "people prescribed drug":
           @values[record.site.name][record.value_date]["ppo_prescribed_drugs"] = record.value_numeric
-          @values["All"][record.value_date]["ppo_prescribed_drugs"] += record.value_numeric
+        @values["All"][record.value_date]["ppo_prescribed_drugs"] += record.value_numeric
       end
 
     end
@@ -337,16 +337,27 @@ class ReportController < ApplicationController
   end
 
   def delivery_report
-
-    site = Site.find_by_name(params[:site_name])
-    return {} if site.blank?
-    site_id = site.id
-    start_date = params[:start_date] || nil
-    end_date = params[:end_date] || nil
-    delivery_code = params[:delivery_code] || nil
+    @site = "?"
+    site_id = -1
+    if params[:delivery_code].blank?
+      site = Site.find_by_name(params[:site_name])
+      return {} if site.blank?
+      site_id = site.id
+    else
+      
+      site_id = Observation.site_by_code(params[:delivery_code])
+    end
     
-    data = Observation.deliveries(site_id, start_date, end_date, delivery_code)
-   # raise data.to_yaml
-    render :partial => "stock_movement" and return
+    if site_id.blank? || site_id < 1
+      @stocks = {}
+    else
+      @site = Site.find(site_id).name
+      start_date = params[:start_date] || nil
+      end_date = params[:end_date] || nil
+      delivery_code = params[:delivery_code] || nil    
+      @stocks = Observation.deliveries(site_id, start_date, end_date, delivery_code)
+    end
+    
+    render :layout => 'report_layout'
   end
 end

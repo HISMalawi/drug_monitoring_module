@@ -1,0 +1,171 @@
+<style type="text/css">
+  input{
+    width: auto;
+    font-size: 28px;
+  }
+  select{
+    width: 100%;
+    font-size: 28px;
+  }
+  button{
+    width: auto;
+    font-size: 28px;
+  }
+  table.fullpage{
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: -1%;
+    width: 100%;
+    margin-bottom: 20px;
+  }
+  .halfpage tr{
+    height: 80px;
+
+  }
+
+  .link{
+    float: right;
+    position: absolute;
+    z-index: 100;
+    right: 1%;
+    top: 4px;
+  }
+
+  th{
+    text-align: left;
+    font-size: 16px;
+    background: #66CC66;
+    padding: 10px;
+    border-radius: 2px;
+    color: black;
+  }
+  #datalist td{
+    text-align: left;
+    font-size: 16px;
+    color: darkslategrey;
+    background-color: azure;
+  }
+
+  .header {
+    position: absolute;
+    top: 3%;
+    z-index: 0;
+    height: 10%;
+    overflow: hidden;
+  }
+
+</style>
+<script>
+</script>
+
+<div class="stock-data">
+
+  <table  class="fullpage header" width="100" cellspacing="5px" cellpadding="10px">
+
+    <tr>
+
+      <td style="padding-left: 10%; font-size: 20px;"><span style="color: lightblue;font-weight: bold;">Select date :</span>
+
+        <select id="sites" style="margin-left: 3%; width:  40%; font-size: 20px;" name="site_name"
+                onchange="loadSite(this.value)">
+                  <% (@stocks.keys || []).each do |site| %>
+            <option value="<%= site %>"><%= site.to_date.strftime("%d %b, %Y") %></option>
+          <% end %>
+        </select> <span style="color: lightblue; font-size: 18px; font-weight: bold;">Site: <%= @site %></span>
+      </td>
+      <td colspan="2" id ="date" style="color: lightblue; width: 100%; font-weight: bold;">&nbsp</td>
+
+    </tr>
+    <tr>
+      <th style="width: 55%">Drug name</th>
+      <th style="width: 20%">Tins delivered<sub style= "font-size: 12px"> (pills/60)</sub></th>
+      <th style="width: 20%">Delivery code</th>
+
+    </tr>
+    <tr>
+      <td colspan="6">
+        <div id ="data-holder" style="height: 535px; overflow: auto;">
+          <table id ="datalist"  style="width: 100%;" width="100" cellspacing="4px" cellpadding="10px">
+
+          </table>
+        </div>
+      </td>
+    </tr>
+
+  </table>
+
+</div>
+
+<script type="text/javascript">
+  <!--
+  var stocks = {};
+  var site = "<%=  @stocks.keys.first%>"
+<%@stocks.keys.each do |key|%>
+
+    stocks["<%= key %>"] = {};
+  <%@stocks[key].keys.each do |drug|%>
+
+      stocks["<%= key %>"]["<%= drug %>"] = {};
+    <% @stocks[key][drug].each do |k, v| %>
+        stocks["<%= key %>"]["<%= drug %>"]["<%= k %>"] = "<%= v%>";
+    <%end%>
+  <%end%>
+<%end%>
+
+  function loadSite(site)
+  {
+    var data = stocks[site];
+    var drugs = Object.keys(data);
+    var table = document.getElementById("datalist");
+    var dateLabel = document.getElementById("date");
+    dateLabel.innerHTML = "";
+    table.innerHTML = "";
+
+    for (var i = 0; i < drugs.length; i++){
+
+      var row = create("tr", "table-row", "");
+      row.style.width = "100%";
+
+      var td1 = create("td", "table-data", drugs[i]);
+      td1.style.width = "55%";
+      td1.style.paddingLeft = "0px";
+      row.appendChild(td1);
+      var v = 0
+      try{v = parseInt(parseInt(data[drugs[i]]["value"])/60)}catch(x){ v = 0}
+      var td2 = create("td", "table-data", v.toString());
+      td2.style.width = "20%";
+      td2.style.textAlign = "center";
+      row.appendChild(td2)
+
+      var td3 = create("td", "table-data", data[drugs[i]]["code"]);
+      td3.style.width = "20%";
+      td3.style.textAlign = "center";
+      row.appendChild(td3)
+
+      table.appendChild(row);
+    }
+<% if  params[:delivery_code].present? %>
+      dateLabel.innerHTML = "Delivery code: <%= params[:delivery_code] %>";
+<% else %>
+      dateLabel.innerHTML = "<%= params[:start_date].to_date.strftime("%d %b, %Y") %> To <%= params[:end_date].to_date.strftime("%d %b, %Y") %> ";
+<%end%>
+  }
+  function create(divType, type, data){
+    var node = document.createElement(divType);
+    node.style.diplay = type;
+    if (divType == "tr"){
+      node.style.fontSize = "12px";
+      node.style.padding = "0px";
+      node.style.background = "#FFFFFF";
+    }
+    if (data != ""){
+      node.innerHTML = data;
+    }
+    return node;
+  }
+
+  loadSite(site);
+
+  //-->
+</script>
+

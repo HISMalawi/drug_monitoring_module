@@ -1,52 +1,54 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <title>DMP</title>
-  <%= javascript_include_tag 'jquery' %>
-  <script language="javascript" type="text/javascript" src="/javascripts/jquery.ui.draggable.js"></script>
-  <script language="javascript" type="text/javascript" src="/javascripts/jquery.alerts.js"></script>
-  <script language="javascript" type="text/javascript" src="/javascripts/application.js"></script>
-  <link rel="stylesheet" type="text/css" href="/stylesheets/demo_table.css" />
-  <script type="text/javascript" language="javascript" src="/javascripts/jquery.js"></script>
-  <script type="text/javascript" language="javascript" src="/javascripts/jquery.dataTables.js"></script>
-  <script src="/javascripts/highcharts.js"></script>
-  <script src="/javascripts/exporting.js"></script>
-  <script src="/javascripts/standalone-framework.src.js"></script>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>DMP</title>
+    <%= javascript_include_tag 'jquery' %>
+    <script language="javascript" type="text/javascript" src="/javascripts/jquery.ui.draggable.js"></script>
+    <script language="javascript" type="text/javascript" src="/javascripts/jquery.alerts.js"></script>
+    <script language="javascript" type="text/javascript" src="/javascripts/application.js"></script>
+    <link rel="stylesheet" type="text/css" href="/stylesheets/demo_table.css" />
+    <script type="text/javascript" language="javascript" src="/javascripts/jquery.js"></script>
+    <script type="text/javascript" language="javascript" src="/javascripts/jquery.dataTables.js"></script>
+    <script src="/javascripts/highcharts.js"></script>
+    <script src="/javascripts/exporting.js"></script>
+    <script src="/javascripts/standalone-framework.src.js"></script>
 
-  <link rel="stylesheet" type="text/css" href="/stylesheets/application.css" />
-  <link href="/stylesheets/jquery.alerts.css" rel="stylesheet" type="text/css" media="screen" />
-  <style type="text/css">
-     button.link{
-         width: 100px;
-         height: 60px;
-         font-size: 24px;
-         font-family: arial;
-     }
-  </style>
-</head>
+    <link rel="stylesheet" type="text/css" href="/stylesheets/application.css" />
+    <link href="/stylesheets/jquery.alerts.css" rel="stylesheet" type="text/css" media="screen" />
+    <style type="text/css">
+      button.link{
+        width: 100px;
+        height: 60px;
+        font-size: 24px;
+        font-family: arial;
+      }
+    </style>
+  </head>
 
-<body>
-<div class="heading" >
-  <table class="menu" cellspacing="0px">
-    <tr>
-      <td style="width: 60px;"><img src="/images/app.png" style="float: left;margin-top: 5px;margin-left: 5px;height:60px;"></td>
+  <body>
+    <div class="heading" >
+      <table class="menu" cellspacing="0px">
+        <tr>
+          <td style="width: 60px;"><img src="/images/app.png" style="float: left;margin-top: 5px;margin-left: 5px;height:60px;"></td>
 
-      <td style="text-align: center;vertical-align: text-top;">
-        <span style="font-size: 150%;color: #C0C0C0;font-family:arial;">
-            <%= @title  %>
-          </span>
-      </td>
-      <td></td>
-      <td><button class="link" onmousedown="window.location= '/'">Return</button></td>
-    </tr>
-  </table>
+          <td style="text-align: center;vertical-align: text-top;">
+            <span style="font-size: 150%;color: #C0C0C0;font-family:arial;">
+              <%= @title  %>
+            </span>
+          </td>
+          <td >
+           
+          </td>
+          <td><button class="link" onmousedown="window.location= '/'">Return</button></td>
+        </tr>
+      </table>
 
-</div>
+    </div>
 
-<div style="overflow: auto;height: 89vh;">
-  <%= yield %>
-</div>
+    <div style="overflow: auto;height: 89vh;">
+      <%= yield %>
+    </div>
 
-</body>
+  </body>
 </html>
