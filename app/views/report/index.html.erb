@@ -13,6 +13,7 @@
 <%else%>
       var path = [
         "/report/report_menu?type=drug report",
+        "/report/report_menu?type=drug utilization report",
         "/report/report_menu?type=site report",
         "/report/report_menu?type=aggregate report",
         "/report/report_menu?type=delivery report",
@@ -20,10 +21,12 @@
         "/report/report_menu?type=stock movement&name=stock_movement"
         // "/report/index?stock=true"
       ];
+
       // var icons = ['pills3.png','Hospital-icon.png','aggregate.png', 'd_icon.jpeg'];
       // var title = ['Drug Report', 'Site Report', 'Aggregate Report', "Stock Reports"];
-      var icons = ['pills3.png','Hospital-icon.png','aggregate.png', 'd_icon.jpeg', 'd_icon.jpeg', 'stock_movement.gif'];
-      var title = ['Drug Report', 'Site Report', 'Aggregate Report', "Delivery Report", "Months of Stock", "Stock Movement"];
+      var icons = ['pills3.png','pills3.png', 'Hospital-icon.png','aggregate.png', 'd_icon.jpeg', 'd_icon.jpeg', 'stock_movement.gif'];
+      var title = ['Drug Report', 'Drug Utilization Report', 'Site Report', 'Aggregate Report', "Delivery Report", "Months of Stock", "Stock Movement"];
+
 <%end%>
   
     loadMenu(title,icons,path);

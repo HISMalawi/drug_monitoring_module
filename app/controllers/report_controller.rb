@@ -24,6 +24,9 @@ class ReportController < ApplicationController
     when "drug report"
       drug = params[:drug]
       redirect_to :action => 'drug_report',:drug => drug, :start_date => start_date, :end_date => end_date
+    when "drug utilization report"
+      drug = params[:drug]
+      redirect_to :action => 'drug_utilization_report',:drug => drug, :start_date => start_date, :end_date => end_date
     when "aggregate report"
       redirect_to :action => 'aggregate_report', :start_date => start_date, :end_date => end_date
     when "site report"
@@ -145,6 +148,54 @@ class ReportController < ApplicationController
 
     render :layout => 'report_layout'
   end
+
+  def drug_utilization_report
+    @title = "Drug Utilization Report For #{params[:drug]} From #{params[:start_date].to_date.strftime("%d %b %Y")}
+              To #{params[:end_date].to_date.strftime("%d %b %Y")}"
+    defns = Definition.where(:name => ["prescription","dispensation","relocation", "People who received drugs",
+                                       "People prescribed drug"]).collect{|x| x.definition_id}
+    day = {"prescription" => 0, "dispensation" => 0, "relocation" => 0,
+           "ppo_who_received_drugs" => 0, "ppo_prescribed_drugs" => 0}
+    @values = Hash.new()
+    @values["All"] = {}
+
+    obs = Observation.find(:all,:order => "value_date ASC",
+                           :conditions => ["definition_id in (?) AND value_drug = ? AND value_date >= ? AND value_date <= ?",
+                                           defns,params[:drug],params[:start_date],params[:end_date]])
+
+    (obs || []).each do |record|
+      @values[record.site.name] = {} unless !@values[record.site.name].blank?
+      @values[record.site.name][record.value_date] = {"prescription" => 0, "dispensation" => 0, "relocation" => 0,
+                                                      "ppo_who_received_drugs" => 0, "ppo_prescribed_drugs" => 0} unless !@values[record.site.name][record.value_date].blank?
+      @values["All"][record.value_date] = {"prescription" => 0, "dispensation" => 0, "relocation" => 0,
+                                           "ppo_who_received_drugs" => 0, "ppo_prescribed_drugs" => 0} unless !@values["All"][record.value_date].blank?
+
+      case (record.definition_name.downcase)
+        when "prescription" :
+          @values[record.site.name][record.value_date]["prescription"] = record.value_numeric
+          @values["All"][record.value_date]["prescription"] += record.value_numeric
+        when "dispensation":
+          @values[record.site.name][record.value_date]["dispensation"] = record.value_numeric
+          @values["All"][record.value_date]["dispensation"] += record.value_numeric
+        when "relocation":
+          @values[record.site.name][record.value_date]["relocation"] =  record.value_numeric
+          @values["All"][record.value_date]["relocation"] += record.value_numeric
+        when "people who received drugs":
+          @values[record.site.name][record.value_date]["ppo_who_received_drugs"] = record.value_numeric
+          @values["All"][record.value_date]["ppo_who_received_drugs"] += record.value_numeric
+        when "people prescribed drug":
+          @values[record.site.name][record.value_date]["ppo_prescribed_drugs"] = record.value_numeric
+          @values["All"][record.value_date]["ppo_prescribed_drugs"] += record.value_numeric
+      end
+
+    end
+    @days = obs.collect{|x| x.value_date}.uniq.sort.reverse
+
+    @sites = @values.keys.sort!
+
+    render :layout => 'report_layout'
+  end
+
 
   def stock_out_estimates
     @stocks = {}

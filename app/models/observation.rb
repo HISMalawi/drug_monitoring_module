@@ -9,6 +9,10 @@ class Observation < ActiveRecord::Base
     DrugMap.where(:full_name => self.value_drug).first.short_name rescue self.value_drug
   end
 
+  def definition_name
+    self.definition.name
+  end
+
   def self.drug_stock_out_predictions(type = 'calculated')
     # ** This method calculates estimated stock out dates for drugs per each site
     # ** Based on daily consumption/dispensation rate
