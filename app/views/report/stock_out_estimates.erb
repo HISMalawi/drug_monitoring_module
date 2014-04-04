@@ -3,6 +3,9 @@
     width: auto;
     font-size: 28px;
   }
+  .cat{
+    display: none;
+  }
   select{
     width: 100%;
     font-size: 28px;
@@ -155,7 +158,7 @@
 <% elsif params[:name] == "stock_movement" %>
   <%if @drugs.blank?%>
         jQuery('#chart').empty().html("<span style='padding-left: 20.5%; width: 100%; text-align: center; font-size: 30px;'> \n\
-                                                                            No stock details found for specified time range </span>")
+                                                                                No stock details found for specified time range </span>")
   <%else%>
         jQuery('#chart').empty().html("<span style='padding-left: 43.5%; width: 100%; text-align: center; font-size: 30px;'>Loading...</span>").load('/report/stock_movement?start_date=<%= params[:start_date] %>&end_date=<%= params[:end_date] %>&site_name=<%= params[:site_name] %>&drug_name=' + escape(site));
   <%end%>

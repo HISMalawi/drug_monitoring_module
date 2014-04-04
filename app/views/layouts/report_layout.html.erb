@@ -23,9 +23,49 @@
         font-size: 24px;
         font-family: arial;
       }
+      button.cat {
+        width: 123px;
+        height: 60px;
+        font-family: arial;
+        float: right;
+        font-size: 22px;
+        margin-right: 120px;
+      }
+      button{
+        border-radius: 8px;
+      }
     </style>
   </head>
 
+  <script>
+    cat = 'pills';
+
+    function catSwitch(){
+      var label = cat
+      cat = cat == 'pills' ? 'tins' : 'pills'
+      document.getElementById("cat").innerHTML = "Show " + label;
+    }
+
+    function loadValues(){
+      
+      catSwitch();
+      var arr = document.getElementsByClassName("drug_value");
+
+      for (var i = 0; i < arr.length; i ++){
+        try{
+          if (cat == "pills")
+            arr[i].innerHTML = parseInt(arr[i].getAttribute("pills")).toFixed(0).replace(/./g, function(c, i, a) {
+              return i && c !== "." && !((a.length - i) % 3) ? ',' + c : c;
+            });
+          else if (cat == "tins"){
+            arr[i].innerHTML = (parseInt((arr[i].innerHTML.replace(/,/g, "")) / 60)).toFixed(0).replace(/./g, function(c, i, a) {
+              return i && c !== "." && !((a.length - i) % 3) ? ',' + c : c;
+            });
+          }
+        }catch(e){}
+      }
+    }
+  </script>
   <body>
     <div class="heading" >
       <table class="menu" cellspacing="0px">
@@ -38,10 +78,17 @@
             </span>
           </td>
           <td >
-           
+
           </td>
-          <td style="text-align: right;padding-right: 5px;width: 150px;">
-            <button class="link" onmousedown="window.location= '/'">Return</button>
+          <td>
+            <table cellspacing="2" celpadding="2" style="float: right; width: 20%;">
+              <tr>
+                <td>
+                  <button  class="link cat" id="cat"  onclick="loadValues()">Show tins</button>
+                </td>
+                <td><button class="link" onmousedown="window.location= '/'">Return</button></td>
+              </tr>
+            </table>
           </td>
         </tr>
       </table>
@@ -52,7 +99,7 @@
       <%= yield %>
     </div>
     <div class="footer">
-         <%= "Report Ranges From #{params["start_date"].to_date.strftime("%d %B %Y")} To #{params["end_date"].to_date.strftime("%d %B %Y")}" rescue "" %>
+      <%= "Report Ranges From #{params["start_date"].to_date.strftime("%d %B %Y")} To #{params["end_date"].to_date.strftime("%d %B %Y")}" rescue "" %>
     </div>
   </body>
 </html>

@@ -1,122 +1,122 @@
 <style type="text/css">
-    input{
-        width: auto;
-        font-size: 28px;
-    }
-    select{
-        width: 100%;
-        font-size: 28px;
-    }
-    button{
-        width: auto;
-        font-size: 28px;
-    }
-    table.fullpage{
-        margin-left: auto;
-        margin-right: auto;
-        margin-top: -1%;
-        width: 100%;
-        margin-bottom: 20px;
-    }
-    .halfpage tr{
-        height: 80px;
+  input{
+    width: auto;
+    font-size: 28px;
+  }
+  select{
+    width: 100%;
+    font-size: 28px;
+  }
+  button{
+    width: auto;
+    font-size: 28px;
+  }
+  table.fullpage{
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: -1%;
+    width: 100%;
+    margin-bottom: 20px;
+  }
+  .halfpage tr{
+    height: 80px;
 
-    }
+  }
 
-    .link{
-        float: right;
-        position: absolute;
-        z-index: 1;
-        right: 1%;
-        top: 4px;
-    }
+  .link{
+    float: right;
+    position: absolute;
+    z-index: 1;
+    right: 1%;
+    top: 4px;
+  }
 
-    th.stylish{
-        text-align: left;
-        font-size: 16px;
-        background: #66CC66;
-        padding: 0px;
-        padding-top: 2px;
-        color: black;
-    }
-    #datalist td{
-        text-align: left;
-        font-size: 16px;
-        color: darkslategrey;
-        background-color: azure;
-    }
+  th.stylish{
+    text-align: left;
+    font-size: 16px;
+    background: #66CC66;
+    padding: 0px;
+    padding-top: 2px;
+    color: black;
+  }
+  #datalist td{
+    text-align: left;
+    font-size: 16px;
+    color: darkslategrey;
+    background-color: azure;
+  }
 
-    .header {
-        position: absolute;
-        top: 3%;
-        z-index: 0;
-        height: 10%;
-        overflow: hidden;
-    }
+  .header {
+    position: absolute;
+    top: 3%;
+    z-index: 0;
+    height: 10%;
+    overflow: hidden;
+  }
 
-    div.graph{
-        border: 1px solid #15191C;
-        width: 100%;
-        height: 45vh;
-    }
+  div.graph{
+    border: 1px solid #15191C;
+    width: 100%;
+    height: 45vh;
+  }
 </style>
 <script type="text/javascript" charset="utf-8">
-    $(document).ready(function() {
-        $('#datalist').dataTable({
-            "aaSorting": [[ 0, "asc" ]],
-            'iDisplayLength': 10,
-            "bLengthChange": false,
-            "bFilter": false
-        });
-    } );
+  $(document).ready(function() {
+    $('#datalist').dataTable({
+      "aaSorting": [[ 0, "asc" ]],
+      'iDisplayLength': 10,
+      "bLengthChange": false,
+      "bFilter": false
+    });
+  } );
 
-    function trend(counts)
-    {
-        try{
+  function trend(counts)
+  {
+    try{
 
-            var chart = new Highcharts.Chart({
-                chart: {
-                    renderTo: "trends"
-                },
-                xAxis: {
+      var chart = new Highcharts.Chart({
+        chart: {
+          renderTo: "trends"
+        },
+        xAxis: {
 
-                    title: {
-                        text: 'Days'
-                    },
-                    type:'datetime',
-                    dateTimeLabelFormats: {
-                        month: '%e. %b',
-                        year: '%b'
-                    }
+          title: {
+            text: 'Days'
+          },
+          type:'datetime',
+          dateTimeLabelFormats: {
+            month: '%e. %b',
+            year: '%b'
+          }
 
-                },
-                tooltip: {
-                    formatter: function() {
-                        return '<b>'+ this.series.name +'</b><br/>'+
-                                Highcharts.dateFormat('%e %b %Y', this.x) +': '+ this.y +' pills';
-                    }
-                },
-                yAxis: {
-                    title: {
-                        text: 'Pill Count'
-                    },
-                    min : 0
-                },
-                title: {
-                    text : "Stocks Trend"
-                },
-                series: [{name: "Supervised Counts", data: counts, color:"#FF8000"}],
-                exporting: { enabled: false },
-                credits: {enabled: false}
-            });
+        },
+        tooltip: {
+          formatter: function() {
+            return '<b>'+ this.series.name +'</b><br/>'+
+              Highcharts.dateFormat('%e %b %Y', this.x) +': '+ this.y +' pills';
+          }
+        },
+        yAxis: {
+          title: {
+            text: 'Pill Count'
+          },
+          min : 0
+        },
+        title: {
+          text : "Stocks Trend"
+        },
+        series: [{name: "Supervised Counts", data: counts, color:"#FF8000"}],
+        exporting: { enabled: false },
+        credits: {enabled: false}
+      });
 
 
-        }
-        catch(ex)
-        {
-            alert('error in jQuery call:' + ex);
-        }
     }
+    catch(ex)
+    {
+      alert('error in jQuery call:' + ex);
+    }
+  }
 
 </script>
 
@@ -125,7 +125,7 @@
   <span style="font-weight: bold;margin-left: 0.5%;">Select Site</span>
   <select id="sites" style="margin-left: 3%; width: 20%; font-size: 20px;" name="site_name" id='site' onchange="loadSite(this.value)">
     <% (@sites || []).each do |site| %>
-        <option><%= site %></option>
+      <option><%= site %></option>
     <% end %>
   </select>
 
@@ -168,113 +168,117 @@
 </div>
 
 <script type="text/javascript">
-    <!--
+  <!--
 
-    var facilities = {};
-    <% @values.keys.each do |facility|%>
+  var facilities = {};
+<% @values.keys.each do |facility|%>
 
     facilities["<%= facility %>"] = {};
-    <%@values[facility].each do |date, values|%>
-        <% next if values["supervision_count"] == 0 %>
-    facilities["<%= facility %>"]["<%= date %>"] = {"supervision" :<%= values["supervision_count"].to_i %>,
-                                                    "clinic" : <%= values["clinic_count"].to_i %>,
-                                                    "ppo_who_received_drugs": <%= values["ppo_who_received_drugs"] %>,
-                                                    "ppo_prescribed_drugs": <%= values["ppo_prescribed_drugs"] %>};
+  <%@values[facility].each do |date, values|%>
+    <% next if values["supervision_count"] == 0 %>
+      facilities["<%= facility %>"]["<%= date %>"] = {"supervision" :<%= values["supervision_count"].to_i %>,
+        "clinic" : <%= values["clinic_count"].to_i %>,
+        "ppo_who_received_drugs": <%= values["ppo_who_received_drugs"] %>,
+        "ppo_prescribed_drugs": <%= values["ppo_prescribed_drugs"] %>};
 
 
-    <%end%>
-    <%end%>
+  <%end%>
+<%end%>
 
 
-    function loadSite(site)
+  function loadSite(site)
+  {
+    var data = facilities[site];
+    var days = Object.keys(data);
+    var table = document.getElementById("datalist");
+    var supervised_array = [];
+
+    days.sort(function(a,b){
+      return new Date(a)-new Date(b);
+    }).reverse();
+
+    while(table.rows.length > 1)
     {
-        var data = facilities[site];
-        var days = Object.keys(data);
-        var table = document.getElementById("datalist");
-        var supervised_array = [];
-
-        days.sort(function(a,b){
-            return new Date(a)-new Date(b);
-        }).reverse();
-
-        while(table.rows.length > 1)
-        {
-            table.deleteRow(1);
-        }
-
-        for (var i = 0; i < days.length; i++){
-            var day = days[i];
-            var row = create("tr", "table-row", "");
-            row.style.width = "100%";
-
-            var td1 = create("td", "table-data", new Date(day).toLocaleFormat('%d %b %Y'));
-            td1.style.textAlign = "left"
-            row.appendChild(td1);
-
-
-            var td2 = create("td", "table-data",data[day]["supervision"].toString()) ;
-            td2.style.textAlign = "center";
-            row.appendChild(td2)
-
-            var td3 = create("td", "table-data", data[day]['clinic'].toString());
-            td3.style.textAlign = "center";
-            row.appendChild(td3)
-
-            var td4 = create("td", "table-data", data[day]["ppo_prescribed_drugs"]);
-            td4.style.textAlign = "center";
-            row.appendChild(td4)
-
-
-            var td5 = create("td", "table-data", data[day]['ppo_who_received_drugs'].toString());
-            td5.style.textAlign = "center";
-            row.appendChild(td5)
-
-            var td7 = create("td", "table-data", get_ppo_not_given_drug(data[day]['ppo_prescribed_drugs'],data[day]['ppo_who_received_drugs']));
-            td7.style.textAlign = "center";
-            row.appendChild(td7)
-
-            var utc = new Date(day);
-            table.appendChild(row);
-
-            supervised_array.push([Date.UTC(utc.getFullYear(), utc.getMonth() ,utc.getDate()), data[day]['supervision']]);
-            ;
-        }
-        trend(supervised_array);
+      table.deleteRow(1);
     }
 
-    function create(divType, type, data){
-        var node = document.createElement(divType);
-        node.style.diplay = type;
-        if (divType == "tr"){
-            node.style.fontSize = "12px";
-            node.style.padding = "0px";
-            node.style.background = "#FFFFFF";
-        }
-        if (data != ""){
-            node.innerHTML = data;
-        }
-        return node;
+    for (var i = 0; i < days.length; i++){
+      var day = days[i];
+      var row = create("tr", "table-row", "");
+      row.style.width = "100%";
+
+      var td1 = create("td", "table-data", new Date(day).toLocaleFormat('%d %b %Y'));
+      td1.style.textAlign = "left"
+      row.appendChild(td1);
+
+
+      var td2 = create("td", "table-data",data[day]["supervision"].toString()) ;
+      td2.setAttribute("class", "drug_value");
+      td2.setAttribute("pills", data[day]["supervision"].toString())
+      td2.style.textAlign = "center";
+      row.appendChild(td2)
+
+      var td3 = create("td", "table-data", data[day]['clinic'].toString());
+      td3.setAttribute("class", "drug_value");
+      td3.setAttribute("pills", data[day]["clinic"].toString())
+      td3.style.textAlign = "center";
+      row.appendChild(td3)
+
+      var td4 = create("td", "table-data", data[day]["ppo_prescribed_drugs"]);
+      td4.style.textAlign = "center";
+      row.appendChild(td4)
+
+
+      var td5 = create("td", "table-data", data[day]['ppo_who_received_drugs'].toString());
+      td5.style.textAlign = "center";
+      row.appendChild(td5)
+
+      var td7 = create("td", "table-data", get_ppo_not_given_drug(data[day]['ppo_prescribed_drugs'],data[day]['ppo_who_received_drugs']));
+      td7.style.textAlign = "center";
+      row.appendChild(td7)
+
+      var utc = new Date(day);
+      table.appendChild(row);
+
+      supervised_array.push([Date.UTC(utc.getFullYear(), utc.getMonth() ,utc.getDate()), data[day]['supervision']]);
+      ;
     }
+    trend(supervised_array);
+  }
 
-    function get_pres_disp_diff(pres, disp){
-        var diff = pres - disp;
-        diff = diff.toString() +" ("+ Math.abs((((pres - disp)/pres)*100).toFixed(2)).toString() + "%)"
-        return diff;
+  function create(divType, type, data){
+    var node = document.createElement(divType);
+    node.style.diplay = type;
+    if (divType == "tr"){
+      node.style.fontSize = "12px";
+      node.style.padding = "0px";
+      node.style.background = "#FFFFFF";
     }
-
-    function get_ppo_not_given_drug(pres, disp){
-        var diff = pres - disp;
-         if (diff < 0)
-         {
-             diff = Math.abs(diff).toString() +" (More recieved" +")"
-         }
-        return diff.toString();
+    if (data != ""){
+      node.innerHTML = data;
     }
-    loadSite(document.getElementById("sites").value);
+    return node;
+  }
+
+  function get_pres_disp_diff(pres, disp){
+    var diff = pres - disp;
+    diff = diff.toString() +" ("+ Math.abs((((pres - disp)/pres)*100).toFixed(2)).toString() + "%)"
+    return diff;
+  }
+
+  function get_ppo_not_given_drug(pres, disp){
+    var diff = pres - disp;
+    if (diff < 0)
+    {
+      diff = Math.abs(diff).toString() +" (More recieved" +")"
+    }
+    return diff.toString();
+  }
+  loadSite(document.getElementById("sites").value);
 
 
 
-    //-->
+  //-->
 </script>
 
 
