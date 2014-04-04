@@ -42,7 +42,7 @@ class ReportController < ApplicationController
   end
 
   def site_report
-    @title = "Site Report For #{params[:site]}  From #{params[:start_date].to_date.strftime("%d %b %Y")} To #{params[:end_date].to_date.strftime("%d %b %Y")}"
+    @title = "Site Report For #{params[:site]}"
 
     prescription_id = Definition.where(:name => "prescription").first.id
     dispensation_id = Definition.where(:name => "dispensation").first.id
@@ -116,8 +116,7 @@ class ReportController < ApplicationController
   end
 
   def drug_report
-    @title = "Drug Stock Report For #{params[:drug]} From #{params[:start_date].to_date.strftime("%d %b %Y")}
-              To #{params[:end_date].to_date.strftime("%d %b %Y")}"
+    @title = "Drug Stock Report For #{params[:drug]}"
     defns = Definition.where(:name => ["Supervision verification", "People who received drugs",
                                        "Clinic verification","People prescribed drug"]).collect{|x| x.definition_id}
 
@@ -159,8 +158,8 @@ class ReportController < ApplicationController
   end
 
   def drug_utilization_report
-    @title = "Drug Utilization Report For #{params[:drug]} From #{params[:start_date].to_date.strftime("%d %b %Y")}
-              To #{params[:end_date].to_date.strftime("%d %b %Y")}"
+    @title = "Drug Utilization Report For #{params[:drug]} "
+
     defns = Definition.where(:name => ["prescription","dispensation","relocation", "People who received drugs",
                                        "People prescribed drug"]).collect{|x| x.definition_id}
 

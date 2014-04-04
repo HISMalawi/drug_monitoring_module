@@ -39,9 +39,11 @@ div.footer {
     position:fixed;
     left:0;
     background:#15191C;
-    height:50px;
+    height:7vh;
     min-width: 1048px;
     width: 100%;
+    color: #C0C0C0;
+    font-family:arial;
 }
 div.content {
     top:100px;

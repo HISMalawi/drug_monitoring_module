@@ -145,7 +145,8 @@
                     formatter: function() {
                         return '<b>'+ this.series.name +'</b><br/>'+
                                 Highcharts.dateFormat('%e %b %Y', this.x) +': '+ this.y +' pills';
-                    }
+                    },
+                    enabled:false
                 },
                 yAxis: {
                     title: {
@@ -341,7 +342,10 @@
 
     function get_ppo_who_not_give_drug(pres, disp){
         var diff = pres - disp;
-
+        if (diff < 0)
+        {
+            diff = Math.abs(diff).toString() +" (More recieved" +")"
+        }
         return diff.toString();
     }
     loadSite(document.getElementById("sites").value);

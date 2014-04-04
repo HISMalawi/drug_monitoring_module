@@ -229,7 +229,7 @@
             td5.style.textAlign = "center";
             row.appendChild(td5)
 
-            var td7 = create("td", "table-data", get_ppo_who_not_give_drug(data[day]['ppo_prescribed_drugs'],data[day]['ppo_who_received_drugs']));
+            var td7 = create("td", "table-data", get_ppo_not_given_drug(data[day]['ppo_prescribed_drugs'],data[day]['ppo_who_received_drugs']));
             td7.style.textAlign = "center";
             row.appendChild(td7)
 
@@ -262,11 +262,11 @@
         return diff;
     }
 
-    function get_ppo_who_not_give_drug(pres, disp){
+    function get_ppo_not_given_drug(pres, disp){
         var diff = pres - disp;
          if (diff < 0)
          {
-             diff = "More recieved"
+             diff = Math.abs(diff).toString() +" (More recieved" +")"
          }
         return diff.toString();
     }

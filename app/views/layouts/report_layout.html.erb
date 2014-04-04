@@ -40,15 +40,19 @@
           <td >
            
           </td>
-          <td><button class="link" onmousedown="window.location= '/'">Return</button></td>
+          <td style="text-align: right;padding-right: 5px;width: 150px;">
+            <button class="link" onmousedown="window.location= '/'">Return</button>
+          </td>
         </tr>
       </table>
 
     </div>
 
-    <div style="overflow: auto;height: 89vh;">
+    <div style="overflow: auto;height: 83vh;">
       <%= yield %>
     </div>
-
+    <div class="footer">
+         <%= "Report Ranges From #{params["start_date"].to_date.strftime("%d %B %Y")} To #{params["end_date"].to_date.strftime("%d %B %Y")}" rescue "" %>
+    </div>
   </body>
 </html>
