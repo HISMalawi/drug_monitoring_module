@@ -59,6 +59,9 @@
         width: 100%;
         height: 45vh;
     }
+    div.dataTables_filter, div.dataTables_length{
+        display: none ;
+    }
 </style>
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function() {
@@ -67,7 +70,8 @@
             'iDisplayLength': 10,
             "bLengthChange": false,
             "bRetrieve": true,
-            "bFilter": false
+            "bFilter": false,
+            "oSearch ":false
         });
     } );
 
@@ -210,14 +214,14 @@
     <table class="display" id="datalist" width="100%">
       <thead>
       <tr style="background-color:#66CC66">
-        <th>Date</th>
-        <th>Prescribed</th>
-        <th>Dispensed</th>
-        <th>Difference<br>(Pres - Disp)</th>
-        <th>Relocated</th>
-        <th>People  <br>Precribed Drugs</th>
-        <th>People Who <br>Received Drugs</th>
-        <th>People Who Didn't <br> Receive Drugs</th>
+        <th style="width: 15%">Date</th>
+        <th style="width: 10%">Prescribed</th>
+        <th style="width: 10%">Dispensed</th>
+        <th >Difference<br>(Pres - Disp)</th>
+        <th style="width: 10%">Relocated</th>
+        <th style="width: 10%">People  <br>Precribed Drugs</th>
+        <th style="width: 15%">People Who <br>Received Drugs</th>
+        <th style="width: 15%">People Who Didn't <br> Receive Drugs</th>
       </tr>
       </thead>
       <tbody>
