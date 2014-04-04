@@ -23,9 +23,29 @@
         font-size: 24px;
         font-family: arial;
       }
+      button.cat {
+        width: 123px;
+        height: 60px;
+        font-family: arial;
+        float: right;
+        font-size: 22px;
+        margin-right: 120px;
+      }
+      button{
+        border-radius: 8px;
+      }
     </style>
   </head>
 
+  <script>
+    cat = 'pills';
+
+    function catSwitch(){
+      var label = cat
+      cat = cat == 'pills' ? 'tins' : 'pills'
+      document.getElementById("cat").innerHTML = "Show " + label;
+    }
+  </script>
   <body>
     <div class="heading" >
       <table class="menu" cellspacing="0px">
@@ -38,15 +58,15 @@
             </span>
           </td>
           <td >
-           
+
           </td>
-          <td><button class="link" onmousedown="window.location= '/'">Return</button></td>
+          <td><button class="link cat" id="cat" onmousedown="catSwitch()">Show tins</button><button class="link" onmousedown="window.location= '/'">Return</button></td>
         </tr>
       </table>
 
     </div>
 
-    <div style="overflow: auto;height: 89vh;">
+    <div style="overflow: auto  ! important; height: 1vh">
       <%= yield %>
     </div>
 

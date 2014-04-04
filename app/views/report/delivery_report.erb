@@ -52,15 +52,7 @@
     z-index: 0;
     height: 10%;
     overflow: hidden;
-  }
-  .cat {
-    background: green;
-    color: black;
-    border-radius: 7px;
-    font-size: 17px;
-    padding: 0px;
-    margin-left: 13px;
-  }
+  } 
 
 </style>
 <script>
@@ -87,9 +79,8 @@
     </tr>
     <tr>
       <th style="width: 50%">Drug name</th>
-      <th style="width: 20%">Tins delivered <sub style= "font-size: 12px"> (pills)</sub></th>
-      <th style="width: 20%">Delivery code </th>
-
+      <th id = "del" style="width: 20%">Total delivered <sub style= "font-size: 12px"> (pills)</sub></th>
+      <th style="width: 20%">Delivery code</th>
     </tr>
     <tr>
       <td colspan="6">
@@ -133,6 +124,12 @@
     var dateLabel = document.getElementById("date");
     dateLabel.innerHTML = "";
     table.innerHTML = "";
+    
+    document.getElementById("cat").onclick = function(){
+      var d = document.getElementById("del")
+      d.innerHTML = d.innerHTML.replace((cat == "pills" ? "tins" : "pills"), cat)
+      loadSite(sit);
+    }
 
     for (var i = 0; i < drugs.length; i++){
 
