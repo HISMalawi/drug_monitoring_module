@@ -145,7 +145,8 @@
                     formatter: function() {
                         return '<b>'+ this.series.name +'</b><br/>'+
                                 Highcharts.dateFormat('%e %b %Y', this.x) +': '+ this.y +' pills';
-                    }
+                    },
+                    enabled:false
                 },
                 yAxis: {
                     title: {
@@ -278,10 +279,14 @@
 
 
             var td2 = create("td", "table-data",data[day]["prescription"].toString()) ;
+            td2.setAttribute("class", "drug_value");
+            td2.setAttribute("pills", data[day]["prescription"].toString())
             td2.style.textAlign = "center";
             row.appendChild(td2)
 
             var td3 = create("td", "table-data", data[day]['dispensation'].toString());
+            td3.setAttribute("class", "drug_value");
+            td3.setAttribute("pills", data[day]["dispensation"].toString())
             td3.style.textAlign = "center";
             row.appendChild(td3)
 
@@ -291,6 +296,8 @@
 
 
             var td5 = create("td", "table-data", data[day]['relocated_drugs'].toString());
+            td5.setAttribute("class", "drug_value");
+            td5.setAttribute("pills", data[day]["relocated_drugs"].toString())
             td5.style.textAlign = "center";
             row.appendChild(td5)
 
@@ -341,7 +348,10 @@
 
     function get_ppo_who_not_give_drug(pres, disp){
         var diff = pres - disp;
-
+        if (diff < 0)
+        {
+            diff = Math.abs(diff).toString() +" (More received" +")"
+        }
         return diff.toString();
     }
     loadSite(document.getElementById("sites").value);

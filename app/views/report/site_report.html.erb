@@ -1,9 +1,6 @@
 <link rel="stylesheet" type="text/css" href="/stylesheets/demo_table.css" />
 <script type="text/javascript" language="javascript" src="/javascripts/jquery.js"></script>
 <script type="text/javascript" language="javascript" src="/javascripts/jquery.dataTables.js"></script>
-<script src="/javascripts/highcharts.js"></script>
-<script src="/javascripts/exporting.js"></script>
-<script src="/javascripts/standalone-framework.src.js"></script>
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function() {
         $('#drugs').dataTable({
@@ -34,11 +31,11 @@
             <tr>
               <td><%= day.strftime('%d %B %Y') %></td>
               <td><%= drug %></td>
-              <td><%= number_with_delimiter(value["prescription"], :delimeter => ',') %></td>
-              <td><%= number_with_delimiter(value["dispensation"], :delimeter => ',') %></td>
+              <td class="drug_value" pills="<%= value["prescription"] %>"><%= number_with_delimiter(value["prescription"], :delimeter => ',') %></td>
+              <td class="drug_value" pills="<%= value["dispensation"] %>"><%= number_with_delimiter(value["dispensation"], :delimeter => ',') %></td>
               <% percent = ((value["prescription"].to_f - value["dispensation"].to_f)/value["prescription"].to_f).round(2) rescue 0 %>
               <td><%= number_with_delimiter(value["prescription"] - value["dispensation"], :delimeter => ',') %> (<%= percent.abs %>%)</td>
-              <td><%= number_with_delimiter(value["relocation"], :delimeter => ',') %></td>
+              <td class="drug_value" pills="<%= value["relocation"] %>"><%= number_with_delimiter(value["relocation"], :delimeter => ',') %></td>
               <td><%= number_with_delimiter(value["ppo_who_received_drugs"], :delimeter => ',') %></td>
             </tr>
         <% end %>
