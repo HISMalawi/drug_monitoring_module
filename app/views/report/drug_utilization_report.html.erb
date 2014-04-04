@@ -280,10 +280,10 @@
 
             $("#datalist").dataTable().fnAddData([
                 new Date(day).toLocaleFormat('%d %b %Y'),
-                data[day]["prescription"].toString(),
-                data[day]['dispensation'].toString(),
+               ("<span class='drug_value' pills=" + data[day]["prescription"] + ">" + data[day]["prescription"].toString() + "</span>"),
+                ("<span class='drug_value' pills=" + data[day]["dispensation"] + ">" + data[day]["dispensation"].toString() + "</span>"),
                 get_pres_disp_diff(data[day]["prescription"],data[day]['dispensation'] ),
-                data[day]['relocated_drugs'].toString(),
+                 ("<span class='drug_value' pills=" + data[day]["relocated_drugs"] + ">" + data[day]["relocated_drugs"].toString() + "</span>"),
                 data[day]['ppo_prescribed_drugs'].toString(),
                 data[day]['ppo_who_received_drugs'].toString(),
                 get_ppo_who_not_give_drug(data[day]['ppo_prescribed_drugs'],data[day]['ppo_who_received_drugs'])
