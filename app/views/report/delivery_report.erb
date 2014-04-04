@@ -53,9 +53,18 @@
     height: 10%;
     overflow: hidden;
   }
+  .cat {
+    background: green;
+    color: black;
+    border-radius: 7px;
+    font-size: 17px;
+    padding: 0px;
+    margin-left: 13px;
+  }
 
 </style>
 <script>
+  var cat = 'pills'
 </script>
 
 <div class="stock-data">
@@ -77,9 +86,9 @@
 
     </tr>
     <tr>
-      <th style="width: 55%">Drug name</th>
-      <th style="width: 20%">Tins delivered<sub style= "font-size: 12px"> (pills/60)</sub></th>
-      <th style="width: 20%">Delivery code</th>
+      <th style="width: 50%">Drug name</th>
+      <th style="width: 20%">Tins delivered <sub style= "font-size: 12px"> (pills)</sub></th>
+      <th style="width: 20%">Delivery code </th>
 
     </tr>
     <tr>
@@ -111,10 +120,14 @@
     <%end%>
   <%end%>
 <%end%>
-
-  function loadSite(site)
+  function reload(){
+    alert(site)
+  }
+  
+  function loadSite(sit)
   {
-    var data = stocks[site];
+    site = sit;
+    var data = stocks[sit];
     var drugs = Object.keys(data);
     var table = document.getElementById("datalist");
     var dateLabel = document.getElementById("date");
@@ -131,16 +144,20 @@
       td1.style.paddingLeft = "0px";
       row.appendChild(td1);
       var v = 0
-      try{v = parseInt(parseInt(data[drugs[i]]["value"])/60)}catch(x){ v = 0}
+      if (cat == 'tins'){
+        try{v = parseInt(parseInt(data[drugs[i]]["value"])/60)}catch(x){ v = 0}
+      }else{
+        try{v = parseInt(parseInt(data[drugs[i]]["value"]))}catch(x){ v = 0}
+      }
       var td2 = create("td", "table-data", v.toString());
       td2.style.width = "20%";
       td2.style.textAlign = "center";
-      row.appendChild(td2)
+      row.appendChild(td2);
 
       var td3 = create("td", "table-data", data[drugs[i]]["code"]);
       td3.style.width = "20%";
       td3.style.textAlign = "center";
-      row.appendChild(td3)
+      row.appendChild(td3);
 
       table.appendChild(row);
     }
