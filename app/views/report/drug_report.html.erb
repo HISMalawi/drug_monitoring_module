@@ -60,7 +60,7 @@
     height: 45vh;
   }
   div.dataTables_filter, div.dataTables_length{
-      display: none ;
+    display: none ;
   }
 </style>
 <script type="text/javascript" charset="utf-8">
@@ -73,13 +73,13 @@
       "bFilter": false,
       "oSearch ":false,
       "aoColumns": [
-          { "sTitle": "date", "sClass": "right"},
-          { "sTitle": "available", "sClass": "center"},
-          { "sTitle": "difference", "sClass": "right"},
-          { "sTitle": "prescribed", "sClass": "right"},
-          { "sTitle": "dispensed", "sClass": "right"},
-          { "sTitle": "omanidwa", "sClass": "right"}
-       ]
+        { "sTitle": "date", "sClass": "right"},
+        { "sTitle": "available", "sClass": "center"},
+        { "sTitle": "difference", "sClass": "right"},
+        { "sTitle": "prescribed", "sClass": "right"},
+        { "sTitle": "dispensed", "sClass": "right"},
+        { "sTitle": "omanidwa", "sClass": "right"}
+      ]
     });
   } );
 
@@ -162,14 +162,14 @@
   <div style="width: 100%;margin-top:5px; text-align: center;">
     <table class="display" id="datalist" width="100%">
       <thead>
-          <tr style="background-color:#66CC66">
-            <th style="width: 15%;">Date</th>
-            <th>Available Stock<br>(Supervised)</th>
-            <th>Difference with<br> clinic stock</th>
-            <th>People  <br>Precribed Drug</th>
-            <th>People <br>Dispensed Drug</th>
-            <th>People Who Didn't <br> Receive Drug</th>
-          </tr>
+        <tr style="background-color:#66CC66">
+          <th style="width: 15%;">Date</th>
+          <th>Available Stock<br>(Supervised)</th>
+          <th>Difference with<br> clinic stock</th>
+          <th>People  <br>Precribed Drug</th>
+          <th>People <br>Dispensed Drug</th>
+          <th>People Who Didn't <br> Receive Drug</th>
+        </tr>
       </thead>
       <tbody>
 
@@ -220,14 +220,14 @@
       var row = create("tr", "table-row", "");
       row.style.width = "100%";
 
-        $("#datalist").dataTable().fnAddData([
-            new Date(day).toLocaleFormat('%d %b %Y'),
-            data[day]["supervision"].toString(),
-            data[day]['clinic'].toString(),
-            data[day]["ppo_prescribed_drugs"],
-            data[day]['ppo_who_received_drugs'].toString(),
-            get_ppo_not_given_drug(data[day]['ppo_prescribed_drugs'],data[day]['ppo_who_received_drugs'])
-        ]);
+      $("#datalist").dataTable().fnAddData([
+        new Date(day).toLocaleFormat('%d %b %Y'),
+        ("<span class='drug_value' pills=" + data[day]["supervision"].toString() + ">" + data[day]["supervision"].toString() + "</span>"),
+        ("<span class='drug_value' pills=" + data[day]['clinic'].toString() + ">" + data[day]['clinic'].toString() + "</span>"),
+        data[day]["ppo_prescribed_drugs"],
+        data[day]['ppo_who_received_drugs'].toString(),
+        get_ppo_not_given_drug(data[day]['ppo_prescribed_drugs'],data[day]['ppo_who_received_drugs'])
+      ]);
       /*var td1 = create("td", "table-data", new Date(day).toLocaleFormat('%d %b %Y'));
       td1.style.textAlign = "left"
       row.appendChild(td1);
@@ -258,7 +258,7 @@
       td7.style.textAlign = "center";
       row.appendChild(td7)
        table.appendChild(row);
-      */
+       */
       var utc = new Date(day);
 
 
