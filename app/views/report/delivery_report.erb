@@ -2,7 +2,7 @@
 <script type="text/javascript" language="javascript" src="/javascripts/jquery.js"></script>
 <script type="text/javascript" language="javascript" src="/javascripts/jquery.dataTables.js"></script>
 <script>
- /* $(document).ready(function() {
+  /* $(document).ready(function() {
     $('#datalist').dataTable({
       "bPaginate": false,
       "bLengthChange": false,
@@ -12,17 +12,17 @@
       "bAutoWidth": false
     });
 } );
-  */
-   $(document).ready(function() {
-        $('#datalist').dataTable({
-            "aaSorting": [[ 0, "asc" ]],
-            'iDisplayLength': 10,
-            "bLengthChange": false,
-            "bRetrieve": true,
-            "bFilter": false,
-            "oSearch ":false
-        });
-    } );
+   */
+  $(document).ready(function() {
+    $('#datalist').dataTable({
+      "aaSorting": [[ 0, "asc" ]],
+      'iDisplayLength': 10,
+      "bLengthChange": false,
+      "bRetrieve": true,
+      "bFilter": false,
+      "oSearch ":false
+    });
+  } );
 
 </script>
 
@@ -89,8 +89,8 @@
     margin-top: -3%;
   }
   div.dataTables_filter, div.dataTables_length{
-        display: none ;
-    }
+    display: none ;
+  }
 </style>
 
 <div class="stock-data">
@@ -147,7 +147,7 @@
   function loadSite(sit)
   {
 
-
+    site = sit;
     if(Object.keys(stocks).length == 0){
       jQuery('#data-holder').empty().html("<span style='padding-left: 20.5%; margin-top: 40%; vertical-align: middle; width: 100%; text-align: center; font-size: 30px;'> \n\
     No delivery details found for specified time range </span>")
@@ -156,41 +156,29 @@
       var drugs = Object.keys(data);
       var table = document.getElementById("body");
       var dateLabel = document.getElementById("date");
-
+      jQuery("#datalist").dataTable().fnClearTable();
+      
       for (var i = 0; i < drugs.length; i++){
 
-				var v = 0
+        var v = 0
         if (cat == 'tins'){
           try{v = parseInt(parseInt(data[drugs[i]]["value"])/60)}catch(x){ v = 0}
         }else{
           try{v = parseInt(parseInt(data[drugs[i]]["value"]))}catch(x){ v = 0}
         }
 
-$("#datalist").dataTable().fnAddData([
+        jQuery("#datalist").dataTable().fnAddData([
 
-               (drugs[i].toString()),
-                ("<span class='drug_value' pills=" + v + ">" + v.toString() + "</span>"),
-                (data[drugs[i]]["code"].toString())
+          (drugs[i].toString()),
+          ("<span class='drug_value' pills=" + v + ">" + v.toString() + "</span>"),
+          (data[drugs[i]]["code"].toString())
 
-            ]);
+        ]);
 
+      }
     }
   }
-  }
-  function create(divType, type, data){
-    var node = document.createElement(divType);
-    node.style.diplay = type;
-    if (divType == "tr"){
-      node.style.fontSize = "12px";
-      node.style.padding = "0px";
-      node.style.background = "#FFFFFF";
-    }
-    if (data != ""){
-      node.innerHTML = data;
-    }
-    return node;
-  }
-
+  
   loadSite(site);
 
   //-->
