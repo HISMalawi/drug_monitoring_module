@@ -1,3 +1,31 @@
+<link rel="stylesheet" type="text/css" href="/stylesheets/demo_table.css" />
+<script type="text/javascript" language="javascript" src="/javascripts/jquery.js"></script>
+<script type="text/javascript" language="javascript" src="/javascripts/jquery.dataTables.js"></script>
+<script>
+ /* $(document).ready(function() {
+    $('#datalist').dataTable({
+      "bPaginate": false,
+      "bLengthChange": false,
+      "bFilter": true,
+      "bSort": false,
+      "bInfo": false,
+      "bAutoWidth": false
+    });
+} );
+  */
+   $(document).ready(function() {
+        $('#datalist').dataTable({
+            "aaSorting": [[ 0, "asc" ]],
+            'iDisplayLength': 10,
+            "bLengthChange": false,
+            "bRetrieve": true,
+            "bFilter": false,
+            "oSearch ":false
+        });
+    } );
+
+</script>
+
 <style type="text/css">
   input{
     width: auto;
@@ -45,15 +73,24 @@
     color: darkslategrey;
     background-color: azure;
   }
+  #datalist{
 
+  }
   .header {
     position: absolute;
     top: 3%;
+    width: 100%;
     z-index: 0;
     height: 10%;
     overflow: hidden;
-  } 
+  }
 
+  #datalist_filter{
+    margin-top: -3%;
+  }
+  div.dataTables_filter, div.dataTables_length{
+        display: none ;
+    }
 </style>
 
 <div class="stock-data">
@@ -62,35 +99,33 @@
 
     <tr>
 
-      <td style="padding-left: 10%; font-size: 20px;"><span style="color: lightblue;font-weight: bold;">Select date :</span>
+      <td style=" width: 100%; padding-left: 10%; font-size: 20px;"><span style="color: lightblue;font-weight: bold;">Select date :</span>
 
-        <select id="sites" style="margin-left: 3%; width:  40%; font-size: 20px;" name="site_name"
+        <select id="sites" style="margin-left: 3%; width:  20%; font-size: 20px;" name="site_name"
                 onchange="loadSite(this.value)">
                   <% (@stocks.keys || []).each do |site| %>
             <option value="<%= site %>"><%= site.to_date.strftime("%d %b, %Y") %></option>
           <% end %>
         </select> <span style="color: lightblue; font-size: 18px; font-weight: bold;">Site: <%= @site %></span>
       </td>
-      <td colspan="2" id ="date" style="color: lightblue; width: 100%; font-weight: bold;">&nbsp</td>
-
-    </tr>
-    <tr>
-      <th style="width: 55%">Drug name</th>
-      <th style="width: 20%">Total delivered</sub></th>
-      <th style="width: 20%">Delivery code</th>
-    </tr>
-    <tr>
-      <td colspan="6">
-        <div id ="data-holder" style="height: 535px; overflow: auto;">
-          <table id ="datalist"  style="width: 100%;" width="100" cellspacing="4px" cellpadding="10px">
-
-          </table>
-        </div>
-      </td>
+      <td id ="date" style="display: none; color: lightblue; font-size: 18px; font-weight: bold;"></td>
     </tr>
 
   </table>
+  <div style="width: 100%;text-align: center;">
+    <table id ="datalist"  style="margin-top: 0%; width: 100%"  cellspacing="4px" cellpadding="10px">
+      <thead width="100"  style="width: 100%;">
+        <tr  style="background-color:#66CC66">
+          <th style="width: 55%">Drug name</th>
+          <th style="width: 20%">Total delivered</sub></th>
+          <th style="width: 20%">Delivery code</th>
+        </tr>
+      </thead>
+      <tbody id="body">
 
+      </tbody>
+    </table>
+  </div>
 </div>
 
 <script type="text/javascript">
@@ -108,57 +143,39 @@
     <%end%>
   <%end%>
 <%end%>
-   
+
   function loadSite(sit)
   {
-    
-   
+
+
     if(Object.keys(stocks).length == 0){
       jQuery('#data-holder').empty().html("<span style='padding-left: 20.5%; margin-top: 40%; vertical-align: middle; width: 100%; text-align: center; font-size: 30px;'> \n\
     No delivery details found for specified time range </span>")
     }else{
       var data = stocks[sit];
       var drugs = Object.keys(data);
-      var table = document.getElementById("datalist");
+      var table = document.getElementById("body");
       var dateLabel = document.getElementById("date");
-      dateLabel.innerHTML = "";
-      table.innerHTML = "";
-    
+
       for (var i = 0; i < drugs.length; i++){
 
-        var row = create("tr", "table-row", "");
-        row.style.width = "100%";
-
-        var td1 = create("td", "table-data", drugs[i]);
-        td1.style.width = "55%";
-        td1.style.paddingLeft = "0px";
-        row.appendChild(td1);
-        var v = 0
+				var v = 0
         if (cat == 'tins'){
           try{v = parseInt(parseInt(data[drugs[i]]["value"])/60)}catch(x){ v = 0}
         }else{
           try{v = parseInt(parseInt(data[drugs[i]]["value"]))}catch(x){ v = 0}
         }
-        var td2 = create("td", "table-data", v.toString());
-        td2.style.width = "20%";
-        td2.setAttribute("class", "drug_value");
-        td2.setAttribute("pills", v.toString());
-        td2.style.textAlign = "center";
-        row.appendChild(td2);
 
-        var td3 = create("td", "table-data", data[drugs[i]]["code"]);
-        td3.style.width = "20%";
-        td3.style.textAlign = "center";
-        row.appendChild(td3);
+$("#datalist").dataTable().fnAddData([
 
-        table.appendChild(row);
-      }
-<% if  params[:delivery_code].present? %>
-        dateLabel.innerHTML = "Delivery code: <%= params[:delivery_code] %>";
-<% else %>
-        dateLabel.innerHTML = "" 
-<%end%>
+               (drugs[i].toString()),
+                ("<span class='drug_value' pills=" + v + ">" + v.toString() + "</span>"),
+                (data[drugs[i]]["code"].toString())
+
+            ]);
+
     }
+  }
   }
   function create(divType, type, data){
     var node = document.createElement(divType);
@@ -178,4 +195,3 @@
 
   //-->
 </script>
-
