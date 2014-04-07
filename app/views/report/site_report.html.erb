@@ -16,12 +16,12 @@
   <table class="display" id="drugs" width="100%">
     <thead>
     <tr style="background-color:#66CC66">
-      <th style="width: 10%">Date</th>
+      <th style="width: 15%">Date</th>
       <th style="width: 20%">Drug</th>
-      <th style="width: 15%">Prescribed</th>
-      <th style="width: 15%">Dispensed</th>
-      <th style="width: 10%">Difference<br>(Pres - Disp)</th>
-      <th style="width: 15%">Relocated</th>
+      <th style="width: 10%">Prescribed</th>
+      <th style="width: 10%">Dispensed</th>
+      <th style="width: 15%">Difference<br>(Pres - Disp)</th>
+      <th style="width: 10%">Relocated</th>
       <th style="width: 15%">People Who Received Drugs</th>
     </tr>
     </thead>
@@ -29,8 +29,8 @@
     <% (@values || []).each do |day, drugs|%>
         <% (drugs || []).each do |drug, value|%>
             <tr>
-              <td><%= day.strftime('%d %B %Y') %></td>
-              <td><%= drug %></td>
+              <td style="text-align: left;"><%= day.strftime('%d %B %Y') %></td>
+              <td style="text-align: left;"><%= drug %></td>
               <td class="drug_value" pills="<%= value["prescription"] %>"><%= number_with_delimiter(value["prescription"], :delimeter => ',') %></td>
               <td class="drug_value" pills="<%= value["dispensation"] %>"><%= number_with_delimiter(value["dispensation"], :delimeter => ',') %></td>
               <% percent = ((value["prescription"].to_f - value["dispensation"].to_f)/value["prescription"].to_f).round(2) rescue 0 %>
