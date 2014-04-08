@@ -21,7 +21,7 @@ class ReportController < ApplicationController
     end_date = params[:end_date].to_date.strftime("%Y-%m-%d") rescue nil
 
     case params[:report_type]
-    when "drug report"
+    when "drug stock report"
       drug = params[:drug]
       redirect_to :action => 'drug_report',:drug => drug, :start_date => start_date, :end_date => end_date
     when "drug utilization report"

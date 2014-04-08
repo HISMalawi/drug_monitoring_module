@@ -210,10 +210,7 @@
       return new Date(a)-new Date(b);
     }).reverse();
 
-    while(table.rows.length > 1)
-    {
-      table.deleteRow(1);
-    }
+      $("#datalist").dataTable().fnClearTable();
 
     for (var i = 0; i < days.length; i++){
       var day = days[i];
