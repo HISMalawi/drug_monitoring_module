@@ -1,51 +1,159 @@
-<style type="text/css">
-  div.alerts{
-     text-align: center;
-     font-family:arial;
-     font-weight: bold;
-     font-size: 1.5em;
-     background-color: silver;
-     border: 1px solid #000000;
-     border-radius: 10px 10px 0px 0px;
-  }
-  tr.odd{
-      background-color: #FFCC00;
-      font-family: arial;
-  }
-  tr.even{
-      background-color: #ffffff;
-      font-family: arial;
-  }
-</style>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>DDE Dashboard</title>
+  <style>
+      body {
+          overflow: hidden;
+          margin: 0px;
+      }
 
+      .table {
+          display: table;
+      }
 
-<div style="width: 100%">
-  <table style="width: 100%;" cellspacing="15px">
-    <tr>
-      <td style="vertical-align: text-top;">
+      .row {
+          display: table-row;
+      }
 
-         <div class="alerts">
-           NOTIFICATIONS
-         </div>
-         <div style="max-height: 70vh; overflow: auto;">
-           <table>
-             <% (@notices || []).each do |notice| %>
-                 <tr class=<%= cycle('odd','even') %>>
-                    <td>
-                        <%= notice %>
-                    </td>
-                 </tr>
-             <% end %>
-           </table>
-         </div>
+      .cell {
+          display: table-cell;
+      }
+  </style>
+</head>
+<body onresize="resizeTable()" onload="resizeTable()">
 
-      </td>
-      <td style="width: 55%;">
-        <div >
-          <%= render "graph" %>
+<div id="main" class="table" style="width: 100%; height: 83vh; border: 1px solid #000;">
+  <div class="row">
+    <div class="cell" style="">
+      <iframe id="main-display" style="width: 100%; height: 90vh; border: none; overflow: auto;" src="/home/notices"></iframe>
+    </div>
+    <div class="cell" style="vertical-align: top;">
+      <div style="float: right; height: 100%;">
+        <div id="right-table" class="table" style="width: 100%; border-spacing: 0px; height: 100%;">
+          <div class="row">
+            <div class="cell" style="border-left: 1px solid #000; border-right: 1px solid #000;height: 45vh; border-bottom: 1px solid #000; width: 50%;">
+              <iframe id="mini1-display" style="margin-left: 20px; width: 100%; height: 45vh; border: none; overflow: hidden;" src="/home/low_stock"></iframe>
+            </div>
+            <div class="cell" style="border-bottom: 1px solid #000; width: 50%;height: 45vh;">
+              <iframe id="mini2-display" style="margin-left: 20px; width: 100%; height: 45vh; border: none; overflow: hidden;" src="/home/overstock"></iframe>
+            </div>
+          </div>
+          <div class="row">
+            <div class="cell" style="border-left: 1px solid #000; border-right: 1px solid #000; width: 50%;">
+              <iframe id="mini3-display" style="margin-left: 20px; width: 100%; height: 45vh; border: none; overflow: hidden;" src="/home/notices"></iframe>
+            </div>
+            <div class="cell" style="width: 50%;">
+              <iframe id="mini4-display" style="margin-left: 20px; width: 100%; height: 45vh; border: none; overflow: hidden;" src="/home/low_stock"></iframe>
+            </div>
+          </div>
         </div>
-      </td>
-    </tr>
-  </table>
+      </div>
+    </div>
+  </div>
 </div>
 
+<script>
+    <!--
+
+    var pages = ["/home/notices", "/home/notices", "/home/notices", "/home/notices", "/home/notices"]
+
+    var current_pos = 0;
+    var timerHnd;
+
+    var timerSpacing = 40;
+
+    function __$(id){
+        return document.getElementById(id);
+    }
+
+    function switchViews(){
+        clearTimeout(timerHnd);
+
+        var current_path = __$("main-display").getAttribute("src");
+        var target;
+        var next_path = "";
+
+        switch(current_pos){
+            case 0:
+                next_path = __$("mini1-display").getAttribute("src");
+
+                target = __$("mini1-display");
+
+                current_pos = 1;
+                break;
+            case 1:
+                next_path = __$("mini2-display").getAttribute("src");
+
+                target = __$("mini2-display");
+
+                current_pos = 2;
+                break;
+            case 2:
+                next_path = __$("mini3-display").getAttribute("src");
+
+                target = __$("mini3-display");
+
+                current_pos = 3;
+                break;
+            case 3:
+                next_path = __$("mini4-display").getAttribute("src");
+
+                target = __$("mini4-display");
+
+                current_pos = 0;
+
+                break;
+        }
+
+        if(target){
+            target.setAttribute("src", current_path);
+
+            __$("main-display").setAttribute("src", next_path);
+        }
+
+        timerHnd = setTimeout("switchViews()", timerSpacing * 1000);
+    }
+
+    function resizeTable(){
+        __$("main").style.height = (window.innerHeight - 150) + "px";
+
+        __$("main-display").style.height = (window.innerHeight - 150) + "px";
+
+        __$("main-display").style.width = (window.innerWidth - ((window.innerHeight ) * 2 / 2.3)) + "px";
+
+        __$("right-table").style.height = (window.innerHeight - 150) + "px";
+
+        __$("mini1-display").style.height = ((window.innerHeight - 170) / 2) + "px";
+
+        __$("mini1-display").style.width = ((window.innerHeight) / 3) + "px";
+
+        __$("mini1-display").style.marginLeft = ((window.innerHeight) / 12) + "px";
+
+        __$("mini2-display").style.height = ((window.innerHeight - 170) / 2) + "px";
+
+        __$("mini2-display").style.width = ((window.innerHeight) / 3) + "px";
+
+        __$("mini2-display").style.marginLeft = ((window.innerHeight) / 12) + "px";
+
+        __$("mini3-display").style.height = ((window.innerHeight - 170) / 2) + "px";
+
+        __$("mini3-display").style.width = ((window.innerHeight) / 3) + "px";
+
+        __$("mini3-display").style.marginLeft = ((window.innerHeight) / 12) + "px";
+
+        __$("mini4-display").style.height = ((window.innerHeight - 170) / 2) + "px";
+
+        __$("mini4-display").style.width = ((window.innerHeight) / 3) + "px";
+
+        __$("mini4-display").style.marginLeft = ((window.innerHeight) / 12) + "px";
+
+    }
+
+    timerHnd = setTimeout("switchViews()", timerSpacing * 1000);
+
+    //-->
+</script>
+
+</body>
+</html>

@@ -1,10 +1,6 @@
 class HomeController < ApplicationController
   def index
-    @lastdate = Observation.find_by_sql("SELECT site_id, max(value_date) as max_date FROM observations
-                                        group by site_id order by max_date asc ;").first.max_date rescue nil
-    @notices = ReportTool.find_significant_disp_pres_diff((Date.today - 7.days), Date.today)
-    @notices += ReportTool.find_dispensation_without_prescriptions((Date.today - 7.days), Date.today)
-    graph()
+
   end
 
   def graph
@@ -185,6 +181,91 @@ class HomeController < ApplicationController
     return [dispensations_line,prescriptions_line,dispensations_pie,prescriptions_pie]
   end
 
+  def notices
+      render :layout => false
+  end
+
+  def low_stock
+    render :layout => false
+  end
+
+  def overstock
+    render :layout => false
+  end
+  def ajax_burdens
+
+    notices = ReportTool.find_significant_disp_pres_diff((Date.today - 7.days), Date.today)
+    @sites = []
+
+    Site.all.each do |source|
+
+      count = notices[source.name].length rescue 0
+
+      site = {
+          'region' => source["region"],
+          'x' => source["x"],
+          'y' =>source["y"],
+          'name' => source["name"],
+          'proportion' => count
+      }
+
+      @sites << site
+    end
+
+    render :json => @sites.to_json
+
+  end
+
+  def ajax_low_stock
+    @sites = {"sites" => []}
+
+    Site.all.each do |source|
+
+      site = {
+          'region' => source["region"],
+          'x' => source["x"],
+          'y' =>source["y"],
+          'name' => source["name"],
+          'proportion' => 0
+      }
+
+      @sites['sites'] << site
+    end
+
+    render :json => @sites.to_json
+  end
+
+  def ajax_high_stock
+    @sites = []
+
+    defn_set = Definition.find(:all, :conditions => ["name in (?)", ['Total prescribed', 'Total dispensed']]).collect { |x| x.id }
+
+    obs = Observation.find_by_sql("SELECT DISTINCT value_drug, site_id FROM observations WHERE voided = 0
+                                    AND definition_id IN (#{defn_set.join(',')}) GROUP BY site_id, value_drug")
+
+    @locations = {}
+    (obs || []).each do |drugs|
+      month_of_stock = Observation.calculate_month_of_stock(drug.value_drug, drug.site_id)
+      @locations[drugs.site.name] = [] if @locations[drugs.site.name].blank?
+      @locations[drugs.site.name] << {drug.value_drug => month_of_stock}
+    end
+
+    sites = Site.find(:all, :conditions => ["name in (?)", @locations.keys])
+    (sites || []).each do |source|
+
+      site = {
+          'region' => source["region"],
+          'x' => source["x"],
+          'y' =>source["y"],
+          'name' => source["name"],
+          'proportion' => 0
+      }
+
+      @sites << site
+    end
+
+    render :json => @sites.to_json
+  end
 end
 
 

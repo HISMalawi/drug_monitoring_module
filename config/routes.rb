@@ -11,6 +11,8 @@ DrugMonitoringProgram::Application.routes.draw do
   post "administration/save_site"
 
   post "administration/delete_site"
+
+  get '/map' => "administration#map"
   ################### USER ##############################
   match '/login' => "user#login"
 
@@ -72,8 +74,13 @@ DrugMonitoringProgram::Application.routes.draw do
 
   match '/home' => "home#index"
   get "home/index"
+  get "home/notices"
+  get "home/overstock"
+  get "home/low_stock"
   post "home/graph"
-
+  get '/ajax_burdens' => "home#ajax_burdens"
+  get '/ajax_low_stock' => "home#ajax_low_stock"
+  get '/ajax_high_stock' => "home#ajax_high_stock"
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
