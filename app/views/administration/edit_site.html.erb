@@ -1,114 +1,193 @@
-
-<script language="javascript" type="text/javascript" src="/javascripts/calendar.js"></script>
 <style type="text/css">
-    input{
-        width: auto;
-        font-size: 28px;
+    td {
+        padding: 10px !important;
     }
-    button{
-        width: auto;
-        font-size: 28px;
+    select,
+    textarea,
+    input {
+        width: 70% !important;
+        float: left !important;
     }
-    table.halfpage{
-        margin-left: auto;
-        margin-right: auto;
-        margin-top: 20px;
-        margin-bottom: 20px;
-    }
-    .halfpage tr{
-        height: 80px;
-
-    }
-    .halfpage caption{
-        font-weight:bold;
+    button {
+        margin: 10px !important;
     }
 </style>
 
+<div class="container theme-showcase" role="main">
 
-<div class="main_container">
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Edit Site</h3>
+  </div>
+  <div class="panel-body">
 
-  <table class="halfpage" cellspacing="10px" cellpadding="20px">
-    <form method="post" action="/administration/save_site" >
-      <caption style="font-family: arial;font-size:34px;">Edit Site Details</caption>
-      <tr>
-        <td id="site_lbl">Site Name</td>
-        <td><input type="text" name="site_name" id='site' value='<%= params[:site] %>'></td>
-      </tr>
-      <tr>
-        <td id='address_lbl'>IP Address</td>
-        <td><input name="address" type="text" id='address' value='<%= params[:address] %>'></td>
-      </tr>
-      <tr>
-        <td id='port_lbl'>Port</td>
-        <td><input name="port" type="text" id='port' value='<%= params[:port] %>'></td>
-      </tr>
+    <%= form_tag('/administration/save_site', :method => 'post', :enctype => 'multipart/form-data',
+                 :id => 'site-form', :class => "form-horizontal", :autocomplete => "off",:role => "form", :novalidate=> "novalidate") do %>
 
-    </form>
-    <tr>
-      <td colspan="2" style="text-align: center;">
-        <button onclick="verify_form();" style="width: 300px;height:60px;border-radius: 30px;" class="main">Save</button>
-      </td>
-    </tr>
-  </table>
+        <div class="form-control-group">
+          <table style="width: 100%;">
+            <tr>
+              <td align="right" style="width: 20%">
+                <label class="control-label">Site Name:</label>&nbsp;&nbsp;&nbsp;
+              </td>
+              <td>
+                <select id="sitename" name="sitename" class="form-control" placeholder="Region" required="" onchange="switchSite(this.value)" >
+                  <option value="">[ - Select site - ]</option>
 
+                  <% @sites.each do |site| %>
+
+                      <option value="<%= site.name %>"><%= site.name %></option>
+
+                  <% end %>
+                  <input name="old_site" class="form-control" id="old_site" required="" value="" type="hidden" />
+                </select>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="form-control-group">
+          <table style="width: 100%;">
+            <tr>
+              <td align="right" style="width: 20%">
+                <label class="control-label">IP Address:</label>&nbsp;&nbsp;&nbsp;
+              </td>
+              <td>
+                <input name="ip_address" class="form-control" placeholder="Site IP Address" id="ip_address" required="" value="" type="text" minlength=7 ipaddress=true />
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="form-control-group">
+          <table style="width: 100%;">
+            <tr>
+              <td align="right" style="width: 20%">
+                <label class="control-label">Port:</label>&nbsp;&nbsp;&nbsp;
+              </td>
+              <td>
+                <input name="port" class="form-control" placeholder="Port" id="port" required="" value="" type="text" />
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="form-control-group">
+          <table style="width: 100%;">
+            <tr>
+              <td align="right" style="width: 20%">
+                <label class="control-label">Region:</label>&nbsp;&nbsp;&nbsp;
+              </td>
+              <td>
+                <select id="region" name="region" class="form-control" placeholder="Region" required="" onchange="switchRegion(this.value)" >
+                  <option value="">[ - Select site region in Malawi - ]</option>
+                  <option value="Centre">Central Region</option>
+                  <option value="North">Northern Region</option>
+                  <option value="South">Southern Region</option>
+                </select>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="form-control-group">
+          <table style="width: 100%;">
+            <tr>
+              <td align="right" style="width: 20%; vertical-align: top;">
+                <label class="control-label">Site location:</label>&nbsp;&nbsp;&nbsp;
+              </td>
+              <td>
+                <iframe id="map" style="border: 1px dotted #999; padding: 0px; text-align: center; width: 70%; overflow: hidden !important; height: 600px;" src="/map?region"></iframe>
+                <input name="x" class="form-control" id="x" required="" value="" type="hidden" />
+                <input name="y" class="form-control" id="y" required="" value="" type="hidden" />
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <table style="width: 100%;">
+          <tr>
+            <td style="width: 20%;">
+              <button type="button" class="btn btn-danger" style="font-size: 18px !important; float: left;" onclick="window.location = '/'">Cancel</button>
+            </td>
+            <td>
+              <button type="submit" class="btn btn-success btn-large" style="font-size: 18px !important; float: right;">Save Site</button>
+            </td>
+          </tr>
+        </table>
+
+    <% end %>
+
+  </div>
+</div>
 </div>
 
-<script type="text/javascript">
-    <!--
-    function verify_form()
-    {
+<script defer="true">
+    var sites = {};
 
-        var site = document.getElementById('site').value;
-        var address = document.getElementById('address').value;
-        var port = document.getElementById('port').value;
-        var old_site = '<%= params[:site] %>';
-        var ipformat = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+    <% @sites.each do |site| %>
+        sites["<%= site.name %>"] = {"name": '<%= site.name %>', "ip_address": '<%= site.ip_address %>',
+                                     "port": '<%= site.port %>', "x": '<%= site.x %>', "y":'<%= site.y %>' , "region":'<%= site.region %>'}
+
+    <% end %>
 
 
-        if (site.trim() == "")
-        {
-            highlight('site_lbl',true);
-            jAlert("Please provide site name", "Incomplete Information");
-        }
-        else if (!address.match(ipformat))
-        {
-            jAlert("Expecting an IP address of format xxx.xxx.xxx.xxx", "Incomplete Information");
-            highlight('author_lbl',true);
-        }
-        else if (!parseInt(port))
-        {
-            jAlert("Please provide application port", "Incomplete Information");
-            highlight('port_lbl',true);
-        }
-        else
-        {
-            jQuery.ajax({
-                url:  "/administration/save_site?site=" + site + "&address=" + address +"&port=" +port +"&old_site=" +old_site,
-                type:"POST",
-                success: function(msg){
-                    jAlert(msg, "Site Creation Outcome")
-                    window.location="/administration/list_sites"
+
+    jQuery.validator.addMethod("sitecode", function(value, element) {
+        return this.optional(element) || /^[A-Z]{3}$/.test(value);
+    }, "Please 3 capital letters only.");
+
+    jQuery.validator.addMethod("ipaddress", function(value, element) {
+        return this.optional(element) || /^\d+\.\d+\.\d+\.\d+$/.test(value);
+    }, "Not a valid IP address.");
+
+    function switchRegion(region){
+        document.getElementById("map").setAttribute("src", "/map?region=" + region.toLowerCase().trim());
+    }
+
+    function switchSite(sitename){
+        document.getElementById("sitename").value = sites[sitename]["name"];
+        document.getElementById("old_site").value = sites[sitename]["name"];
+        document.getElementById("ip_address").value = sites[sitename]["ip_address"];
+        document.getElementById("port").value = sites[sitename]["port"];
+        document.getElementById("map").setAttribute("src", "/map?region=" + sites[sitename]["region"] + "&x=" + sites[sitename]["x"] + "&y=" + sites[sitename]["y"]);
+        document.getElementById("x").value = sites[sitename]["x"];
+        document.getElementById("y").value = sites[sitename]["y"];
+        document.getElementById("region").value = sites[sitename]["region"];
+    }
+
+
+    function prettyPrint(){
+        $(document).ready(function(){
+
+            $('#site-form').validate({
+                rules: {},
+                highlight: function(element) {
+                    $(element).closest('.control-group').removeClass('success').addClass('error');
                 },
-                error: function(){
-                    jAlert("Could not create site", "Unsuccessful!");
+                success: function(element) {
+                    element
+                            .text('OK!').addClass('valid')
+                            .closest('.control-group').removeClass('error').addClass('success');
                 }
-
             });
-        }
 
-
+        }); // end document.ready
     }
 
-    function clear()
-    {
-        document.getElementById('site').value = "";
-        document.getElementById('address').value = "";
-        document.getElementById('port').value = "";
+    $(document).ready(function(){
 
-    }
-    //-->
+        $('#site-form').validate({
+            highlight: function(element) {
+                $(element).closest('.control-group').removeClass('success').addClass('error');
+            },
+            success: function(element) {
+                element
+                        .text('OK!').addClass('valid')
+                        .closest('.control-group').removeClass('error').addClass('success');
+            }
+        });
+
+    }); // end document.ready
+
+    addEventListener('load', prettyPrint, false);
+    $(document).ready(function(){
+        $('pre').addClass('prettyprint linenums');
+    });
 </script>
-
-
-
-
