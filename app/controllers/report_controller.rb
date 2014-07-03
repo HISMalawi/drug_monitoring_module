@@ -368,7 +368,7 @@ class ReportController < ApplicationController
     render :layout => 'report_layout'
   end
 
-  def create_notification(site_id, date, notice, drug)
+  def self.create_notification(site_id, date, notice, drug)
 
     notice_defn = Definition.find_by_name("Notice")
     state_defn = Definition.find_by_name("New")

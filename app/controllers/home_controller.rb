@@ -194,7 +194,7 @@ class HomeController < ApplicationController
   end
   def ajax_burdens
 
-    notices = ReportTool.find_significant_disp_pres_diff((Date.today - 7.days), Date.today)
+    notices = ReportController.find_significant_disp_pres_diff((Date.today - 7.days), Date.today)
     @sites = []
 
     Site.all.each do |source|
