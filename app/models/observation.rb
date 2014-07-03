@@ -390,7 +390,7 @@ class Observation < ActiveRecord::Base
 
     if stock_level < 0
       notice = "Site has negative stock level for #{drug}. Verify with site for accurate values"
-      create_notification(site_id,date,notice,drug)
+
     end
 
     return stock_level < 0 ? 0 : stock_level
@@ -415,26 +415,5 @@ class Observation < ActiveRecord::Base
 
   end
 
-  def self.create_notification(site_id, date, notice, drug)
 
-    notice_defn = Definition.find_by_name("Notice")
-    state_defn = Definition.find_by_name("New")
-
-    obs = Observation.where(:site_id => site_id,
-                           :definition_id => notice_defn.id,
-                           :value_drug => drug,
-                           :value_date => date,
-                           :value_text => notice
-    ).first
-
-    if obs.blank?
-      obs = Observation.create(:site_id => site_id,
-                              :definition_id => notice_defn.id,
-                              :value_drug => drug,
-                              :value_date => date,
-                              :value_text => notice
-      )
-      state = State.create(:observation_id => obs.id, :state => state_defn.name)
-    end
-  end
 end
