@@ -193,20 +193,38 @@ class HomeController < ApplicationController
     render :layout => false
   end
   def ajax_burdens
-
-    notices = ReportController.find_significant_disp_pres_diff((Date.today - 7.days), Date.today)
     @sites = []
+    new_notices_by_site = {}
+    notices_under_investigation_by_site = {}
+    new_notices = Observation.find_by_sql("SELECT * FROM observations INNNER JOIN states
+     USING(observation_id) WHERE state='New' ")
+
+    new_notices.each do |notice|
+        site_id = notice.site_id
+        new_notices_by_site[site_id] = {} if new_notices_by_site[site_id].blank?
+        new_notices_by_site[site_id]["count"] = 0 if new_notices_by_site[site_id]["count"].blank?
+        new_notices_by_site[site_id]["count"]+=1
+    end
+
+    notices_under_investigation = Observation.find_by_sql("SELECT * FROM observations INNNER JOIN states
+     USING(observation_id) WHERE state='Investigating' ")
+
+    notices_under_investigation.each do |notice|
+        site_id = notice.site_id
+        notices_under_investigation_by_site[site_id] = {} if notices_under_investigation_by_site[site_id].blank?
+        notices_under_investigation_by_site[site_id]["count"] =  0 if notices_under_investigation_by_site[site_id]["count"].blank?
+        notices_under_investigation_by_site[site_id]["count"] += 1
+    end
 
     Site.all.each do |source|
-
-      count = notices[source.name.to_s].count
-
       site = {
           'region' => source["region"],
           'x' => source["x"],
           'y' =>source["y"],
           'name' => source["name"],
-          'proportion' => count
+          'proportion' => (new_notices_by_site[source.id]["count"] ),
+          'new' => (new_notices_by_site[source.id]["count"] rescue 0),
+          'investigating' => (notices_under_investigation_by_site[source.id]["count"] rescue 0)
       }
 
       @sites << site
