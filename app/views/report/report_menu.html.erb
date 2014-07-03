@@ -107,10 +107,10 @@
       }
     }
   }
-  
+
   function verify_form()
   {
-   
+
     var type = '<%= params[:type]%>';
     if(type == "delivery report")
     {
@@ -126,7 +126,7 @@
       }
       else{
         document.forms[0].submit();
-      }     
+      }
     }
     else if(document.getElementById('start_date').value.trim() == "")
     {

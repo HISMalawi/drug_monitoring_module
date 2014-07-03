@@ -37,7 +37,13 @@ definitions = [["Prescription", "Describes the number of precriptions"],
   ["People who received drugs", "Number of people to whom a drug was dispensed"],
   ["People prescribed drug", "Number of people to whom a drug was prescribed"],
   ["Relocation", "Drugs that expired, damaged or were transferred to other locations"],
-  ["New Delivery", "Drugs just arrived at a site"]
+  ["Month of Stock", "Calculated month of stock of a drug at a site"],
+  ["Stock Level", "Calculated stock levels for a drug at a site"],
+  ["New Delivery", "Drugs just arrived at a site"],
+  ["Notice", "Notification of discrepancy in data"],
+  ["New", "State for notification"],
+  ["Investigating", "State of notification"],
+  ["Resolved", "State of notification"]
 ]
 
 (definitions || []).each do |definition|

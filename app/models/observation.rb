@@ -152,7 +152,7 @@ class Observation < ActiveRecord::Base
           "SELECT ROUND(AVG(value_numeric)) AS rate FROM observations
         WHERE definition_id = #{dispensation_id} AND value_drug = '#{drug}'
         AND site_id = #{site_id}"
-      ).rate rescue "Unknown"
+      ).first.rate
     end
 
   end
@@ -251,7 +251,7 @@ class Observation < ActiveRecord::Base
         return  self.find_by_sql(
             "SELECT MAX(value_numeric) AS value FROM observations
         WHERE definition_id = #{dispensation_id} AND value_drug = '#{drug}'
-        AND site_id = #{site_id}").value
+        AND site_id = #{site_id}").first.value
       end
     end
   end
@@ -289,27 +289,27 @@ class Observation < ActiveRecord::Base
         return  self.find_by_sql(
             "SELECT MIN(value_numeric) AS value FROM observations
         WHERE definition_id = #{dispensation_id} AND value_drug = '#{drug}'
-        AND site_id = #{site_id}").value
+        AND site_id = #{site_id}").first.value
       end
     end
   end
 
-  def self.total_dispensed( date, drug =nil, site_id =nil)
-    dispensation_id = Definition.where(:name => "dispensation").first.id
+  def self.total_dispensed( date = Date.today, drug =nil, site_id =nil)
+    dispensation_id = Definition.where(:name => "Dispensation").first.id
 
     if drug.blank?
       if site_id.blank?
         return  self.find_by_sql(
-            "SELECT value_drug,SUM(value_numeric) AS value,site_id FROM observations
-        WHERE definition_id = #{dispensation_id} AND value_date >= '#{date}'
+            "SELECT value_drug,MAX(value_numeric) AS value,site_id FROM observations
+        WHERE definition_id = #{dispensation_id} AND value_date <= '#{date}'
         GROUP BY value_drug, site_id"
         ).inject({}){|result, obs|
           result[obs.site_id] = [] if result[obs.site_id].blank?; result[obs.site_id] << {obs.value_drug => obs.value}; result
         }
       else
         return  self.find_by_sql(
-            "SELECT value_drug,SUM(value_numeric) AS value FROM observations
-        WHERE definition_id = #{dispensation_id}  AND value_date >= '#{date}' AND site_id = #{site_id}
+            "SELECT value_drug,MAX(value_numeric) AS value FROM observations
+        WHERE definition_id = #{dispensation_id}  AND value_date <= '#{date}' AND site_id = #{site_id}
         GROUP BY value_drug"
         ).inject({}){|result, obs|
           result[obs.value_drug] = {} if result[obs.site_id].blank?; result[obs.value_drug] = obs.value; result
@@ -318,7 +318,7 @@ class Observation < ActiveRecord::Base
     else
       if site_id.blank?
         return  self.find_by_sql(
-            "SELECT SUM(value_numeric) AS value,site_id FROM observations
+            "SELECT MAX(value_numeric) AS value,site_id FROM observations
         WHERE definition_id = #{dispensation_id} AND value_drug = '#{drug}'
          AND value_date >= '#{date}' GROUP BY site_id"
         ).inject({}){|result, obs|
@@ -328,16 +328,113 @@ class Observation < ActiveRecord::Base
         return  self.find_by_sql(
             "SELECT SUM(value_numeric) AS value FROM observations
         WHERE definition_id = #{dispensation_id} AND value_drug = '#{drug}'
-        AND site_id = #{site_id}").value
+        AND site_id = #{site_id} ").first.value
       end
     end
   end
 
-  def self.calculate_stock_level(drug)
+  def self.total_removed( date = Date.today, drug =nil, site_id =nil)
+    removed_id = Definition.where(:name => "Total Removed").first.id
+
+    if drug.blank?
+      if site_id.blank?
+        return  self.find_by_sql(
+            "SELECT value_drug,MAX(value_numeric) AS value,site_id FROM observations
+        WHERE definition_id = #{removed_id} AND value_date <= '#{date}'
+        GROUP BY value_drug, site_id"
+        ).inject({}){|result, obs|
+          result[obs.site_id] = [] if result[obs.site_id].blank?; result[obs.site_id] << {obs.value_drug => obs.value}; result
+        }
+      else
+        return  self.find_by_sql(
+            "SELECT value_drug,MAX(value_numeric) AS value FROM observations
+        WHERE definition_id = #{removed_id}  AND value_date <= '#{date}' AND site_id = #{site_id}
+        GROUP BY value_drug"
+        ).inject({}){|result, obs|
+          result[obs.value_drug] = {} if result[obs.site_id].blank?; result[obs.value_drug] = obs.value; result
+        }
+      end
+    else
+      if site_id.blank?
+        return  self.find_by_sql(
+            "SELECT MAX(value_numeric) AS value,site_id FROM observations
+        WHERE definition_id = #{removed_id} AND value_drug = '#{drug}'
+         AND value_date <= '#{date}' GROUP BY site_id"
+        ).inject({}){|result, obs|
+          result[obs.site_id] = obs.value; result
+        }
+      else
+        return  self.find_by_sql(
+            "SELECT SUM(value_numeric) AS value FROM observations
+        WHERE definition_id = #{removed_id} AND value_drug = '#{drug}'
+        AND site_id = #{site_id} AND value_date >='#{date}'").first.value
+      end
+    end
+  end
+
+  def self.calculate_stock_level(drug, site_id, date = Date.today )
+
+    total_delivered_defn = Definition.find_by_name("supervision verification").id
+
+    obs = Observation.find_by_sql("SELECT value_numeric, MAX(value_date) as date FROM observations WHERE voided = 0
+                                              AND definition_id = #{total_delivered_defn} AND value_drug = '#{drug}'
+                                              AND site_id = #{site_id} ORDER BY value_date").first
+
+    total_delivered = obs.value_numeric
+
+    dispensed_total = Observation.total_dispensed(obs.date,drug,site_id)
+
+    removed_total = Observation.total_removed(obs.date,drug,site_id)
+
+    stock_level = total_delivered.to_i - (dispensed_total.to_i + removed_total.to_i)
+
+    if stock_level < 0
+      notice = "Site has negative stock level for #{drug}. Verify with site for accurate values"
+      create_notification(site_id,date,notice,drug)
+    end
+
+    return stock_level < 0 ? 0 : stock_level
 
   end
 
   def self.calculate_month_of_stock(drug, site_id = nil)
 
+    stock_level = Observation.calculate_stock_level(drug, site_id).to_i
+
+    dispensation_rate = Observation.drug_dispensation_rates(drug,site_id).to_i
+
+    if dispensation_rate.class == Fixnum
+      consumption_rate = (dispensation_rate * 0.5)
+
+      expected = (stock_level/ 60)
+
+      return (expected/ consumption_rate)
+    else
+      return "Unknown"
+    end
+
+  end
+
+  def self.create_notification(site_id, date, notice, drug)
+
+    notice_defn = Definition.find_by_name("Notice")
+    state_defn = Definition.find_by_name("New")
+
+    obs = Observation.where(:site_id => site_id,
+                           :definition_id => notice_defn.id,
+                           :value_drug => drug,
+                           :value_date => date,
+                           :value_text => notice
+    ).first
+
+    if obs.blank?
+      obs = Observation.create(:site_id => site_id,
+                              :definition_id => notice_defn.id,
+                              :value_drug => drug,
+                              :value_date => date,
+                              :value_text => notice
+      )
+      state = State.create(:observation_id => obs.id, :state => state_defn.name)
+    end
   end
 end

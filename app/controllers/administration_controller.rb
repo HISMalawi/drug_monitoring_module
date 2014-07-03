@@ -39,6 +39,7 @@ class AdministrationController < ApplicationController
         site.region = params[:region]
         site.ip_address = params[:ip_address]
         site.port = params[:port]
+        site.threshold = params[:threshold]
         site.save
       end
     end

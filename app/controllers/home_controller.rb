@@ -199,7 +199,7 @@ class HomeController < ApplicationController
 
     Site.all.each do |source|
 
-      count = notices[source.name].length rescue 0
+      count = notices[source.name.to_s].count
 
       site = {
           'region' => source["region"],
@@ -238,7 +238,7 @@ class HomeController < ApplicationController
   def ajax_high_stock
     @sites = []
 
-    defn_set = Definition.find(:all, :conditions => ["name in (?)", ['Total prescribed', 'Total dispensed']]).collect { |x| x.id }
+    defn_set = Definition.find(:all, :conditions => ["name in (?)", ['Supervision Verification']]).collect { |x| x.id }
 
     obs = Observation.find_by_sql("SELECT DISTINCT value_drug, site_id FROM observations WHERE voided = 0
                                     AND definition_id IN (#{defn_set.join(',')}) GROUP BY site_id, value_drug")

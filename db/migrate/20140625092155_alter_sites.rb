@@ -6,6 +6,7 @@ class AlterSites < ActiveRecord::Migration
       s.column :ip_address, :string, :default => " "
       s.column :port, :string, :default => " "
       s.column :region, :string, :default => " "
+      s.column :threshold, :integer, :default => 20
     end
   end
 

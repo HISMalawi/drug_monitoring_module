@@ -22,12 +22,14 @@ class ReportTool < ActiveRecord::Base
         issues[prescription.site.name] << "#{prescription.get_short_form} has prescriptions but no dispensations on #{prescription.value_date.strftime('%d %B %Y')}"
       else
         percent = (((prescription.value_numeric.to_f - dispensation[0].value_numeric.to_f)/prescription.value_numeric.to_f)*100).round(2)
-        if percent >= 20.0
+        if percent >= prescription.site.threshold
+          notice = "#{percent.abs}% more prescriptions than dispensations for #{prescription.get_short_form} on #{prescription.value_date.strftime('%d %B %Y')}"
+          Observation.create_notification(prescription.site_id,prescription.value_date, notice, prescription.get_short_form)
           issues[prescription.site.name] << "#{percent.abs}% more prescriptions than dispensations for #{prescription.get_short_form} on #{prescription.value_date.strftime('%d %B %Y')}"
-        elsif percent <= -20.0
-          issues[prescription.site.name] << "#{percent.abs}% more dispensations than prescriptions for #{prescription.get_short_form} on #{prescription.value_date.strftime('%d %B %Y')}"
+        elsif percent <= -prescription.site.threshold
+          notice = "#{percent.abs}% more dispensations than prescriptions for #{prescription.get_short_form} on #{prescription.value_date.strftime('%d %B %Y')}"
+          Observation.create_notification(prescription.site_id,prescription.value_date, notice, prescription.get_short_form)
         end
-
       end
     end
 
@@ -39,6 +41,8 @@ class ReportTool < ActiveRecord::Base
                                                               prescription_id, dispensation.value_date,dispensation.value_drug, dispensation.site_id])
       if prescription.blank?
         issues[dispensation.site.name] = [] if issues[dispensation.site.name].blank?
+        noitice = "#{dispensation.get_short_form} has dispensation but no prescriptions on #{dispensation.value_date.strftime('%d %B %Y')}"
+        Observation.create_notification(dispensation.site_id,dispensation.value_date, notice, dispensation.get_short_form)
         issues[dispensation.site.name] << "#{dispensation.get_short_form} has dispensation but no prescriptions on #{dispensation.value_date.strftime('%d %B %Y')}"
       end
     end

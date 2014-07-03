@@ -6,7 +6,7 @@ $dispensation_id = Definition.where(:name => "dispensation").first.id
 $relocation_id = Definition.where(:name => "relocation").first.id
 $drug_given_to_id = Definition.where(:name => "People who received drugs").first.id
 $drug_prescribed_id = Definition.where(:name => "People prescribed drug").first.id
- 
+
 def start
 
   sites = YAML.load_file("#{Rails.root.to_s}/config/sites.yml")

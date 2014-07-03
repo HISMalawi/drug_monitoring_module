@@ -73,6 +73,19 @@
           <table style="width: 100%;">
             <tr>
               <td align="right" style="width: 20%">
+                <label class="control-label">Threshold:</label>&nbsp;&nbsp;&nbsp;
+              </td>
+              <td>
+                <input type="text" id="threshold" name="threshold" value="" class="form-control" placeholder="Enter discrepancy threshold" required="" digits=true />
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="form-control-group">
+          <table style="width: 100%;">
+            <tr>
+              <td align="right" style="width: 20%">
                 <label class="control-label">Region:</label>&nbsp;&nbsp;&nbsp;
               </td>
               <td>
@@ -123,7 +136,8 @@
 
     <% @sites.each do |site| %>
         sites["<%= site.name %>"] = {"name": '<%= site.name %>', "ip_address": '<%= site.ip_address %>',
-                                     "port": '<%= site.port %>', "x": '<%= site.x %>', "y":'<%= site.y %>' , "region":'<%= site.region %>'}
+                                     "port": '<%= site.port %>', "x": '<%= site.x %>', "y":'<%= site.y %>' ,
+                                    "threshold": <%= site.threshold %>,"region":'<%= site.region %>'}
 
     <% end %>
 
@@ -150,6 +164,7 @@
         document.getElementById("x").value = sites[sitename]["x"];
         document.getElementById("y").value = sites[sitename]["y"];
         document.getElementById("region").value = sites[sitename]["region"];
+        document.getElementById("threshold").value = sites[sitename]["threshold"];
     }
 
 
