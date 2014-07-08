@@ -178,19 +178,19 @@ class ReportController < ApplicationController
         "ppo_who_received_drugs" => 0, "ppo_prescribed_drugs" => 0} unless !@values["All"][record.value_date].blank?
 
       case (record.definition_name.downcase)
-      when "prescription" :
+      when "prescription"
           @values[record.site.name][record.value_date]["prescription"] = record.value_numeric
         @values["All"][record.value_date]["prescription"] += record.value_numeric
-      when "dispensation":
+      when "dispensation"
           @values[record.site.name][record.value_date]["dispensation"] = record.value_numeric
         @values["All"][record.value_date]["dispensation"] += record.value_numeric
-      when "relocation":
+      when "relocation"
           @values[record.site.name][record.value_date]["relocation"] =  record.value_numeric
         @values["All"][record.value_date]["relocation"] += record.value_numeric
-      when "people who received drugs":
+      when "people who received drugs"
           @values[record.site.name][record.value_date]["ppo_who_received_drugs"] = record.value_numeric
         @values["All"][record.value_date]["ppo_who_received_drugs"] += record.value_numeric
-      when "people prescribed drug":
+      when "people prescribed drug"
           @values[record.site.name][record.value_date]["ppo_prescribed_drugs"] = record.value_numeric
         @values["All"][record.value_date]["ppo_prescribed_drugs"] += record.value_numeric
       end
