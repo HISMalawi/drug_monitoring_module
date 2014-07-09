@@ -284,6 +284,11 @@ class HomeController < ApplicationController
 
     render :json => @sites.to_json
   end
+
+  def manage_notices
+
+  end
+  
 end
 
 
