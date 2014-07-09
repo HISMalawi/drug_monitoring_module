@@ -232,11 +232,15 @@
         d3.selectAll("circle.site").remove();
 
         for(var i = 0; i < sites.length; i++){
+            
             var xs = -10;
             var ys = -10;
 
             var xt = -10;
             var yt = -10;
+
+            var investigating = sites[i]['investigating']
+            var new_notices = sites[i]['new']
 
             if(sites[i]["x"] != null && sites[i]["y"] != null){
                 if(sites[i]["region"].toLowerCase() == "centre"){
@@ -257,47 +261,16 @@
                 }
             }
 
-            if(d3.select("#" + sites[i]["site_code"].toLowerCase())[0][0] == null){
-                if(sites[i]["type"].toLowerCase() == "master"){
-                    d3.select("#region").append("rect")
+            d3.select("#region").append("circle")
                             .style("stroke", "white")
                             .style("stroke-width", "1px")
-                            .style("fill", "#1954cd")
+                            .style("fill", "red")
                             .style("margin", "auto")
                             .attr("class", "site")
-                            .attr("width", 8)
-                            .attr("height", 8)
-                            .attr("x", xs - 4)
-                            .attr("y", ys - 4)
-                            .attr("id", sites[i]["site_code"].toLowerCase())
-                            .attr("tag", sites[i]["name"])
-                            .on("mouseover", function(){
-                                d3.select("#" + this.id).attr("r", 6).style("z-index", "100")
-                                        .style("fill", "#537ee0");
-                                return tooltip.style("visibility", "visible");
-                            })
-                            .on("mousemove", function(){
-                                return tooltip.style("top",
-                                                (d3.event.pageY-10)+"px")
-                                        .style("left", (d3.event.pageX+20)+"px")
-                                        .text(getSiteInfo(this.id));
-                            })
-                            .on("mouseout", function(){
-                                d3.select("#" + this.id).attr("r", 6).style("z-index", "10")
-                                        .style("fill", "red");
-                                return tooltip.style("visibility", "hidden");
-                            });
-                } else {
-                    d3.select("#region").append("circle")
-                            .style("stroke", "white")
-                            .style("stroke-width", "1px")
-                            .style("fill", "#1954cd")
-                            .style("margin", "auto")
-                            .attr("class", "site")
-                            .attr("r", 3)
+                            .attr("r", 6)
                             .attr("cx", xs)
                             .attr("cy", ys)
-                            .attr("id", sites[i]["site_code"].toLowerCase())
+                            .attr("id", sites[i]["name"].toLowerCase())
                             .attr("tag", sites[i]["name"])
                             .on("mouseover", function(){
                                 d3.select("#" + this.id).attr("r", 6).style("z-index", "100")
@@ -315,8 +288,6 @@
                                         .style("fill", "red");
                                 return tooltip.style("visibility", "hidden");
                             });
-                }
-            }
         }
     }
 
@@ -332,7 +303,6 @@
         foreground = {};
         text = {};
         meter = {};
-
         for(var i = 0; i < sites.length; i++){
             var xs = -10;
             var ys = -10;
@@ -370,15 +340,36 @@
                     .outerRadius(oradius + 1);
 
             var meter = isvg.append("g")
-                    .attr("class", "progress-meter");
-
+                    .attr("class", "progress-meter")
+                    .attr("id", sites[i]["name"])
+                    .attr("new", sites[i]["new"])
+                    .attr("investigating", sites[i]["investigating"])
+                    .on("mouseover", function(){
+                      return tooltip.style("visibility", "visible");
+                    })
+                    .on("mousemove", function(){
+                     site_name = this.getAttribute('id')
+                     new_notices = this.getAttribute('new')
+                     investigating = this.getAttribute('investigating')
+                     return tooltip.style("top", (d3.event.pageY-10)+"px")
+                          .style("left", (d3.event.pageX+20)+"px")
+                          .html("<center>" + site_name + '</center>New notices: ' + new_notices + " <br />Investigating: " + investigating);
+                    })
+                    .on("mouseout", function(){
+                        return tooltip.style("visibility", "hidden");
+                    });
             meter.append("path")
                     .attr("class", "background-most")
                     .attr("d", barc.endAngle(twoPi));
-
+                  
             var foreground = meter.append("path")
-                    .attr("d", arc.endAngle(twoPi));
+                    .attr("d", arc.endAngle(twoPi))
+                    .on("mouseover", function(){
 
+                  return tooltip.style("visibility", "visible");
+              })
+
+              
             var pos = sites[i]["proportion"];
 
             if(pos == 0){
@@ -393,7 +384,6 @@
                     .attr("text-anchor", "middle")
                     .attr("dy", ".35em")
                     .text(formatPercent(pos));
-
         }
 
         // loadSites();
@@ -469,7 +459,6 @@
                 var result = JSON.parse(aXMLHttpRequest.responseText);
 
                 sites = result;
-
                 loadProgress();
 
             } catch(e){
