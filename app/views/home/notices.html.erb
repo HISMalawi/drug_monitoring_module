@@ -310,9 +310,6 @@
             var xt = -10;
             var yt = -10;
 
-            var investigating = sites[i]['investigating']
-            var new_notices = sites[i]['new']
-            
             if(sites[i]["x"] != null && sites[i]["y"] != null){
                 if(sites[i]["region"].toLowerCase() == "centre"){
 
@@ -345,11 +342,15 @@
             var meter = isvg.append("g")
                     .attr("class", "progress-meter")
                     .attr("id", sites[i]["name"])
+                    .attr("new", sites[i]["new"])
+                    .attr("investigating", sites[i]["investigating"])
                     .on("mouseover", function(){
                       return tooltip.style("visibility", "visible");
                     })
                     .on("mousemove", function(){
                      site_name = this.getAttribute('id')
+                     new_notices = this.getAttribute('new')
+                     investigating = this.getAttribute('investigating')
                      return tooltip.style("top", (d3.event.pageY-10)+"px")
                           .style("left", (d3.event.pageX+20)+"px")
                           .html("<center>" + site_name + '</center>New notices: ' + new_notices + " <br />Investigating: " + investigating);

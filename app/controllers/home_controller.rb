@@ -222,7 +222,7 @@ class HomeController < ApplicationController
           'x' => source["x"],
           'y' =>source["y"],
           'name' => source["name"],
-          'proportion' => (new_notices_by_site[source.id]["count"] ),
+          'proportion' => (new_notices_by_site[source.id]["count"] rescue 0),
           'new' => (new_notices_by_site[source.id]["count"] rescue 0),
           'investigating' => (notices_under_investigation_by_site[source.id]["count"] rescue 0)
       }
