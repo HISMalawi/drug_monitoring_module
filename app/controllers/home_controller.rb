@@ -286,7 +286,17 @@ class HomeController < ApplicationController
   end
 
   def manage_notices
+    @site_name = params[:site_name]
+    site_id = Site.find_by_name(params[:site_name]).site_id
+    @new_notices = Observation.find_by_sql("SELECT * FROM observations INNNER JOIN states
+     USING(observation_id) WHERE state='New' AND site_id=#{site_id}")
 
+    @under_investigations = Observation.find_by_sql("SELECT * FROM observations INNNER JOIN states
+     USING(observation_id) WHERE state='Investigating' AND site_id=#{site_id}")
+
+    @resolved = Observation.find_by_sql("SELECT * FROM observations INNNER JOIN states
+     USING(observation_id) WHERE state='Resolved' AND site_id=#{site_id}")
+    
   end
   
 end
