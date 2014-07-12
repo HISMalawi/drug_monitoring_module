@@ -5,15 +5,14 @@
 </style>
 
 <div id="site_breakdown">
+  <div id="notices_header" style="margin-left: 40%;">
+    <span>Site Name: <b style="font-size: 12pt;"><%= @site_name %></b></span><br />
+    <span>New notices: <b style="font-size: 12pt;"><%= @new_notices.count %></b></span><br />
+    <span>Investigating: <b style="font-size: 12pt;"><%= @under_investigations.count %></b></span><br />
+    <span>Resolved: <b style="font-size: 12pt;"><%= @resolved.count %></b></span><br /><br />
+  </div>
   <table cellspacing="0" style="position:absolute; width: 80%; left: 10%;">
-    <tr style="background-color: green; border-bottom: 1px solid black;">
-      <td colspan="3" style="color: white;"><center>Site Name: <span style="font-size: 14pt; font-weight: bold; letter-spacing: 3px;"><%= @site_name %></span></center></td>
-    </tr>
-    <tr>
-      <td style="border-right: 1px solid black; border-left: 1px solid black; border-bottom: 1px solid black;"><center>New Notices: <span style="font-size: 14pt; font-weight: bold;"><%= @new_notices.count %></span></center></td>
-      <td style="border-right: 1px solid black; border-bottom: 1px solid black;"><center>Under Investigations: <span style="font-size: 14pt; font-weight: bold;"><%= @under_investigations.count %></span></center></td>
-      <td style="border-right: 1px solid black; border-bottom: 1px solid black;"><center>Resolved: <span style="font-size: 14pt; font-weight: bold;"><%= @resolved.count %></span></center></td>
-    </tr>
+
     <tr style="background-color: #A9A9A9;">
       <td colspan="3" style="color: white;"><center><span style="font-size: 12pt; letter-spacing: 3px;">New Notices</span></center></td>
     </tr>
