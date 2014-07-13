@@ -1,11 +1,11 @@
 <script type="text/javascript">
-  function saveNewNoticesChanges(){
-    new_notices_form = document.getElementById('new_notices');
+  function saveNewNoticesChanges(id){
+    new_notices_form = document.getElementById(id);
     form_elements = new_notices_form.elements;
     resolved = [];
     investigating = [];
     for(i=0; i<form_elements.length; i++){
-      if (form_elements[i].type == 'radio'){
+      if (form_elements[i].type == 'radio' || form_elements[i].type == 'checkbox'){
         if (form_elements[i].checked){
             values = form_elements[i].value.split(/:/);
             mark_type = values[0];
@@ -26,6 +26,34 @@
 
     });
   }
+
+  function show_hide_resolved_notices(q){
+    resolved_data = document.getElementsByClassName('resolved_notices');
+    hide = document.getElementById('hide');
+    if (q == 'Hide'){
+      hide.innerHTML='Show';
+      for (i=0; i< resolved_data.length; i++){
+        resolved_data[i].style.display='none'
+      }
+    }
+
+    if (q == 'Show'){
+      hide.innerHTML='Hide';
+      for (i=0; i< resolved_data.length; i++){
+        resolved_data[i].style.display=''
+      }
+    }
+
+  }
+
+  function t(){
+    document.getElementById('hide').onclick= function(){
+      q = document.getElementById('hide').innerHTML
+     
+      show_hide_resolved_notices(q);
+     }
+   }
+   setTimeout("t();", 300);
 </script>
 <style>
   #site_breakdown{
@@ -72,7 +100,7 @@
           </tr>
         <% end %>
           <tr style="line-height:1em;">
-            <td colspan="3" id="apply_button"><span onclick="saveNewNoticesChanges();" style="float:right;">Save changes</span></td>
+            <td colspan="3" id="apply_button"><span onclick="saveNewNoticesChanges('new_notices');" style="float:right;">Save changes</span></td>
           </tr>
       </form>
     <% else %>
@@ -82,20 +110,22 @@
     <% end %>
           
     <tr style="background-color: #A9A9A9; color: white;">
-      <td><center><span style="font-size: 12pt; letter-spacing: 3px;">Under Investigation</span></center></td>
-      <td colspan="2"><center><span>Mark as Resolved</span></center></td>
+      <td><span style="font-size: 12pt; letter-spacing: 3px;">Investigating</span></td>
+      <td colspan="2"><center style="font-size: 12pt; letter-spacing: 3px;"><span>Mark as Resolved</span></center></td>
     </tr>
 
     <% unless @under_investigations.blank? %>
+      <form id="investigating">
         <% @under_investigations.each do |notice| %>
           <tr style="border-bottom: 2px solid black; border-top: 1px solid black;">
             <td style="border-left: 1px solid black; border-right: 1px solid black;"><%= notice.value_text %></td>
-            <td colspan="2"><center><span><input type="checkbox" value="resolved:<%= notice.id %>" name="new_notice:<%= notice.id %>"/></span></center></td>
+            <td colspan="2" style="border-right: 1px solid black;"><center><span><input type="checkbox" value="resolved:<%= notice.id %>" name="investigating_notice:<%= notice.id %>"/></span></center></td>
           </tr>
         <% end %>
         <tr style="line-height:1em;">
-            <td colspan="3" id="apply_button"><span style="float:right;">Save changes</span></td>
+            <td colspan="3" id="apply_button"><span onclick="saveNewNoticesChanges('investigating');" style="float:right;">Save changes</span></td>
         </tr>
+      </form>
     <% else %>
           <tr style="border-right: 1px solid black; border-left: 1px solid black; border-bottom: 1px solid black; border-top: 1px solid black;">
             <td colspan="3"><span><center>(No data)</center></span></td>
@@ -103,21 +133,16 @@
     <% end %>
 
     <tr style="background-color: #A9A9A9; ">
-      <td style="color: white;"><center><span style="font-size: 12pt; letter-spacing: 3px;">Resolved</span></center></td>
-      <td>Mark as Investigating</td>
-      <td>Mark as Resolved</td>
+      <td colspan="3" style="color: white;"><center><span style="font-size: 12pt; letter-spacing: 3px;">
+            Resolved(<span id="hide" style="letter-spacing: 0 !important ;cursor:pointer; color: #F0E68C !important">Hide</span>)
+          </span></center></td>
     </tr>
     <% unless @resolved.blank? %>
         <% @resolved.each do |notice| %>
-          <tr style="border-bottom: 2px solid black; border-top: 1px solid black;">
-            <td style="border-left: 1px solid black; border-right: 1px solid black;"><%= notice.value_text %></td>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
+          <tr class="resolved_notices" style="border-bottom: 2px solid black; border-top: 1px solid black;">
+            <td colspan="3" style="border-left: 1px solid black; border-right: 1px solid black;"><%= notice.value_text %></td>
           </tr>
         <% end %>
-        <tr style="line-height:1em;">
-            <td colspan="3" id="apply_button"><span style="float:right;">Save changes</span></td>
-        </tr>
     <% else %>
           <tr style="border-right: 1px solid black; border-left: 1px solid black; border-bottom: 1px solid black; border-top: 1px solid black;">
             <td colspan="3"><span><center>(No data)</center></span></td>
