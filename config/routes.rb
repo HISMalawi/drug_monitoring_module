@@ -13,6 +13,8 @@ DrugMonitoringProgram::Application.routes.draw do
   post "administration/delete_site"
 
   get '/map' => "administration#map"
+  
+  post "administration/save_notice_changes"
   ################### USER ##############################
   match '/login' => "user#login"
 
