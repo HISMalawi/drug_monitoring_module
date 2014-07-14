@@ -84,14 +84,16 @@ div, table{
 }
 </style>
 
-<div id="site_breakdown">
-  <div id="notices_header" style=";margin-left: -2%;">
+<div id="site_breakdown" style="position:absolute; left: 5%; width: 95%; height: 90%;">
+  <div id="notices_header" style="position: relative;margin-left: 10%;">
     <span class="notice_data">Site Name <span style="margin-left:28px">: </span><b style="font-size: 12pt; margin-left: 20px;"><%= @site_name %></b></span><br />
     <span class="notice_data">New notices<span style="margin-left:21px">: </span><b style="font-size: 12pt; margin-left: 20px;"><%= @new_notices.count %></b></span><br />
     <span class="notice_data">Investigating<span style="margin-left:6px">: </span><b style="font-size: 12pt; margin-left: 20px;"><%= @under_investigations.count %></b></span><br />
     <span class="notice_data">Resolved<span style="margin-left:47px">: </span><b style="font-size: 12pt; margin-left: 20px;"><%= @resolved.count %></b></span><br /><br />
   </div>
-  <table cellspacing="0" style="position:absolute; width: 80%; left: 10%;">
+
+  <div style="position: absolute; overflow:auto; height: 70%; width: 90%;">
+  <table cellspacing="0" style="position:absolute; width: 90%; left: 10%;">
 
     <tr style="background-color: #A9A9A9; color: white;">
       <td><span style="font-size: 12pt; letter-spacing: 2px;">New Notices</span></td>
@@ -158,4 +160,5 @@ div, table{
     <% end %>
 
   </table>
+</div>
 </div>
