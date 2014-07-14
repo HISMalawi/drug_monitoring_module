@@ -1,4 +1,8 @@
-
+<script type="text/javascript" language="javascript" src="/javascripts/jquery.js"></script>
+<script type="text/javascript" language="javascript" src="/javascripts/jquery.dataTables.js"></script>
+<script src="/javascripts/highcharts.js"></script>
+<script src="/javascripts/exporting.js"></script>
+<script src="/javascripts/standalone-framework.src.js"></script>
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function() {
         $('#drugs').dataTable({
@@ -166,6 +170,23 @@
 
     }
 </style>
+
+<div class="heading" >
+  <table class="menu" cellspacing="0px" style="width:100%;">
+    <tr>
+      <td style="text-align: left;vertical-align: text-top;">
+            <span style="font-size: 150%;font-weight:bold;color: #000000;font-family:arial;">
+              <%= @title  %>
+            </span>
+      </td>
+      <td style= "" >
+        <button class="btn" style="float:right"  id="cat"  onclick="loadValues()">Show tins</button>
+      </td>
+    </tr>
+  </table>
+
+</div>
+
 
 <div style="text-align: center;">
   <table  style="width: 99%;margin-left: 0.5%;">

@@ -21,28 +21,28 @@ class ReportController < ApplicationController
     end_date = params[:end_date].to_date.strftime("%Y-%m-%d") rescue nil
 
     case params[:report_type]
-    when "drug stock report"
-      drug = params[:drug]
-      redirect_to :action => 'drug_report',:drug => drug, :start_date => start_date, :end_date => end_date
-    when "drug utilization report"
-      drug = params[:drug]
-      redirect_to :action => 'drug_utilization_report',:drug => drug, :start_date => start_date, :end_date => end_date
-    when "aggregate report"
-      redirect_to :action => 'aggregate_report', :start_date => start_date, :end_date => end_date
-    when "site report"
-      site = params[:site_name]
-      redirect_to :action => 'site_report', :site => site, :start_date => start_date, :end_date => end_date
-    when "stock movement"
-      redirect_to :action => 'stock_out_estimates', :start_date => start_date, :end_date => end_date, 
-        :type => "verified_by_supervision", :name => "stock_movement", :site_name => params[:site_name]
-    when "delivery report"
-      redirect_to :action => 'delivery_report', :start_date => start_date, :end_date => end_date,
-        :name => "delivery_report", :site_name => params[:site_name], :delivery_code => params[:delivery_code]
+      when "drug stock report"
+        drug = params[:drug]
+        redirect_to :action => 'drug_report',:drug => drug, :start_date => start_date, :end_date => end_date
+      when "drug utilization report"
+        drug = params[:drug]
+        redirect_to :action => 'drug_utilization_report',:drug => drug, :start_date => start_date, :end_date => end_date
+      when "aggregate report"
+        redirect_to :action => 'aggregate_report', :start_date => start_date, :end_date => end_date
+      when "site report"
+        site = params[:sitename]
+        redirect_to :action => 'site_report', :site => site, :start_date => start_date, :end_date => end_date
+      when "stock movement"
+        redirect_to :action => 'stock_out_estimates', :start_date => start_date, :end_date => end_date,
+          :type => "verified_by_supervision", :name => "stock_movement", :site_name => params[:site_name]
+      when "delivery report"
+        redirect_to :action => 'delivery_report', :start_date => start_date, :end_date => end_date,
+          :name => "delivery_report", :site_name => params[:site_name], :delivery_code => params[:delivery_code]
     end
   end
 
   def site_report
-    @title = "Site Report For #{params[:site]}"
+    @title = "Site Report For #{params[:site]} From #{params["start_date"].to_date.strftime("%d %B %Y")} To #{params["end_date"].to_date.strftime("%d %B %Y")}"
 
     prescription_id = Definition.where(:name => "prescription").first.id
     dispensation_id = Definition.where(:name => "dispensation").first.id
@@ -71,7 +71,7 @@ class ReportController < ApplicationController
     end
 
 
-    render :layout => 'report_layout'
+    #render :layout => 'report_layout'
   end
 
   def aggregate_report
@@ -112,7 +112,7 @@ class ReportController < ApplicationController
       end
     end
 
-    render :layout => 'report_layout'
+    #render :layout => 'report_layout'
   end
 
   def drug_report
@@ -135,30 +135,30 @@ class ReportController < ApplicationController
                                            "ppo_who_received_drugs" => 0, "ppo_prescribed_drugs" => 0} unless !@values["All"][record.value_date].blank?
 
       case (record.definition_name.downcase)
-        when "supervision verification" :
+        when "supervision verification"
           @values[record.site.name][record.value_date]["supervision_count"] = record.value_numeric
           @values["All"][record.value_date]["supervision_count"] += record.value_numeric
-        when "clinic verification":
+        when "clinic verification"
           @values[record.site.name][record.value_date]["clinic_count"] = record.value_numeric
           @values["All"][record.value_date]["clinic_count"] += record.value_numeric
-        when "people who received drugs":
+        when "people who received drugs"
           @values[record.site.name][record.value_date]["ppo_who_received_drugs"] = record.value_numeric
           @values["All"][record.value_date]["ppo_who_received_drugs"] += record.value_numeric
-        when "people prescribed drug":
+        when "people prescribed drug"
           @values[record.site.name][record.value_date]["ppo_prescribed_drugs"] = record.value_numeric
-          @values["All"][record.value_date]["ppo_prescribed_drugs"] += record.value_numeric
       end
+          @values["All"][record.value_date]["ppo_prescribed_drugs"] += record.value_numeric
 
     end
     @days = obs.collect{|x| x.value_date}.uniq.sort.reverse
 
     @sites = @values.keys.sort!
 
-    render :layout => 'report_layout'
+#    render :layout => 'report_layout'
   end
 
   def drug_utilization_report
-    @title = "Drug Utilization Report For #{params[:drug]} "
+    @title = "Drug Utilization Report For #{params[:drug]} From #{params["start_date"].to_date.strftime("%d %B %Y")} To #{params["end_date"].to_date.strftime("%d %B %Y")}"
 
     defns = Definition.where(:name => ["prescription","dispensation","relocation", "People who received drugs",
                                        "People prescribed drug"]).collect{|x| x.definition_id}
@@ -200,7 +200,7 @@ class ReportController < ApplicationController
 
     @sites = @values.keys.sort!
 
-    render :layout => 'report_layout'
+ #   render :layout => 'report_layout'
   end
 
 
@@ -225,7 +225,7 @@ class ReportController < ApplicationController
 
     @drug_map = drug_map
     @updates = Observation.site_update_dates
-    render :layout => 'report_layout'
+
   end
 
   def months_of_stock
@@ -365,79 +365,7 @@ class ReportController < ApplicationController
       @stocks = Observation.deliveries(site_id, start_date, end_date, delivery_code)
     end
     
-    render :layout => 'report_layout'
-  end
-
-  def self.create_notification(site_id, date, notice, drug)
-
-    notice_defn = Definition.find_by_name("Notice")
-    state_defn = Definition.find_by_name("New")
-
-    obs = Observation.where(:site_id => site_id,
-                            :definition_id => notice_defn.id,
-                            :value_drug => drug,
-                            :value_date => date,
-                            :value_text => notice
-    ).first
-
-    if obs.blank?
-      obs = Observation.create(:site_id => site_id,
-                               :definition_id => notice_defn.id,
-                               :value_drug => drug,
-                               :value_date => date,
-                               :value_text => notice
-      )
-      state = State.create(:observation_id => obs.id, :state => state_defn.name)
-    end
-  end
-
-  def self.find_significant_disp_pres_diff(start_date ,end_date)
-
-    #This function gets significant differences between prescriptions and dispensations
-    prescription_id = Definition.where(:name => "prescription").first.id
-    dispensation_id = Definition.where(:name => "dispensation").first.id
-
-    issues = Hash.new([])
-    prescriptions = Observation.where("definition_id = ? AND value_date >= ? AND value_date <= ?", prescription_id ,start_date, end_date)
-
-    (prescriptions || []).each do |prescription|
-      #getting dispensation on given day for specific drug
-      dispensation = Observation.where("definition_id = ? AND value_date = ? AND value_drug = ? AND site_id = ?",
-                                       dispensation_id, prescription.value_date,prescription.value_drug, prescription.site_id)
-
-      issues[prescription.site.name] = [] if issues[prescription.site.name].blank?
-      #Checking existence of dispensation and percentage of difference
-
-      if dispensation.blank?
-        issues[prescription.site.name] << "#{prescription.get_short_form} has prescriptions but no dispensations on #{prescription.value_date.strftime('%d %B %Y')}"
-      else
-        percent = (((prescription.value_numeric.to_f - dispensation[0].value_numeric.to_f)/prescription.value_numeric.to_f)*100).round(2)
-        if percent >= prescription.site.threshold
-          notice = "#{percent.abs}% more prescriptions than dispensations for #{prescription.get_short_form} on #{prescription.value_date.strftime('%d %B %Y')}"
-          create_notification(prescription.site_id,prescription.value_date, notice, prescription.get_short_form)
-          issues[prescription.site.name] << "#{percent.abs}% more prescriptions than dispensations for #{prescription.get_short_form} on #{prescription.value_date.strftime('%d %B %Y')}"
-        elsif percent <= -prescription.site.threshold
-          notice = "#{percent.abs}% more dispensations than prescriptions for #{prescription.get_short_form} on #{prescription.value_date.strftime('%d %B %Y')}"
-         create_notification(prescription.site_id,prescription.value_date, notice, prescription.get_short_form)
-        end
-      end
-    end
-
-    dispensations = Observation.where("definition_id = ? AND value_date >= ? AND value_date <= ?", dispensation_id,start_date,end_date)
-
-    (dispensations || []).each do |dispensation|
-      #Getting prescription for specific drug on given date
-      prescription = Observation.find(:first, :conditions => ["definition_id = ? AND value_date = ? AND value_drug = ? AND site_id = ?",
-                                                              prescription_id, dispensation.value_date,dispensation.value_drug, dispensation.site_id])
-      if prescription.blank?
-        issues[dispensation.site.name] = [] if issues[dispensation.site.name].blank?
-        noitice = "#{dispensation.get_short_form} has dispensation but no prescriptions on #{dispensation.value_date.strftime('%d %B %Y')}"
-        create_notification(dispensation.site_id,dispensation.value_date, notice, dispensation.get_short_form)
-        issues[dispensation.site.name] << "#{dispensation.get_short_form} has dispensation but no prescriptions on #{dispensation.value_date.strftime('%d %B %Y')}"
-      end
-    end
-
-    issues
+   # render :layout => 'report_layout'
   end
 
 end

@@ -13,3 +13,32 @@
 //= require jquery
 //= require jquery_ujs
 //= require_tree .
+    cat = 'pills';
+
+    function catSwitch(){
+      var label = cat
+      cat = cat == 'pills' ? 'tins' : 'pills'
+      document.getElementById("cat").innerHTML = "Show " + label;
+    }
+
+    function loadValues(){
+      
+      catSwitch();
+      var arr = document.getElementsByClassName("drug_value");
+
+      for (var i = 0; i < arr.length; i ++){
+        try{
+          if (cat == "pills")
+            arr[i].innerHTML = Math.round(arr[i].getAttribute("pills")).toFixed(0).replace(/./g, function(c, i, a) {
+              return i && c !== "." && !((a.length - i) % 3) ? ',' + c : c;
+            });
+          else if (cat == "tins"){
+            arr[i].innerHTML = (Math.round((arr[i].innerHTML.replace(/,/g, "")) / 60)).toFixed(0).replace(/./g, function(c, i, a) {
+              return i && c !== "." && !((a.length - i) % 3) ? ',' + c : c;
+            });
+          }
+        }catch(e){}
+      }
+    }
+
+

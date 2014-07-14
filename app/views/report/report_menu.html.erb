@@ -12,7 +12,7 @@
     }
 </style>
 
-<link href="/stylesheets/bootstrap.min.css" rel="stylesheet">
+
 <script src="/javascripts/jquery.min.js"></script>
 <script src="/javascripts/bootstrap-datepicker.js"></script>
 <script language="javascript" type="text/javascript" src="/javascripts/jquery.alerts.js"></script>
@@ -39,7 +39,7 @@
                   <label class="control-label">Site Name:</label>&nbsp;&nbsp;&nbsp;
                 </td>
                 <td>
-                  <select id="sitename" name="site_name" class="form-control" placeholder="Region" required="" onchange="switchSite(this.value)" >
+                  <select id="sitename" name="sitename" class="form-control" placeholder="Region" required=""  >
                     <option value="">[ - Select site - ]</option>
 
                     <% (@sites || []).each do |site| %>
@@ -82,7 +82,7 @@
                 </td>
                 <td>
                   <div style="width: 50% !important;" class="input-group date">
-                    <input id="start_date" type="text" class="form-control"><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+                    <input id="start_date" name="start_date" type="text" class="form-control"><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
                   </div>
                 </td>
               </tr>
@@ -97,7 +97,7 @@
                 </td>
                 <td>
                   <div style="width: 50% !important;" class="input-group date">
-                    <input id="end_date" type="text" class="form-control"><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+                    <input id="end_date" name="end_date" type="text" class="form-control"><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
                   </div>
                 </td>
               </tr>
@@ -174,7 +174,7 @@
             else if (document.getElementById('end_date').value.trim() == "" && document.getElementById('delivery_code').value.trim() == ""){
                 jAlert("Please provide end date for report", "Incomplete Information");
             }
-            else if ((document.getElementById('d_code').value.trim() == "") && (document.getElementById('start_date').value.trim() == "") &&
+            else if ((document.getElementById('delivery_code').value.trim() == "") && (document.getElementById('start_date').value.trim() == "") &&
                     (document.getElementById('end_date').value.trim() == "")){
                 jAlert("Please provide delivery code or date range", "Incomplete Information");
             }
@@ -194,7 +194,7 @@
         {
             jAlert("Please provide site name", "Incomplete Information");
         }
-        else if(((type= "drug stock report") || (type= "drug utilization report")) && (document.getElementById('drug').value.trim() == ""))
+        else if(((type == "drug stock report") || (type == "drug utilization report")) && (document.getElementById('drug').value.trim() == ""))
         {
             jAlert("Please provide drug name", "Incomplete Information");
         }
