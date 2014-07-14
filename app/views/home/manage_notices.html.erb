@@ -54,6 +54,7 @@
      }
    }
    setTimeout("t();", 300);
+
 </script>
 <style>
   #site_breakdown{
@@ -74,14 +75,21 @@
    border: 0.1px solid #5F9EA0;
    color: #5F9EA0;
 }
+div, table{
+  -moz-user-select: none;
+}
+.notice_data{
+  font-family: "Lucida Console", "Lucida Sans Typewriter", Monaco, "Bitstream Vera Sans Mono", monospace;
+  font-weight: bold;
+}
 </style>
 
 <div id="site_breakdown">
-  <div id="notices_header" style="margin-left: 40%;">
-    <span>Site Name: <b style="font-size: 12pt;"><%= @site_name %></b></span><br />
-    <span>New notices: <b style="font-size: 12pt;"><%= @new_notices.count %></b></span><br />
-    <span>Investigating: <b style="font-size: 12pt;"><%= @under_investigations.count %></b></span><br />
-    <span>Resolved: <b style="font-size: 12pt;"><%= @resolved.count %></b></span><br />
+  <div id="notices_header" style=";margin-left: -2%;">
+    <span class="notice_data">Site Name <span style="margin-left:28px">: </span><b style="font-size: 12pt; margin-left: 20px;"><%= @site_name %></b></span><br />
+    <span class="notice_data">New notices<span style="margin-left:21px">: </span><b style="font-size: 12pt; margin-left: 20px;"><%= @new_notices.count %></b></span><br />
+    <span class="notice_data">Investigating<span style="margin-left:6px">: </span><b style="font-size: 12pt; margin-left: 20px;"><%= @under_investigations.count %></b></span><br />
+    <span class="notice_data">Resolved<span style="margin-left:47px">: </span><b style="font-size: 12pt; margin-left: 20px;"><%= @resolved.count %></b></span><br /><br />
   </div>
   <table cellspacing="0" style="position:absolute; width: 80%; left: 10%;">
 
@@ -100,7 +108,7 @@
           </tr>
         <% end %>
           <tr style="line-height:1em;">
-            <td colspan="3" id="apply_button"><span onclick="saveNewNoticesChanges('new_notices');" style="float:right;">Save changes</span></td>
+            <td colspan="3" id="apply_button"><span id="new_notices_apply_button" onclick="saveNewNoticesChanges('new_notices');" style="float:right;">Save changes</span></td>
           </tr>
       </form>
     <% else %>
@@ -123,7 +131,7 @@
           </tr>
         <% end %>
         <tr style="line-height:1em;">
-            <td colspan="3" id="apply_button"><span onclick="saveNewNoticesChanges('investigating');" style="float:right;">Save changes</span></td>
+            <td colspan="3" id="apply_button"><span id="investigating_apply_button" onclick="saveNewNoticesChanges('investigating');" style="float:right;">Save changes</span></td>
         </tr>
       </form>
     <% else %>
