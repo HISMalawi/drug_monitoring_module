@@ -1,8 +1,7 @@
 class ReportController < ApplicationController
 
   def index
-    @lastdate = Observation.find_by_sql("SELECT site_id, max(value_date) as max_date FROM drug_mgmt.observations
-                                        group by site_id order by max_date asc ;").first.max_date rescue nil
+
   end
 
   def site_list
@@ -116,7 +115,7 @@ class ReportController < ApplicationController
   end
 
   def drug_report
-    @title = "Drug Stock Report For #{params[:drug]}"
+    @title = "Drug Stock Report For #{params[:drug]} From #{params["start_date"].to_date.strftime("%d %B %Y")} To #{params["end_date"].to_date.strftime("%d %B %Y")}"
     defns = Definition.where(:name => ["Supervision verification", "People who received drugs",
                                        "Clinic verification","People prescribed drug"]).collect{|x| x.definition_id}
 
@@ -368,4 +367,56 @@ class ReportController < ApplicationController
    # render :layout => 'report_layout'
   end
 
+  def months_of_stock_main
+    @site = Site.find_by_name(params[:site])
+=begin
+    month_of_stock_defn = Definition.find_by_name('Month of Stock').id
+    stock_level_defn = Definition.find_by_name('Stock Level').id
+
+    months_of_stock = Observation.find_by_sql("SELECT o.value_drug, o.value_numeric, MAX(o.value_date)
+                                              FROM observations o INNER JOIN drug_set s ON o.value_drug = s.drug_name
+                                              WHERE o.definition_id = #{month_of_stock_defn} AND o.site_id = #{@site.id}
+                                              AND s.definition_id = #{Definition.find_by_name("HIV Unit Drugs").id}
+                                              GROUP BY o.value_drug")
+=end
+
+    drugs = ['ABC/3TC (Abacavir and Lamivudine 60/30mg tablet)',
+             'AZT/3TC (Zidovudine and Lamivudine 60/30 tablet)',
+             'AZT/3TC (Zidovudine and Lamivudine 300/150mg)',
+             'AZT/3TC/NVP (60/30/50mg tablet)',
+             'AZT/3TC/NVP (300/150/200mg tablet)',
+             'd4T/3TC (Stavudine Lamivudine 6/30mg tablet)',
+             'd4T/3TC (Stavudine Lamivudine 30/150 tablet)',
+             'Triomune baby (d4T/3TC/NVP 6/30/50mg tablet)',
+             'd4T/3TC/NVP (30/150/200mg tablet)',
+             'EFV (Efavirenz 200mg tablet)',
+             'EFV (Efavirenz 600mg tablet)',
+             'LPV/r (Lopinavir and Ritonavir 100/25mg tablet)',
+             'LPV/r (Lopinavir and Ritonavir 200/50mg tablet)',
+             'LPV/r (Lopinavir and Ritonavir syrup)',
+             'ATV/r (Atazanavir 300mg/Ritonavir 100mg)',
+             'NVP (Nevirapine 200 mg tablet)',
+             'TDF/3TC (Tenofavir and Lamivudine 300/300mg tablet','TDF/3TC/EFV (300/300/600mg tablet)',
+             'Cotrimoxazole (480mg tablet)',
+             'Cotrimoxazole (960mg)', 'INH or H (Isoniazid 100mg tablet)', 'INH or H (Isoniazid 300mg tablet)']
+
+    @list = {}
+    (drugs || []).each do |drug|
+
+      month_of_stock = Observation.calculate_month_of_stock(drug, @site.id)
+
+      unless (month_of_stock.is_a? String ||  month_of_stock.nan?)
+        stock_level = Observation.calculate_stock_level(drug,@site.id)
+        disp_rate = Observation.drug_dispensation_rates(drug,@site.id)
+
+        @list[drug] = {"month_of_stock" => month_of_stock,
+                                                "stock_level" => stock_level, "consumption_rate" => (disp_rate.to_i rescue 0) }
+
+      end
+
+    end
+
+    #raise @list.inspect
+    render :layout => false
+  end
 end

@@ -28,35 +28,22 @@
 
 
   </style>
+<script type="text/javascript">
+  window.hello = function (site)
+  {
+      __$("report-display").setAttribute("src", "/report/months_of_stock_main?site="+ site);
+  }
+</script>
 </head>
 <body onresize="resizeTable()" onload="resizeTable()">
 
 <div id="main" class="table" style="width: 99%; height: 83vh; border: 0px solid #000; top: 50px; position: absolute;">
   <div class="row">
-    <div class="cell" style="">
-      <iframe id="main-display" style="width: 100%; height: 90vh; border: none; overflow: auto;" src="/home/notices"></iframe>
+    <div class="cell" style="width: 30%;">
+      <iframe id="main-display" style="width: 50%; height: 90vh; border: none; overflow: auto;" src="/home/notices"></iframe>
     </div>
-    <div class="cell" style="vertical-align: top;">
-      <div style="float: right; height: 100%;">
-        <div id="right-table" class="table" style="width: 100%; border-spacing: 0px; height: 100%;">
-          <div class="row">
-            <div class="cell" style="border-left: 1px solid #000; border-right: 1px solid #000;height: 45vh; border-bottom: 1px solid #000; width: 50%;">
-              <iframe id="mini1-display" style="margin-left: 20px; width: 100%; height: 45vh; border: none; overflow: hidden;" src="/home/low_stock"></iframe>
-            </div>
-            <div class="cell" style="border-bottom: 1px solid #000; width: 50%;height: 45vh;">
-              <iframe id="mini2-display" style="margin-left: 20px; width: 100%; height: 45vh; border: none; overflow: hidden;" src="/home/overstock"></iframe>
-            </div>
-          </div>
-          <div class="row">
-            <div class="cell" style="border-left: 1px solid #000; border-right: 1px solid #000; width: 50%;">
-              <iframe id="mini3-display" style="margin-left: 20px; width: 100%; height: 45vh; border: none; overflow: hidden;" src="/home/notices"></iframe>
-            </div>
-            <div class="cell" style="width: 50%;">
-              <iframe id="mini4-display" style="margin-left: 20px; width: 100%; height: 45vh; border: none; overflow: hidden;" src="/home/low_stock"></iframe>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div class="cell" style="vertical-align: top;width: 65%;">
+      <iframe id="report-display" style="width: 100%; height: 87vh; border: 1px solid; overflow: auto;" src="/report/months_of_stock_main?site=<%= @sites.first.name rescue "" %>"></iframe>
     </div>
   </div>
 </div>
@@ -128,33 +115,7 @@
 
         __$("main-display").style.height = (window.innerHeight - 150) + "px";
 
-        __$("main-display").style.width = (window.innerWidth - ((window.innerHeight ) * 2 / 2.3)) + "px";
-
-        __$("right-table").style.height = (window.innerHeight - 150) + "px";
-
-        __$("mini1-display").style.height = ((window.innerHeight - 170) / 2) + "px";
-
-        __$("mini1-display").style.width = ((window.innerHeight) / 3) + "px";
-
-        __$("mini1-display").style.marginLeft = ((window.innerHeight) / 12) + "px";
-
-        __$("mini2-display").style.height = ((window.innerHeight - 170) / 2) + "px";
-
-        __$("mini2-display").style.width = ((window.innerHeight) / 3) + "px";
-
-        __$("mini2-display").style.marginLeft = ((window.innerHeight) / 12) + "px";
-
-        __$("mini3-display").style.height = ((window.innerHeight - 170) / 2) + "px";
-
-        __$("mini3-display").style.width = ((window.innerHeight) / 3) + "px";
-
-        __$("mini3-display").style.marginLeft = ((window.innerHeight) / 12) + "px";
-
-        __$("mini4-display").style.height = ((window.innerHeight - 170) / 2) + "px";
-
-        __$("mini4-display").style.width = ((window.innerHeight) / 3) + "px";
-
-        __$("mini4-display").style.marginLeft = ((window.innerHeight) / 12) + "px";
+        __$("main-display").style.width = (window.innerWidth - ((window.innerHeight ) * 2 / 1.5)) + "px";
 
     }
 
