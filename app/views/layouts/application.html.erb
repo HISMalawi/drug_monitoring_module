@@ -6,12 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
+
     <script type="text/javascript" language="javascript" src="/javascripts/jquery.js"></script>
     <script type="text/javascript" language="javascript" src="/javascripts/jquery.dataTables.js"></script>
     <script src="/javascripts/highcharts.js"></script>
     <script src="/javascripts/exporting.js"></script>
     <script src="/javascripts/standalone-framework.src.js"></script>
+
     <!-- CSS -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
     <%= stylesheet_link_tag "bootstrap" %>                                         
     <style type="text/css">
 
@@ -21,8 +27,6 @@
       html,
       body {
         height: 100%;
-        /*background: url('/assets/kenya2.jpeg') no-repeat fixed center;
-        background-size: 41%;*/
         /* The html and body elements cannot have any padding or margin. */
       }
 
@@ -41,7 +45,7 @@
         height: 60px;
       }
       #footer {
-        background-color: rgb(37, 37, 37);
+        background-color: #2c2c2c;
       }
 
       /* Lastly, apply responsive CSS fixes as necessary */
@@ -54,12 +58,14 @@
         }
       }
 
+
+
       /* Custom page CSS
       -------------------------------------------------- */
       /* Not required for template or sticky footer method. */
 
       #wrap > .container {
-        padding-top: 0px;
+        padding-top: 60px;
       }
       .container .credit {
         margin: 20px 0;
@@ -71,6 +77,13 @@
 
     </style>
     <%= stylesheet_link_tag "bootstrap-responsive" %>                                         
+    <%#= stylesheet_link_tag "ie6" %>                                         
+    <%#= stylesheet_link_tag "ie6.min" %>                                         
+
+
+    <!--[if IE 6]>    
+      <link href="ie6.min.css" rel="stylesheet">
+    <![endif]-->
 
   </head>
 
@@ -89,61 +102,55 @@
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </button>
-            <a class="brand" href="/home"><%= app_name %></a>
+            <a class="brand" href="/"><%= app_name %></a>
             <div class="nav-collapse collapse">
-              <ul class="nav main-links">
-                <li class="active"><a href="/home">Home</a></li>
+            <%if User.current%>
+              <ul class="nav">
+                <li class="active"><a href="#">Home</a></li>
                 <li class="dropdown">
-                  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Reports<b class="caret"></b></a>
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Reports <b class="caret"></b></a>
                   <ul class="dropdown-menu">
-                    <li><a href="/report/report_menu?type=drug stock report">Drug Stock Report</a></li>
-                    <li><a href="/report/report_menu?type=drug utilization report">Drug Utilization Report</a></li>
-                    <li><a href="/report/report_menu?type=site report">Site Report</a></li>
-                    <li class="divider"></li>                               
-                    <li><a href="/report/report_menu?type=aggregate report">Aggregate Report</a></li>
                     <li><a href="/report/report_menu?type=delivery report">Delivery Report</a></li>
                     <li><a href="/report/stock_out_estimates?type=verified_by_supervision&name=months_of_stock">Months of Stock</a></li>
-                    <li class="divider"></li>                               
                     <li><a href="/report/report_menu?type=stock movement&name=stock_movement">Stock Movement</a></li>
                   </ul>
                 </li>
-                <li class="dropdown">                                           
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Settings <b class="caret"></b></a>
-                    <ul class="dropdown-menu">                                  
-                        <%if admin?%>                                           
-                          <li><a href="/administration/add_site">Add Site</a></li>
-                          <li><a href="/administration/edit_site">Edit Site</a></li>
-                          <li class="divider"></li>                               
-                          <li><a href="/user/create">Add User</a></li>
-                          <li><a href="/user/edit">Edit user</a></li>
-                        <%end%>                                                 
-                    </ul>                                                       
-                </li>                                                           
+                <%if admin?%>                                           
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Settings <b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                      <li><a href="/administration/add_site">Add Site</a></li>
+                      <li><a href="/administration/edit_site">Edit Site</a></li>
+                      <li class="divider"></li>                               
+                      <li><a href="/user/create">Add User</a></li>
+                      <li><a href="/user/edit">Edit user</a></li>
+                  </ul>
+                </li>
+                <%end%>                                                 
+
               </ul>
-              <%if User.current%>
-               <ul class="nav main-links" style="float: right;">
-                 <li class="dropdown">
-                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Logged in as:&nbsp;<b><%= User.current.username[0..9] %></b> <b class="caret"></b></a>
-                   <ul class="dropdown-menu">
-                     <li><a href="#">Change Password</a></li>
-                     <li class="divider"></li>                               
-                     <li><a href="/login">Signout</a></li>
-                   </ul>
-                 </li>
-               </ul>
+
+              <ul class="nav" style="float: right;">
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Logged in as:&nbsp;<b><%= User.current.username[0..9] %></b> <b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li><a href="#">Change Password</a></li>
+                    <li class="divider"></li>                               
+                    <li><a href="/login">Signout</a></li>
+                  </ul>
+                </li>
+              </ul>
+
               <%end%>
             </div><!--/.nav-collapse -->
           </div>
         </div>
       </div>
 
-      <div class="container contents">
-        <br />
-        <br />
-        <br />
-        <%= yield %>
+      <!-- Begin page content -->
+      <div class="container" style="width: 98%; margin-left: auto;margin-right: auto;">
+        <%=yield%>
       </div>
-  
       <div id="push"></div>
     </div>
 
@@ -153,29 +160,31 @@
       </div>
     </div>
 
-    <!-- Placed at the end of the document so the pages load faster -->
-<script type="text/javascript" language="javascript" src="/javascripts/jquery.js"></script>
-    <%unless action_name.match(/search/i)%>
-      <%if not action_name.match(/production/i) and not action_name.match(/market_chart/i) and not action_name.match(/industry_chart/i)%>
-        <%=javascript_include_tag "jquery"%>                                         
-      <%end%>
-      <%=javascript_include_tag "bootstrap-transition"%>                                         
-      <%=javascript_include_tag "bootstrap-alert"%>                                         
-      <%=javascript_include_tag "bootstrap-modal"%>                                         
-      <%=javascript_include_tag "bootstrap-dropdown"%>                                         
-      <%=javascript_include_tag "bootstrap-scrollspy"%>                                         
-      <%=javascript_include_tag "bootstrap-tab"%>                                         
-      <%#=javascript_include_tag "bootstrap-popover"%>                                         
-      <%=javascript_include_tag "bootstrap-tooltip"%>                                         
-      <%=javascript_include_tag "bootstrap-button"%>                                         
-      <%=javascript_include_tag "bootstrap-collapse"%>                                         
-      <%=javascript_include_tag "bootstrap-carousel"%>                                         
-      <%=javascript_include_tag "bootstrap-typeahead"%> 
-      <%=javascript_include_tag "application"%>                                         
-    <%end%>
-                                                                                
-    <%=javascript_include_tag "placeholder"%>                                         
-    <%=javascript_include_tag "invoke_placeholder"%>                                         
+
+    <%=javascript_include_tag "jquery-1.7.1.min"%>                                         
+    <%=javascript_include_tag "bootstrap"%>
+    <%=javascript_include_tag "ie6.min"%>
+                                         
+        <script type="text/javascript">
+      $(function(){if($.browser.msie&&parseInt($.browser.version,10)===6){$('.row div[class^="span"]:last-child').addClass("last-child");$('[class*="span"]').addClass("margin-left-20");$('[class*="span"][class*="offset"]').removeClass('margin-left-20');$(':button[class="btn"], :reset[class="btn"], :submit[class="btn"], input[type="button"]').addClass("button-reset");$(":checkbox").addClass("input-checkbox");$('[class^="icon-"], [class*=" icon-"]').addClass("icon-sprite");$(".pagination li:first-child a").addClass("pagination-first-child")}
+        
+        // Tooltip demo
+        $('.tooltip-demo.well').tooltip({
+          selector: "a[rel=tooltip]",
+          placement: "top"
+        })
+      
+        $('.tooltip-test').tooltip()
+        $('.popover-test').popover()
+      
+        // Popover demo
+        $("a[rel=popover]")
+          .popover({
+          placement : "top"  
+           })
+          .click(function(e) {
+          e.preventDefault()
+          })
+      });</script>
   </body>
 </html>
-

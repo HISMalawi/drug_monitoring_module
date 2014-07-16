@@ -11,13 +11,16 @@ class UserController < ApplicationController
         User.current = user
         redirect_to :controller => :home
       end
+    else
+      session[:user_id] = nil
+      User.current = nil
     end
   end
 
   def logout
     session[:user_id] = nil
     User.current = nil
-    redirect_to :controller => :home
+    redirect_to :action => :login
   end
 
   def create

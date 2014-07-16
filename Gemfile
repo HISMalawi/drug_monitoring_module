@@ -9,3 +9,4 @@ gem 'bcrypt-ruby', :require => 'bcrypt'
 gem 'rest-client'
 gem "paperclip", "~> 2.0"
 gem 'rake', '10.1.1'
+gem 'passenger'
