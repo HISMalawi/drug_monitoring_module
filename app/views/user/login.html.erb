@@ -6,9 +6,9 @@
   #image-logo {                                                                 
     position: relative;                                                         
     float: left;                                                                
-    width: 22%;                                                                 
     height:385px;                                                               
-    padding-top: 15px;                                                          
+    /*padding-top: 15px;*/
+    margin: 10px 170px 0px 170px;
   }  
 
   body {
@@ -17,6 +17,20 @@
   }
 
   h1 { color: oldlace; }
+
+  .page-header {
+    margin: 10px 170px 0;
+  }
+
+  form {
+    margin-top: 10px;
+    float: right;
+  }
+
+  img {
+    height: 120px;
+    width: 120px;
+  }
 </style>
 
 <div class="page-header">                                               
@@ -25,7 +39,7 @@
 
 <div id = "image-logo">                                                 
 <%= image_tag("keys.png" ,:id => "keys")%>                              
-</div>
+
 <%= form_tag :controller => 'user', :action => 'login', :method => :post do %> 
 <table>                                                                 
   <tr>                                                                  
@@ -40,3 +54,4 @@
   </tr>                                                                 
 </table>                                                                
 <%end%>
+</div>
