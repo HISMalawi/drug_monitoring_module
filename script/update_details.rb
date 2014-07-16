@@ -25,6 +25,9 @@ def start
     end
   end
 
+  puts "Calculating Stock Levels"
+  `rails runner #{Rails.root}/script/calculate_stock_levels.rb`
+
 end
 
 def record(site, date,data)

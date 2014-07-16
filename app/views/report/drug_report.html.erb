@@ -5,7 +5,6 @@
   }
   select{
     width: 100%;
-    font-size: 28px;
   }
   button{
     width: auto;
@@ -63,11 +62,7 @@
     display: none ;
   }
 </style>
-<script type="text/javascript" language="javascript" src="/javascripts/jquery.js"></script>
-    <script type="text/javascript" language="javascript" src="/javascripts/jquery.dataTables.js"></script>
-    <script src="/javascripts/highcharts.js"></script>
-    <script src="/javascripts/exporting.js"></script>
-    <script src="/javascripts/standalone-framework.src.js"></script>
+
 <script type="text/javascript" charset="utf-8">
     $('#datalist').dataTable({
       "aaSorting": [[ 0, "asc" ]],
@@ -155,7 +150,7 @@
 
 	  
 	<span style="font-weight: bold;margin-left: 0.5%;">Select Site</span>
-  <select id="sites" style="margin-left: 3%; width: 20%; font-size: 20px;" name="site_name" id='site' onchange="loadSite(this.value)">
+  <select id="sites" style="margin-left: 3%; width: 20%; " name="site_name" id='site' onchange="loadSite(this.value)">
     <% (@sites || []).each do |site| %>
       <option><%= site %></option>
     <% end %>

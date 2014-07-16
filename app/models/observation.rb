@@ -390,7 +390,7 @@ class Observation < ActiveRecord::Base
 
     if stock_level < 0
       notice = "Site has negative stock level for #{drug}. Verify with site for accurate values"
-
+      Observation.create_notification(site_id,obs.date, notice, drug)
     end
 
     return stock_level < 0 ? 0 : stock_level
@@ -401,16 +401,17 @@ class Observation < ActiveRecord::Base
 
     stock_level = Observation.calculate_stock_level(drug, site_id).to_i
 
-    dispensation_rate = Observation.drug_dispensation_rates(drug,site_id).to_i
+    dispensation_rate = Observation.drug_dispensation_rates(drug,site_id)
 
-    if dispensation_rate.class == Fixnum
-      consumption_rate = (dispensation_rate * 0.5)
+    if dispensation_rate.blank?
+      return "Unknown"
+
+    else
+      consumption_rate = (dispensation_rate.to_f * 0.5)
 
       expected = (stock_level/ 60)
 
       return (expected/ consumption_rate)
-    else
-      return "Unknown"
     end
 
   end
