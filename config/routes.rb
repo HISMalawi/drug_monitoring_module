@@ -1,4 +1,5 @@
 DrugMonitoringProgram::Application.routes.draw do
+  match '/test' => "home#test"
 
   get "administration/index"
 

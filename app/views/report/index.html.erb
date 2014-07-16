@@ -1,89 +1,109 @@
 <script type="text/javascript">
-
-  function siteMenu()
-  {
-<%if params[:stock]%>
-      var path = [
-        "/report/stock_out_estimates?type=calculated",
-        "/report/stock_out_estimates?type=verified_by_clinic",
-        "/report/stock_out_estimates?type=verified_by_supervision"
-      ];
-      var icons = ['calculated.jpeg','clinic.png', 'supervisor.jpg'];
-      var title = ['Calculated From Raw Data', 'Verified By Clinic', 'Verified By Supervision'];
-<%else%>
-      var path = [
-        "/report/report_menu?type=drug stock report",
-        "/report/report_menu?type=drug utilization report",
-        "/report/report_menu?type=site report",
-        "/report/report_menu?type=aggregate report",
-        "/report/report_menu?type=delivery report",
-        "/report/stock_out_estimates?type=verified_by_supervision&name=months_of_stock",
-        "/report/report_menu?type=stock movement&name=stock_movement"
-        // "/report/index?stock=true"
-      ];
-
-      // var icons = ['pills3.png','Hospital-icon.png','aggregate.png', 'd_icon.jpeg'];
-      // var title = ['Drug Report', 'Site Report', 'Aggregate Report', "Stock Reports"];
-
-      var icons = ['pills3.png','pills3.png', 'Hospital-icon.png','aggregate.png', 'delivery.jpg', 'd_icon.jpeg', 'stock_movement.gif'];
-      var title = ['Drug Stock Report', 'Drug Utilization Report', 'Site Report', 'Aggregate Report', "Delivery Report", "Months of Stock", "Stock Movement"];
-
-<%end%>
-  
-    loadMenu(title,icons,path);
-
-  }
-
-  function loadMenu(fields, images,paths){
-    document.getElementById("panel").innerHTML = "";
-
-    for(var i = 0; i < fields.length; i++){
-
-      var div = document.createElement("div");
-      div.style.width = "200px";
-      div.style.height = "160px";
-      div.style.textAlign = "center";
-      div.style.cssFloat = "left";
-      div.style.padding = "5px";
-      div.style.opacity = "1";
-      div.style.cursor = "pointer";
-      div.setAttribute("link", paths[i]);
-      div.className = "menu_button blue";
-
-      div.onclick = function(){
-        window.location = this.getAttribute("link");
-      }
-
-      document.getElementById("panel").appendChild(div);
-
-      var img = document.createElement("img");
-      img.src = "/images/" + images[i];
-      img.setAttribute("alt", fields[i]);
-      img.height = "90";
-      img.style.margin = "5px";
-
-      div.appendChild(img);
-
-      div.innerHTML += "<div style='padding: 5px; margin-top: 10px;'>" + fields[i] + "</div>";
-
-    }
-  }
-
-  setTimeout("siteMenu()", 200);
 </script>
 
 <style type="text/css">
 
-  td{
-    text-align: center;
+  .row {
+    margin-left: -285px !important;
   }
+
+  .introItemHeader {
+    font-weight: bold;
+  }
+  
+  .introItem {
+    border-bottom: 1px solid #e0e0e0;
+    cursor: pointer;
+    float: left;
+    min-height: 44px;
+    padding: 15px;
+  }
+
+  
+.introList {
+    color: #444;
+    list-style-type: none;
+    max-width: 1100px;
+    padding-bottom: 20px;
+    padding-top: 10px;
+    width: 100%;
+}
+
+.introIcon {
+    float: left;
+}
+
+img {
+    border: 0 none;
+} 
+
+.introIcon {
+  width: 70px;
+  height: 70px;
+}
+
+.page h3 {
+  color: #606060;
+  font-size: 14pt;
+  font-weight: normal;
+  margin-left: 20px;
+}
+
+.img-container {
+  width: 100%;
+  display: inline-block;
+}
+ 
 </style>
 
 
 
-<div id='panel' style="height: 80%; overflow:auto;">
+<div id="mainPage" class="page">
+<h3>Reports</h3>
+<div class="introList">
+ 
+ <div class="img-container">
+  
+    <div class="introItem" onclick="window.location.href='/report/report_menu?type=stock movement&name=stock_movement'">
+      <img class="introIcon" src="/images/stock_movement.gif">
+      <div class="introItemText">
+        <div class="introItemHeader">Stock movement</div>
+        <div>View how fast drugs are being dispensed.</div>
+      </div>
+    </div>
 
+    <div class="introItem" onclick="window.location.href='/report/stock_out_estimates?type=verified_by_supervision&name=months_of_stock'">
+      <img class="introIcon" src="/images/d_icon.jpeg">
+      <div class="introItemText">
+        <div class="introItemHeader">Month of stock</div>
+        <div>View how fast drugs are being dispensed.</div>
+      </div>
+    </div>
+
+  </div>
+
+
+ <div class="img-container">
+
+    <div class="introItem" onclick="window.location.href='/report/report_menu?type=delivery report'">
+      <img class="introIcon" src="/images/delivery.jpg">
+      <div class="introItemText">
+        <div class="introItemHeader">Delivery report</div>
+        <div>View how fast drugs are being dispensed.</div>
+      </div>
+    </div>
+
+    <div class="introItem" onclick="window.location.href='#'">
+      <img class="introIcon" src="/images/aggregate.png">
+      <div class="introItemText">
+        <div class="introItemHeader">Site physical stock</div>
+        <div>View how fast drugs are being dispensed.</div>
+      </div>
+    </div>
+
+  </div>
 
 </div>
 
+</div>
 
