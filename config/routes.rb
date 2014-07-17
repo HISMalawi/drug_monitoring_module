@@ -79,6 +79,7 @@ DrugMonitoringProgram::Application.routes.draw do
   match '/home' => "home#index"
   get "home/index"
   get "home/notices"
+  get "home/map_main"
   get "home/overstock"
   get "home/low_stock"
   post "home/graph"
