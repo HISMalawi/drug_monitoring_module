@@ -3,6 +3,26 @@ class HomeController < ApplicationController
     @sites = Site.all
   end
 
+  def page
+    @tree = {}
+    @tree["Drug categories"] = {}
+    @tree["Drug categories"]["ARVs"] = ['ABC/3TC (Abacavir and Lamivudine 60/30mg tablet)',
+      'AZT/3TC (Zidovudine and Lamivudine 60/30 tablet)',
+      'AZT/3TC (Zidovudine and Lamivudine 300/150mg)',
+      'TDF/3TC (Tenofavir and Lamivudine 300/300mg tablet',
+      'd4T/3TC (Stavudine Lamivudine 6/30mg tablet)' 
+    ]
+    @tree["Drug categories"]['Opportunistic Infection  medicine'] = {}
+    @tree["Drug categories"]['Antibiotics'] = {}
+    @tree["Drug categories"]['Analgesic'] = {}
+    @tree["Drug categories"]['Antiviral'] = {}
+    @tree["Drug categories"]['Antifungal'] = {}
+    @tree["Drug categories"]['Antimalarial'] = {}
+    
+    #@sheets["Sheets"] = {}
+
+  end
+
   def graph
 
     @days = []

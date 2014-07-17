@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+    <title>Bootstrap Tree</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="description" content="">
+      <meta name="author" content="">
+      <%= stylesheet_link_tag "bootstrap-tree/bootstrap.min" %>                                         
+      <%= stylesheet_link_tag "bootstrap-tree/bootstrap-tree" %>                                         
+    <style>
+body {
+    padding-top: 60px;
+    padding-bottom: 40px;
+}
+.sidebar-nav {
+    padding: 9px 0;
+}
+    </style>
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+        <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    </head>
+    <body>
+        <div class="navbar navbar-inverse navbar-fixed-top">
+            <div class="navbar-inner">
+                <div class="container-fluid">
+                    <!-- <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </a> -->
+                    <a class="brand" href="##">Bootstrap Tree</a>
+                    <!-- <div class="nav-collapse collapse">
+                        <p class="navbar-text pull-right">
+                            Logged in as <a href="#" class="navbar-link">Username</a>
+                        </p>
+                        <ul class="nav">
+                            <li class="active"><a href="#">Home</a></li>
+                            <li><a href="#about">About</a></li>
+                            <li><a href="#contact">Contact</a></li>
+                        </ul>
+                    </div> --><!--/.nav-collapse -->
+                </div>
+            </div>
+        </div>
+
+        <div class="container-fluid">
+            <div class="row-fluid">
+                <div class="span3">
+                    <div class="well">
+                      <ul class="tree">
+                        <!-- for a tree to load closed name the ul class 'in' -->
+                        <li>
+                          <a href="#" role="branch" class="tree-toggle closed" data-toggle="branch" data-value="Bootstrap_Tree">Drug category</a>
+                          <ul class="branch">
+                            <!-- starts -->
+                              <a href="#" role="branch" class="tree-toggle closed" data-toggle="branch" data-value="Bootstrap_Tree">ARVs</a>
+                                <ul class="branch">
+                                  <li><a href="#" role="leaf">1</a></li>
+                                  <li><a href="#" role="leaf">2</a></li>
+                                </ul>
+                            <!-- ends -->
+                            <!--li><a href="#" role="leaf" id="nut">Docs</a></li-->
+                            <li><a href="#" role="leaf">Examples</a></li>
+                            <li><a href="#" role="leaf">Credits</a></li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </div><!--/.well -->
+                  </div><!--/span-->
+                  <div class="span9" id="mainContent">
+                      <div class="row-fluid">
+                          <div class="well span13" id="editorArea">
+                            <!-- content -->
+                              <h1>Bootstrap Tree</h1>
+                              <%#=yield%>
+                            <!-- content ends -->
+                          </div>
+                      </div>
+                      <div class="span8" id="reporter"></div>
+                  </div>
+            </div>
+        </div>
+        <%=javascript_include_tag "bootstrap-tree/jquery-1.8.2"%>                                         
+        <%=javascript_include_tag "bootstrap-tree/bootstrap.min"%>                                         
+        <%=javascript_include_tag "bootstrap-tree/bootstrap-tree"%>                                         
+        <%#=javascript_include_tag "bootstrap-tree/example"%>                                         
+    </body>
+</html>
