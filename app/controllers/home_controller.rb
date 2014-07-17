@@ -298,7 +298,22 @@ class HomeController < ApplicationController
      USING(observation_id) WHERE state='Resolved' AND site_id=#{site_id}")
     
   end
-  
+
+  def map_main
+    @sites = []
+    (Site.all || []).each do |source|
+      site = {
+          'region' => source["region"],
+          'x' => source["x"],
+          'y' =>source["y"],
+          'name' => source["name"],
+          'proportion' => 0
+      }
+
+      @sites << site
+    end
+    render :layout => false
+  end
 end
 
 

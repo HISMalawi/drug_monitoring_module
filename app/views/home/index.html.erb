@@ -29,21 +29,25 @@
 
   </style>
 <script type="text/javascript">
-  window.hello = function (site)
+  window.switch = function (site)
   {
+
+      window.frames['main-display'].contentDocument.getElementById(sites[current_pos]).style.fill= "red"
+      window.frames['main-display'].contentDocument.getElementById(sites[sites.indexOf(site)]).style.fill= "green"
+      current_pos = sites.indexOf(site)
       __$("report-display").setAttribute("src", "/report/months_of_stock_main?site="+ site);
   }
 </script>
 </head>
-<body onresize="resizeTable()" onload="resizeTable()">
+<body onresize="resizeTable()" onload="resizeTable();switchViews()">
 
 <div id="main" class="table" style="width: 99%; height: 83vh; border: 0px solid #000; top: 50px; position: absolute;">
   <div class="row">
     <div class="cell" style="width: 30%;">
-      <iframe id="main-display" style="width: 50%; height: 90vh; border: none; overflow: auto;" src="/home/notices"></iframe>
+      <iframe id="main-display" style="width: 50%; height: 90vh; border: none; overflow: auto;" src="/home/map_main"></iframe>
     </div>
     <div class="cell" style="vertical-align: top;width: 65%;">
-      <iframe id="report-display" style="width: 100%; height: 87vh; border: 1px solid; overflow: auto;" src="/report/months_of_stock_main?site=<%= @sites.first.name rescue "" %>"></iframe>
+      <iframe id="report-display" style="width: 100%; height: 80vh;overflow: auto;" ></iframe>
     </div>
   </div>
 </div>
@@ -51,62 +55,39 @@
 <script>
     <!--
 
-    var pages = ["/home/notices", "/home/notices", "/home/notices", "/home/notices", "/home/notices"]
-
+    var sites = []
     var current_pos = 0;
     var timerHnd;
 
     var timerSpacing = 40;
 
+
+    <% (@sites || []).each do |site| %>
+        sites.push('<%= site.name.downcase %>')
+    <% end %>
+
     function __$(id){
         return document.getElementById(id);
     }
 
+
     function switchViews(){
         clearTimeout(timerHnd);
 
-        var current_path = __$("main-display").getAttribute("src");
-        var target;
-        var next_path = "";
+        window.frames['main-display'].contentDocument.getElementById(sites[current_pos].toLowerCase()).style.fill= "red"
 
-        switch(current_pos){
-            case 0:
-                next_path = __$("mini1-display").getAttribute("src");
-
-                target = __$("mini1-display");
-
-                current_pos = 1;
-                break;
-            case 1:
-                next_path = __$("mini2-display").getAttribute("src");
-
-                target = __$("mini2-display");
-
-                current_pos = 2;
-                break;
-            case 2:
-                next_path = __$("mini3-display").getAttribute("src");
-
-                target = __$("mini3-display");
-
-                current_pos = 3;
-                break;
-            case 3:
-                next_path = __$("mini4-display").getAttribute("src");
-
-                target = __$("mini4-display");
-
-                current_pos = 0;
-
-                break;
+        if ((current_pos + 1) >= sites.length)
+        {
+           current_pos = 0;
+        }
+        else
+        {
+            current_pos += 1;
         }
 
-        if(target){
-            target.setAttribute("src", current_path);
+        window.frames['main-display'].contentDocument.getElementById(sites[current_pos].toLowerCase()).style.fill= "green"
 
-            __$("main-display").setAttribute("src", next_path);
-        }
-
+        __$("report-display").setAttribute("src", "/report/months_of_stock_main?site="+ sites[current_pos]);
         timerHnd = setTimeout("switchViews()", timerSpacing * 1000);
     }
 

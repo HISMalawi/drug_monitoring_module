@@ -359,8 +359,7 @@
                         return tooltip.style("visibility", "hidden");
                     })
                     .on("click", function(){
-                        window.parent.hello(this.getAttribute('id'));
-     //                  window.open('manage_notices?site_name=' + this.id + "&category=notices", "_parent")
+                        window.open('manage_notices?site_name=' + this.id + "&category=notices", "_parent")
                     });
             meter.append("path")
                     .attr("class", "background-most")
