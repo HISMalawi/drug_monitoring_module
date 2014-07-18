@@ -38,7 +38,7 @@
               <div class="row-fluid">
                   <div class="well span13" id="editorArea">
                     <!-- content -->
-                      <h3>Report name</h3>
+                      <h3>Report:&nbsp;<%=params[:id]%></h3>
                       <br />  
                       <br />  
                       <form>
@@ -64,10 +64,10 @@
                             </td>
                           </tr>
                           <tr>
-                            <td>Start date</td><td><input type="text" name="start_date" /></td>
+                            <td>Start date</td><td><input type="text" name="start_date" required="" /></td>
                           </tr>
                           <tr>
-                            <td>End date</td><td><input type="text" name="end_date" /></td>
+                            <td>End date</td><td><input type="text" name="end_date" required="" /></td>
                           </tr>
                           <tr>
                             <td colspan="2">

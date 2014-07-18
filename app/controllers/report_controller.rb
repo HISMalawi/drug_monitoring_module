@@ -4,6 +4,25 @@ class ReportController < ApplicationController
 
   end
 
+  def menu
+    @tree = {}
+    @tree["Drug categories"] = {}
+    @tree["Drug categories"]["ARVs"] = []
+    DrugMap.all[0..19].each do |d|
+      @tree["Drug categories"]["ARVs"] << d.full_name
+    end
+
+    @tree["Drug categories"]['Opportunistic Infection  medicine'] = {}
+    @tree["Drug categories"]['Antibiotics'] = {}
+    @tree["Drug categories"]['Analgesic'] = {}
+    @tree["Drug categories"]['Antiviral'] = {}
+    @tree["Drug categories"]['Antifungal'] = {}
+    @tree["Drug categories"]['Antimalarial'] = {}
+    
+    #@sheets["Sheets"] = {}
+
+  end
+
   def site_list
     @sites = Site.all
   end

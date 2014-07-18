@@ -1,5 +1,4 @@
 DrugMonitoringProgram::Application.routes.draw do
-  match '/test' => "home#page"
 
   get "administration/index"
 
@@ -73,6 +72,7 @@ DrugMonitoringProgram::Application.routes.draw do
   get "report/months_of_stock_main"
   get "report/stock_movement"
   get "report/delivery_report"
+  match 'report/:id' => 'report#menu', :as => :report
 
   ################### HOME ##############################
 
