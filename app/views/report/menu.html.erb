@@ -6,7 +6,7 @@
         <div class="span3">
             <div class="well">
               <ul class="tree">
-                <%(@tree || {}).each do |cat, values|%>
+                <%(@tree || {}).sort_by{|k , v| k }.each do |cat, values|%>
                   <li>
                     <%unless values.blank?%>
                       <a href="#" role="branch" class="tree-toggle closed" data-toggle="branch" data-value="Bootstrap_Tree"><%=cat%></a>
@@ -14,7 +14,7 @@
                       <li><a href="#" onclick="javascript:setSelectedValue('<%=cat%>');" class="tree-toggle" role="branch"><%=cat%></a></li>
                     <%end%>
                       <ul class="branch">
-                        <%(values || {}).each do |child_name, child_values|%>
+                        <%(values || {}).sort_by{|k , v| k }.each do |child_name, child_values|%>
                           <%unless child_values.blank?%>
                             <a href="#" role="branch" class="tree-toggle closed" data-toggle="branch" data-value="Bootstrap_Tree"><%=child_name%></a>
                           <%else%>
@@ -22,7 +22,7 @@
                           <%end%>
                           <%unless child_values.blank?%>
                             <ul class="branch">
-                              <%(child_values || []).each do | c |%>
+                              <%(child_values || []).sort.each do | c |%>
                                 <li><a href="#" role="leaf" onclick="javascript:setSelectedValue('<%= c %>');"><%= c %></a></li>
                               <%end%>
                             </ul>
