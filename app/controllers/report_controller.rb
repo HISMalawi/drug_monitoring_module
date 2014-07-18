@@ -369,16 +369,32 @@ class ReportController < ApplicationController
 
   def months_of_stock_main
     @site = Site.find_by_name(params[:site])
-=begin
+    @list = {}
+
     month_of_stock_defn = Definition.find_by_name('Month of Stock').id
     stock_level_defn = Definition.find_by_name('Stock Level').id
 
-    months_of_stock = Observation.find_by_sql("SELECT o.value_drug, o.value_numeric, MAX(o.value_date)
+    months_of_stock = Observation.find_by_sql("SELECT o.value_drug as drug, o.value_numeric as value, MAX(o.value_date) as date
                                               FROM observations o INNER JOIN drug_set s ON o.value_drug = s.drug_name
                                               WHERE o.definition_id = #{month_of_stock_defn} AND o.site_id = #{@site.id}
                                               AND s.definition_id = #{Definition.find_by_name("HIV Unit Drugs").id}
                                               GROUP BY o.value_drug")
-=end
+
+    (months_of_stock || []).each do |month_of_stock|
+
+
+        stock_level = Observation.calculate_stock_level(month_of_stock.drug,@site.id)
+        stock_level = stock_level / 60 # stock level comes in pills/day here we convert it to tins/month
+        disp_rate = Observation.drug_dispensation_rates(month_of_stock.drug,@site.id)
+        disp_rate = (disp_rate.to_f * 0.5).round #rate is an avg of pills dispensed per day. here we convert it to tins per month
+
+        @list[month_of_stock.drug] = {"month_of_stock" => month_of_stock.value,
+                       "stock_level" => stock_level, "consumption_rate" => disp_rate }
+
+    end
+
+=begin
+#This chunk of code was edited out cause it was a primitive way to get the values needed though it works fine
 
     drugs = ['ABC/3TC (Abacavir and Lamivudine 60/30mg tablet)',
              'AZT/3TC (Zidovudine and Lamivudine 60/30 tablet)',
@@ -400,7 +416,7 @@ class ReportController < ApplicationController
              'Cotrimoxazole (480mg tablet)',
              'Cotrimoxazole (960mg)', 'INH or H (Isoniazid 100mg tablet)', 'INH or H (Isoniazid 300mg tablet)']
 
-    @list = {}
+
     (drugs || []).each do |drug|
 
       month_of_stock = Observation.calculate_month_of_stock(drug, @site.id)
@@ -414,9 +430,9 @@ class ReportController < ApplicationController
 
       end
 
-    end
+=end
 
-    #raise @list.inspect
+
     render :layout => false
   end
 end

@@ -20,19 +20,19 @@ def start
         puts "Month of stock : #{month_of_stock} for drug #{drug.value_drug} "
         Observation.create({:site_id => site.id,
                             :definition_id => month_of_stock_defn,
-                            :value_numeric => month_of_stock.round(3),
+                            :value_numeric => month_of_stock.to_f.round(3),
                             :value_drug => drug.value_drug,
                             :value_date => Date.today})
-=begin
+
         stock_level = Observation.calculate_stock_level(drug,site.id)
 
         Observation.create({:site_id => site.id,
                             :definition_id => stock_level_defn,
-                            :value_numeric => stock_level,
+                            :value_numeric => stock_level.to_f.round(3),
                             :value_drug => drug.value_drug,
                             :value_date => Date.today})
 
-=end
+
         end
     end
 

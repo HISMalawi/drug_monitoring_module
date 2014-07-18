@@ -4,7 +4,7 @@ class AlterObservation < ActiveRecord::Migration
       o.column :voided, :integer, :default => 0
     end
 
-    change_column :observations, :value_numeric, :decimal
+    change_column :observations, :value_numeric, :double
   end
 
   def down
