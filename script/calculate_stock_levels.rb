@@ -16,7 +16,7 @@ def start
 
       month_of_stock = Observation.calculate_month_of_stock(drug.value_drug, site.id)
 
-      unless (month_of_stock.is_a? String ||  month_of_stock.nan?)
+      unless (month_of_stock.is_a? String ||  month_of_stock.nan? || month_of_stock.to_s.downcase == "infinity")
         puts "Month of stock : #{month_of_stock} for drug #{drug.value_drug} "
         Observation.create({:site_id => site.id,
                             :definition_id => month_of_stock_defn,
