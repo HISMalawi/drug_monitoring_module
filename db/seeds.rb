@@ -14,13 +14,15 @@ roles =[["Administrator", "This is the system administrator who handles all syst
   ["Other", "Other system user"] ]
 
 (roles || []).each do |role|
-  new_role = Role.create({:role => role[0], :description => role[1]})
+  new_role = Role.where({:role => role[0], :description => role[1]}).first_or_create
 end
 
 puts "Creating default user"
+if User.find_by_username("admin").blank?
+  user = User.create({:username => "admin", :password => "test"})
+  UserRole.create({:user_id => user.id, :role_id => 1})
+end
 
-user = User.create({:username => "admin", :password => "test"})
-UserRole.create({:user_id => user.id, :role_id => 1})
 
 puts "Creating default definitions"
 definitions = [["Prescription", "Describes the number of precriptions"],
@@ -48,7 +50,7 @@ definitions = [["Prescription", "Describes the number of precriptions"],
 ]
 
 (definitions || []).each do |definition|
-  new_definition = Definition.create({:name => definition[0], :description => definition[1]})
+  new_definition = Definition.where({:name => definition[0], :description => definition[1]}).first_or_create
 end
 
 definition = Definition.find_by_name("HIV Unit Drugs").id
@@ -75,7 +77,7 @@ drugs = [ "ABC/3TC (Abacavir and Lamivudine 60/30mg tablet)",
          "Cotrimoxazole (960mg)", "INH or H (Isoniazid 100mg tablet)", "INH or H (Isoniazid 300mg tablet)"]
 
 (drugs || []).each do |drug|
-  DrugSet.create({:definition_id => definition, :drug_name => drug})
+  DrugSet.where({:definition_id => definition, :drug_name => drug}).first_or_create
 end
 
 puts 'loading drug mappings'
