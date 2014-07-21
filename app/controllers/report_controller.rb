@@ -248,14 +248,32 @@ class ReportController < ApplicationController
 
   def months_of_stock
     
-    @site = params[:site_name]
-    @stocks = Observation.drug_stock_out_predictions(params[:type])
-    
-    @stocks_for_high_charts = filter(@stocks)
-        
-    @site_names = @stocks_for_high_charts.keys
-    @updates = Observation.site_update_dates
-    render :partial => "months_of_stock" and return
+    @site = Site.find_by_name(params[:site_name])
+    @list = {}
+
+    month_of_stock_defn = Definition.find_by_name('Month of Stock').id
+    stock_level_defn = Definition.find_by_name('Stock Level').id
+
+    months_of_stock = Observation.find_by_sql("SELECT o.value_drug as drug, o.value_numeric as value, MAX(o.value_date) as date
+                                              FROM observations o INNER JOIN drug_set s ON o.value_drug = s.drug_name
+                                              WHERE o.definition_id = #{month_of_stock_defn} AND o.site_id = #{@site.id}
+                                              AND s.definition_id = #{Definition.find_by_name("HIV Unit Drugs").id}
+                                              GROUP BY o.value_drug")
+
+    (months_of_stock || []).each do |month_of_stock|
+
+
+      stock_level = Observation.calculate_stock_level(month_of_stock.drug,@site.id)
+      stock_level = stock_level / 60 # stock level comes in pills/day here we convert it to tins/month
+      disp_rate = Observation.drug_dispensation_rates(month_of_stock.drug,@site.id)
+      disp_rate = (disp_rate.to_f * 0.5).round #rate is an avg of pills dispensed per day. here we convert it to tins per month
+
+      @list[month_of_stock.drug] = {"month_of_stock" => month_of_stock.value,
+                                    "stock_level" => stock_level, "consumption_rate" => disp_rate }
+
+    end
+
+    render :layout => false
   end
 
   def filter(stocks)
