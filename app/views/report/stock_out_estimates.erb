@@ -17,7 +17,7 @@
 
 <%if params[:name] == "months_of_stock"%>
   Site name :  <select id="sites" style="margin-top:1%;  width: <%= (@stocks.blank? ? "25%" : "50%")%>;" name="site_name"
-            onchange="switch_site(this.value)">
+            onchange="loadSiteChart(this.value)">
   <option value="">[ - Select site - ]</option>
       <% (@sites || []).each do |site| %>
           <option><%= site %></option>
@@ -34,7 +34,7 @@
     <span style="color: lightblue; font-size: 16px;"><%=   params[:end_date].to_date.strftime("%d-%b- %Y") rescue ("") %></span>
 <%end%>
 
-<iframe id="chart" style="border: none; width: 100%;height: 82vh;"></iframe>
+<div id="chart" style="width: 95%;margin-right: auto; margin-left: auto;"></div>
 
 <script type="text/javascript">
     <!--
@@ -73,69 +73,6 @@
         <%end%>
     }
 
-    function loadSite(site)
-    {
-        var data = stocks[site];
-        var drugs = Object.keys(data);
-        var table = document.getElementById("datalist");
-        var dateLabel = document.getElementById("date");
-        dateLabel.innerHTML = "";
-        table.innerHTML = "";
-
-        for (var i = 0; i < drugs.length; i++){
-
-            var row = create("tr", "table-row", "");
-            row.style.width = "100%";
-
-            var td1 = create("td", "table-data", drugs[i]);
-            td1.style.width = "37%";
-            td1.style.paddingLeft = "0px";
-            row.appendChild(td1);
-
-            var td2 = create("td", "table-data", data[drugs[i]]["prescribed"]);
-            td2.style.width = "13%";
-            td2.style.textAlign = "center";
-            row.appendChild(td2)
-
-            var td3 = create("td", "table-data", data[drugs[i]]["dispensed"]);
-            td3.style.width = "13%";
-            td3.style.textAlign = "center";
-            row.appendChild(td3)
-
-            var td4 = create("td", "table-data", data[drugs[i]]["rate"]);
-            td4.style.width = "13%";
-            td4.style.textAlign = "center";
-            row.appendChild(td4)
-
-            var td5 = create("td", "table-data", data[drugs[i]]["stock_level"]);
-            td5.style.width = "13%";
-            td5.style.textAlign = "center";
-            row.appendChild(td5);
-
-            var td6 = create("td", "table-data", data[drugs[i]]["stockout_date"]);
-            row.appendChild(td6);
-
-            table.appendChild(row);
-        }
-        <% if params[:type] == 'calculated' %>
-        dateLabel.innerHTML = "Raw data updated on " + update_dates[site]["calculated"];
-        <%else%>
-        dateLabel.innerHTML = "Figures <%= params[:type].humanize.downcase %> done " + update_dates[site]["<%= params[:type].match(/clinic|supervision/)[0]%>"];
-        <%end%>
-    }
-    function create(divType, type, data){
-        var node = document.createElement(divType);
-        node.style.diplay = type;
-        if (divType == "tr"){
-            node.style.fontSize = "12px";
-            node.style.padding = "0px";
-            node.style.background = "#FFFFFF";
-        }
-        if (data != ""){
-            node.innerHTML = data;
-        }
-        return node;
-    }
 
 
     // loadSite(document.getElementById("sites").value);
