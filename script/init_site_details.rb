@@ -22,6 +22,7 @@ def start
   sites = YAML.load_file("#{Rails.root.to_s}/config/sites.yml")
   (sites || []).each do |key, value|
     (dates || []).each do |date|
+      next unless date.to_date > '2014-06-27'.to_date
       puts "Getting Data For Site #{key}, Date: #{date.strftime('%A, %d %B %Y')}"
       unless value.blank?
 
