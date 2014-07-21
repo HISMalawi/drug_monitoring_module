@@ -4,6 +4,7 @@ class CreateDrugSets < ActiveRecord::Migration
 
       t.integer :definition_id
       t.string :drug_name
+      t.integer :weight
       t.boolean :voided , :default => false
       t.timestamps
     end

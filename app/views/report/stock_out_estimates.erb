@@ -1,9 +1,11 @@
-<script type="text/javascript" language="javascript" src="/javascripts/jquery.js"></script>
+<script type="text/javascript" language="javascript" src="/javascripts/jquery.js" xmlns="http://www.w3.org/1999/html"></script>
+
 <script type="text/javascript">
     function switch_site(site)
     {
         document.getElementById("chart").setAttribute("src", "/report/months_of_stock?site_name="+ site);
     }
+
 </script>
 <script>
     var drug_map = {}
@@ -17,7 +19,7 @@
 
 <%if params[:name] == "months_of_stock"%>
   Site name :  <select id="sites" style="margin-top:1%;  width: <%= (@stocks.blank? ? "25%" : "50%")%>;" name="site_name"
-            onchange="loadSiteChart(this.value)">
+            onchange="switch_site(this.value)">
   <option value="">[ - Select site - ]</option>
       <% (@sites || []).each do |site| %>
           <option><%= site %></option>
@@ -34,7 +36,7 @@
     <span style="color: lightblue; font-size: 16px;"><%=   params[:end_date].to_date.strftime("%d-%b- %Y") rescue ("") %></span>
 <%end%>
 
-<div id="chart" style="width: 95%;margin-right: auto; margin-left: auto;"></div>
+<iframe id="chart" style="width: 95%;height:90vh;border: none; margin-right: auto; margin-left: auto;"></iframe>
 
 <script type="text/javascript">
     <!--
@@ -62,7 +64,7 @@
     function loadSiteChart(site){
 
         <% if params[:name] == "months_of_stock" %>
-        jQuery('#chart').empty().html("<span style='padding-left: 43.5%;padding-top: 45%; width: 100%; text-align: center; font-size: 30px;'>Loading...</span>").load('/report/months_of_stock?site_name=kawale');
+        jQuery('#chart').empty().html("<span style='padding-left: 43.5%;padding-top: 45%; width: 100%; text-align: center; font-size: 30px;'>Loading...</span>").load('/report/months_of_stock?site_name=' + site);
         <% elsif params[:name] == "stock_movement" %>
         <%if @drugs.blank?%>
         jQuery('#chart').empty().html("<span style='padding-left: 20.5%;padding-top: 45%; width: 100%; text-align: center; font-size: 30px;'> \n\

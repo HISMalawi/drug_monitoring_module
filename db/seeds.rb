@@ -56,28 +56,30 @@ end
 definition = Definition.find_by_name("HIV Unit Drugs").id
 
 puts "Load drug set"
-drugs = [ "ABC/3TC (Abacavir and Lamivudine 60/30mg tablet)",
-         "AZT/3TC (Zidovudine and Lamivudine 60/30 tablet)",
-         "AZT/3TC (Zidovudine and Lamivudine 300/150mg)",
-         "AZT/3TC/NVP (60/30/50mg tablet)",
-         "AZT/3TC/NVP (300/150/200mg tablet)",
-         "d4T/3TC (Stavudine Lamivudine 6/30mg tablet)",
-         "d4T/3TC (Stavudine Lamivudine 30/150 tablet)",
-         "Triomune baby (d4T/3TC/NVP 6/30/50mg tablet)",
-         "d4T/3TC/NVP (30/150/200mg tablet)",
-         "EFV (Efavirenz 200mg tablet)",
-         "EFV (Efavirenz 600mg tablet)",
-         "LPV/r (Lopinavir and Ritonavir 100/25mg tablet)",
-         "LPV/r (Lopinavir and Ritonavir 200/50mg tablet)",
-         "LPV/r (Lopinavir and Ritonavir syrup)",
-         "ATV/r (Atazanavir 300mg/Ritonavir 100mg)",
-         "NVP (Nevirapine 200 mg tablet)",
-         "TDF/3TC (Tenofavir and Lamivudine 300/300mg tablet","TDF/3TC/EFV (300/300/600mg tablet)",
-         "Cotrimoxazole (480mg tablet)",
-         "Cotrimoxazole (960mg)", "INH or H (Isoniazid 100mg tablet)", "INH or H (Isoniazid 300mg tablet)"]
+drugs = [ ["ABC/3TC (Abacavir and Lamivudine 60/30mg tablet)",1],
+         ["AZT/3TC (Zidovudine and Lamivudine 60/30 tablet)",2],
+         ["AZT/3TC (Zidovudine and Lamivudine 300/150mg)",3],
+         ["AZT/3TC/NVP (60/30/50mg tablet)",4],
+         ["AZT/3TC/NVP (300/150/200mg tablet)",5],
+         ["d4T/3TC (Stavudine Lamivudine 6/30mg tablet)",6],
+         ["d4T/3TC (Stavudine Lamivudine 30/150 tablet)",7],
+         ["Triomune baby (d4T/3TC/NVP 6/30/50mg tablet)",8],
+         ["d4T/3TC/NVP (30/150/200mg tablet)",9],
+         ["EFV (Efavirenz 200mg tablet)",10],
+         ["EFV (Efavirenz 600mg tablet)",11],
+         ["LPV/r (Lopinavir and Ritonavir 100/25mg tablet)",12],
+         ["LPV/r (Lopinavir and Ritonavir 200/50mg tablet)",13],
+         # "LPV/r (Lopinavir and Ritonavir syrup)",
+         ["ATV/r (Atazanavir 300mg/Ritonavir 100mg)",14],
+         ["NVP (Nevirapine 200 mg tablet)",15],
+         ["TDF/3TC (Tenofavir and Lamivudine 300/300mg tablet",16],
+         ["TDF/3TC/EFV (300/300/600mg tablet)",17],
+         ["NVP (Nevirapine syrup 1mL/dose in 25mL bottle)",18],
+         ["Cotrimoxazole (480mg tablet)",19],
+         ["Cotrimoxazole (960mg)",20]]
 
 (drugs || []).each do |drug|
-  DrugSet.where({:definition_id => definition, :drug_name => drug}).first_or_create
+  DrugSet.where({:definition_id => definition, :drug_name => drug[0], :weight => drug[1]}).first_or_create
 end
 
 puts 'loading drug mappings'
