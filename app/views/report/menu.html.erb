@@ -75,17 +75,20 @@
                           </tr>
                         </table>
 
-
-                      <%#=yield%>
                     <!-- content ends -->
                   </div>
               </div>
-              <div class="span8" id="reporter">test</div>
+              <div class="span8" id="reporter">
+                <%if params[:id] == 'Stock movement'%>
+                   <%= render(:partial => "stock_movement" ) %>
+                <%else%> 
+                <%end%> 
+              </div>
           </div>
     </div>
 </div>
 
-<%=javascript_include_tag "bootstrap-tree/jquery-1.8.2"%>
+<%#=javascript_include_tag "bootstrap-tree/jquery-1.8.2"%>
 <%=javascript_include_tag "bootstrap-tree/bootstrap.min"%>
 <%=javascript_include_tag "bootstrap-tree/bootstrap-tree"%>
 
@@ -103,7 +106,7 @@ function display_report(){
     var drug = document.getElementById('selection-label').innerHTML
 
 
-    document.getElementById('reporter').innerHTML = "Please wait ....";
+    //document.getElementById('reporter').innerHTML = "Please wait ....";
 
     if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
         xmlhttp=new XMLHttpRequest();
@@ -117,10 +120,10 @@ function display_report(){
                 document.getElementById('reporter').innerHTML = "....";
                 return;
             }else if(results.length > 0){
+                document.getElementById('results').value = results;
                 plotGraph();
-                document.getElementById('reporter').innerHTML = results;
             }else{
-                document.getElementById('reporter').innerHTML = "....";
+                //document.getElementById('reporter').innerHTML = "....";
                 return;
             }
         }
@@ -130,62 +133,6 @@ function display_report(){
 
 
 
-    //jQuery('#reporter').empty().html("<span style='padding-left: 43.5%; width: 100%; text-align: center; font-size: 30px;'>Loading...</span>").load('/report/stock_movement?site_name=' + site + "&start_date="+ start_date + "&end_date="+end_date + "&drug="+ drug  );
 }
 </script>
 
-<script type="text/javascript">
-
-    function plotGraph(){
-        $('#graph').innerHtml = "testing graph"
-        $(function () {
-            $('#graph').highcharts({
-                chart: {
-                    type: 'line'
-                },
-                title: {
-                    text: ''
-                },
-                subtitle: {
-                    text: ''
-                },
-                xAxis: {
-                    /*categories:  getDates(), */
-                    type: 'datetime',
-                    dateTimeLabelFormats: {
-                        day: '%e %b',
-                        week: '%e %b'
-                    }
-                },
-                yAxis: {
-
-                    title: {
-                        text: 'Tins in stock'
-                    },
-                    labels: {
-                        formatter: function() {
-                            return this.value;
-                        }
-                    }
-
-                },
-                tooltip: {
-                    shared: true,
-                    valueSuffix: ' Tins'
-                },
-                plotOptions: {
-                    area: {
-                        stacking: 'normal',
-                        lineColor: '#666666',
-                        lineWidth: 2,
-                        marker: {
-                            lineWidth: 100,
-                            lineColor: '#666666'
-                        }
-                    }
-                },
-                series: [{name: 'Time', data: [1,2,5,3,48,92,48,2,5], negativeColor: 'red', pointInterval: 24 * 3600 * 1000}]
-            });
-        });
-    }
-</script>

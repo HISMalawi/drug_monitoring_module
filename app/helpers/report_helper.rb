@@ -19,4 +19,5 @@ html =<<EOF
 EOF
     html.html_safe
   end
+
 end

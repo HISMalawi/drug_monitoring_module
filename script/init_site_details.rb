@@ -8,7 +8,7 @@ $drug_given_to_id = Definition.where(:name => "People who received drugs").first
 $drug_prescribed_id = Definition.where(:name => "People prescribed drug").first.id
 
 def get_dates
-  dates = [] ; curr_date = Date.today
+  dates = [] ; curr_date = "23 April 2014".to_date # Date.today
   1.upto(90).collect do |n|
     dates << curr_date
     curr_date -= 1.day
@@ -22,7 +22,7 @@ def start
   sites = YAML.load_file("#{Rails.root.to_s}/config/sites.yml")
   (sites || []).each do |key, value|
     (dates || []).each do |date|
-      next unless date.to_date > '2014-06-27'.to_date
+      next unless date.to_date > '2014-01-01'.to_date and date.to_date < '23 April 2014'.to_date
       puts "Getting Data For Site #{key}, Date: #{date.strftime('%A, %d %B %Y')}"
       unless value.blank?
 
