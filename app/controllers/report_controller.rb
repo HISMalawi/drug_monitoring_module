@@ -7,11 +7,8 @@ class ReportController < ApplicationController
   def menu
     @tree = {}
     @tree["Drug categories"] = {}
-    @tree["Drug categories"]["ARVs"] = []
-    DrugMap.all[0..19].each do |d|
-      @tree["Drug categories"]["ARVs"] << d.full_name
-    end
-
+    hiv_unit_drugs = Definition.find_by_name("HIV Unit Drugs").id
+    @tree["Drug categories"]["ARVs"] = DrugSet.where(:definition_id =>hiv_unit_drugs ).order("weight asc").collect{|x| x.get_short_name}
     @tree["Drug categories"]['Opportunistic Infection  medicine'] = {}
     @tree["Drug categories"]['Antibiotics'] = {}
     @tree["Drug categories"]['Analgesic'] = {}
@@ -307,12 +304,12 @@ class ReportController < ApplicationController
   end
 
   def stock_movement
-
+=begin
     start_date = params[:start_date].to_date
     end_date = params[:end_date].to_date
 
     definition_id = Definition.where(:name => "Supervision verification").first.id
-    site_id = Site.find_by_name(params[:site_name]).id
+    site_id = params[:site_name]
     
     stocks = {}
    
@@ -361,8 +358,10 @@ class ReportController < ApplicationController
     }
 
     puts "#{params[:drug_name]}"
-    
-    render :partial => "stock_movement" and return
+=end
+    result = view_context.stock_movement("test")
+
+    render :text => result
   end
   
   def drugs

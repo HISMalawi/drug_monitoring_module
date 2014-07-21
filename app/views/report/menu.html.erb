@@ -22,7 +22,7 @@
                           <%end%>
                           <%unless child_values.blank?%>
                             <ul class="branch">
-                              <%(child_values || []).sort.each do | c |%>
+                              <%(child_values || []).each do | c |%>
                                 <li><a href="#" role="leaf" onclick="javascript:setSelectedValue('<%= c %>');"><%= c %></a></li>
                               <%end%>
                             </ul>
@@ -30,9 +30,9 @@
                         <%end%>
                 <%end%>
               </ul>
+              </ul>
 
-
-            </div><!--/.well -->
+            </div><!--/well-->
           </div><!--/span-->
           <div class="span9" id="mainContent">
               <div class="row-fluid">
@@ -40,8 +40,7 @@
                     <!-- content -->
                       <h3>Report:&nbsp;<%=params[:id]%></h3>
                       <br />  
-                      <br />  
-                      <form>
+                      <br />
                         <table style="width: 99%;">
                           <tr>
                             <td><label>Drug:</label></td>
@@ -64,24 +63,24 @@
                             </td>
                           </tr>
                           <tr>
-                            <td>Start date</td><td><input type="text" name="start_date" required="" /></td>
+                            <td>Start date</td><td><input type="text" id="start_date" required="" /></td>
                           </tr>
                           <tr>
-                            <td>End date</td><td><input type="text" name="end_date" required="" /></td>
+                            <td>End date</td><td><input type="text" id="end_date" required="" /></td>
                           </tr>
                           <tr>
                             <td colspan="2">
-                              <input type="submit" class="btn btn-success" value="Submit" style="width: 60%;" />
+                              <input type="submit" class="btn btn-success" value="Submit" onclick="display_report()" style="width: 60%;" />
                             </td>
                           </tr>
                         </table>
-                      </form>
+
 
                       <%#=yield%>
                     <!-- content ends -->
                   </div>
               </div>
-              <div class="span8" id="reporter"></div>
+              <div class="span8" id="reporter">test</div>
           </div>
     </div>
 </div>
@@ -95,4 +94,98 @@ function setSelectedValue(value) {
   label = document.getElementById('selection-label');
   label.innerHTML = value;
 }
+function display_report(){
+
+
+    var site = document.getElementById('sitename').value
+    var start_date = document.getElementById("start_date").value
+    var end_date = document.getElementById('end_date').value
+    var drug = document.getElementById('selection-label').innerHTML
+
+
+    document.getElementById('reporter').innerHTML = "Please wait ....";
+
+    if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
+        xmlhttp=new XMLHttpRequest();
+    }else{// code for IE6, IE5
+        xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    xmlhttp.onreadystatechange=function() {
+        if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+            var results = xmlhttp.responseText;
+            if(results == 'undefined' || results == '' || results == '"not validate"') {
+                document.getElementById('reporter').innerHTML = "....";
+                return;
+            }else if(results.length > 0){
+                plotGraph();
+                document.getElementById('reporter').innerHTML = results;
+            }else{
+                document.getElementById('reporter').innerHTML = "....";
+                return;
+            }
+        }
+    }
+    xmlhttp.open("GET",'/report/stock_movement?site_id=' + site + "&start_date="+ start_date + "&end_date="+end_date + "&drug="+ drug ,true);
+    xmlhttp.send();
+
+
+
+    //jQuery('#reporter').empty().html("<span style='padding-left: 43.5%; width: 100%; text-align: center; font-size: 30px;'>Loading...</span>").load('/report/stock_movement?site_name=' + site + "&start_date="+ start_date + "&end_date="+end_date + "&drug="+ drug  );
+}
+</script>
+
+<script type="text/javascript">
+
+    function plotGraph(){
+        $('#graph').innerHtml = "testing graph"
+        $(function () {
+            $('#graph').highcharts({
+                chart: {
+                    type: 'line'
+                },
+                title: {
+                    text: ''
+                },
+                subtitle: {
+                    text: ''
+                },
+                xAxis: {
+                    /*categories:  getDates(), */
+                    type: 'datetime',
+                    dateTimeLabelFormats: {
+                        day: '%e %b',
+                        week: '%e %b'
+                    }
+                },
+                yAxis: {
+
+                    title: {
+                        text: 'Tins in stock'
+                    },
+                    labels: {
+                        formatter: function() {
+                            return this.value;
+                        }
+                    }
+
+                },
+                tooltip: {
+                    shared: true,
+                    valueSuffix: ' Tins'
+                },
+                plotOptions: {
+                    area: {
+                        stacking: 'normal',
+                        lineColor: '#666666',
+                        lineWidth: 2,
+                        marker: {
+                            lineWidth: 100,
+                            lineColor: '#666666'
+                        }
+                    }
+                },
+                series: [{name: 'Time', data: [1,2,5,3,48,92,48,2,5], negativeColor: 'red', pointInterval: 24 * 3600 * 1000}]
+            });
+        });
+    }
 </script>
