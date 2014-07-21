@@ -7,6 +7,8 @@
     	<!--[if lt IE 9]>
     		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     	<![endif]-->
+
+      <%= stylesheet_link_tag "footer.sticky" %>                                         
       <%= stylesheet_link_tag "IE/bootstrap" %>                                         
    		<style>
     		body{ padding-top: 60px; }
@@ -63,6 +65,13 @@
           <%=yield%>
         </section>
         </div> <!-- /container -->
+
+        <div class="footer">
+          <div class="container" style="text-align: center;">
+            <p class="text-muted credit"><%=app_name%> <a target="_blank" href="http://www.baobabhealth.org">baobabhealth.org</a>.</p>
+          </div>
+        </div>
+
 
         <%#=javascript_include_tag "IE/jquery-1.7.1.min"%>                                         
         <%=javascript_include_tag "bootstrap-tree/jquery-1.8.2"%>                                         
