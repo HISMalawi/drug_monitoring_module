@@ -26,7 +26,9 @@
         bottom: 0px;
       }
 
-
+      #main{
+        position: relative;
+      }
   </style>
 <script type="text/javascript">
   window.switch = function (site)
@@ -41,13 +43,13 @@
 </head>
 <body onresize="resizeTable()" onload="resizeTable();switchViews()">
 
-<div id="main" class="table" style="width: 99%; height: 83vh; border: 0px solid #000; top: 50px; position: absolute;">
+<div id="main" class="table" style="width: 99%;  border: 0px solid #000; top: 50px; position: absolute;">
   <div class="row">
-    <div style="text-align: center;background-color: #f5f5f5;border: 1px solid rgba(0, 0, 0, 0.05);border-radius: 4px;" >
-      <iframe id="main-display" style=" height: 90vh; border: none; overflow: auto;" src="/home/map_main"></iframe>
+    <div style="overflow:auto; height:30%; text-align: center;background-color: #f5f5f5;border: 1px solid rgba(0, 0, 0, 0.05);border-radius: 4px;" >
+      <iframe id="main-display" style=" height: 500px; width:100%; border: none; overflow: auto;" src="/home/map_main"></iframe>
     </div>
-    <div class="cell" style="vertical-align: top;width: 65%;">
-      <iframe id="report-display" style="width: 100%;border: none; height: 80vh;overflow: auto;" ></iframe>
+    <div class="cell" style="vertical-align: top; width: 65%;">
+      <iframe id="report-display" style="width: 100%; border: none; height: 500px;overflow: auto;" ></iframe>
     </div>
   </div>
 </div>
