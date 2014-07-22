@@ -1,5 +1,11 @@
 
 <%= stylesheet_link_tag "bootstrap-tree/bootstrap-tree" %>                                         
+<style>
+  .td-heading {
+    width: 100px;
+  }
+
+</style>
 
 <div class="container-fluid">
     <div class="row-fluid">
@@ -43,11 +49,11 @@
                       <br />
                         <table style="width: 99%;">
                           <tr>
-                            <td><label>Drug:</label></td>
+                            <td class="td-heading"><label>Drug:</label></td>
                             <td><label id="selection-label" style="font-weight: bold;"></label></td>
                           </tr>
                           <tr>
-                            <td>Select site</td>
+                            <td class="td-heading">Select site</td>
                             <%sites = []
                               Site.all.map do |s|
                                 sites << [s.name, s.id]
@@ -63,14 +69,14 @@
                             </td>
                           </tr>
                           <tr>
-                            <td>Start date</td><td><input type="text" id="start_date" required="" /></td>
+                            <td class="td-heading">Start date</td><td><input type="text" id="start_date" required="" /></td>
                           </tr>
                           <tr>
-                            <td>End date</td><td><input type="text" id="end_date" required="" /></td>
+                            <td class="td-heading">End date</td><td><input type="text" id="end_date" required="" /></td>
                           </tr>
                           <tr>
-                            <td colspan="2">
-                              <input type="submit" class="btn btn-success" value="Submit" onclick="display_report()" style="width: 60%;" />
+                            <td class="td-heading">
+                              <input type="submit" class="btn btn-success" value="Submit" onclick="display_report()" style="width: 100%;" />
                             </td>
                           </tr>
                         </table>
