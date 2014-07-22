@@ -15,60 +15,53 @@
       results = document.getElementById('results').value;
       results = JSON.parse(results);
 
-
     $(function () {
         $('#container-chart').highcharts({
             chart: {
-                type: 'line',
-                marginRight: 130,
-                marginBottom: 25
+                type: 'line'
             },
             title: {
-                text: 'Monthly Average Temperature',
-                x: -20 //center
+                text: ''
             },
             subtitle: {
-                text: 'Source: WorldClimate.com',
-                x: -20
+                text: ''
             },
             xAxis: {
-                categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                /*categories:  getDates(), */
+
             },
             yAxis: {
+
                 title: {
-                    text: 'Temperature (°C)'
+                    text: 'Tins in stock'
                 },
-                plotLines: [{
-                    value: 0,
-                    width: 1,
-                    color: '#808080'
-                }]
+                labels: {
+                    formatter: function() {
+                        return this.value;
+                    }
+                }
+
             },
             tooltip: {
-                valueSuffix: '°C'
+                shared: true,
+                valueSuffix: ' Tins'
             },
-            legend: {
-                layout: 'vertical',
-                align: 'right',
-                verticalAlign: 'top',
-                x: -10,
-                y: 100,
-                borderWidth: 0
+            plotOptions: {
+                area: {
+                    stacking: 'normal',
+                    lineColor: '#666666',
+                    lineWidth: 2,
+                    marker: {
+                        lineWidth: 100,
+                        lineColor: '#666666'
+                    }
+                }
             },
             series: [{
-                name: 'Tokyo',
-                data: results['Tokyo']
-            }, {
-                name: 'New York',
-                data: results['New York']
-            }, {
-                name: 'Berlin',
-                data: results['Berlin']
-            }, {
-                name: 'London',
-                data: results['London']
-            }]
+                data: results
+            }],
+            exporting: { enabled: false },
+            credits: { enabled: false }
         });
     });
     

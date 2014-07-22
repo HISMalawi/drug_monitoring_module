@@ -46,7 +46,14 @@ definitions = [["Prescription", "Describes the number of precriptions"],
   ["Resolved", "State of notification"],
   ["Month of Stock", "Calculated month of stock of a drug at a site"],
   ["Stock Level", "Calculated stock levels for a drug at a site"],
-  ["HIV Unit Drugs", "List of items required by HIV unit"]
+  ["HIV Unit Drugs", "List of items required by HIV unit"],
+	["ARV", "Anti-retroviral drug"],
+	["Analgesic","pain relief medicine" ],
+	["Antibiotics", "anti-bacteria drug"],
+	["Antifungal", "anti-fungal medicine"],
+	["Antimalarial", "anti-malaria medicine"],
+	["Antiviral", "anti-viral medicine", ],
+	["Opportunistic infection medicine", "medicine for all other infections and diseases"]
 ]
 
 (definitions || []).each do |definition|
