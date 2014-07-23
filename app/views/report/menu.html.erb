@@ -84,10 +84,10 @@
                     <!-- content ends -->
                   </div>
               </div>
-              <div class="span8" id="reporter">
+              <div class="well span13" id="reporter" style="margin-left: 0% !important;margin-bottom: 5%;">
                 <%if params[:id] == 'Stock movement'%>
                    <%= render(:partial => "stock_movement" ) %>
-                <%else%> 
+                <%else%>
                 <%end%> 
               </div>
           </div>
@@ -127,7 +127,7 @@ function display_report(){
                 return;
             }else if(results.length > 0){
                 document.getElementById('results').value = results;
-                plotGraph();
+                plotGraph(drug);
             }else{
                 //document.getElementById('reporter').innerHTML = "....";
                 return;

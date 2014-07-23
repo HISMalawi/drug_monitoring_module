@@ -439,4 +439,18 @@ class Observation < ActiveRecord::Base
     end
   end
 
+  def self.day_deliveries(site_id = 1, date = Date.today)
+
+    definition_id = Definition.find_by_name("New Delivery").id
+    result = {}
+
+
+      result = Observation.find_by_sql(["SELECT value_date d, value_drug dr, SUM(value_numeric) n, value_text t FROM observations
+                                    WHERE site_id = #{site_id} AND definition_id = #{definition_id} AND value_date = ?
+                                    GROUP BY value_drug, value_date, value_text", date.to_date]).inject({}){|r, o|
+         r[o.dr] = {} if !r.keys.include?(o.dr); r[o.dr]["value"] = o.n; r[o.dr]["code"] = o.t; r}
+
+
+    return result
+  end
 end

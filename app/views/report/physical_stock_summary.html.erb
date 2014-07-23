@@ -1,12 +1,13 @@
-<!doctype html>
+<%=javascript_include_tag "bootstrap-tree/jquery-1.8.2"%>
+<script type="text/javascript" language="javascript" src="/javascripts/DataTables/jquery.dataTables.js"></script>
+<%= stylesheet_link_tag "bootstrap-tree/bootstrap-tree" %>
 <style>
     .td-heading {
         width: 100px;
     }
 
 </style>
-<%=javascript_include_tag "bootstrap-tree/jquery-1.8.2"%>
-<script type="text/javascript" language="javascript" src="/javascripts/DataTables/jquery.dataTables.js"></script>
+
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span3">
@@ -44,20 +45,35 @@
       <div class="row-fluid">
         <div class="well span13" id="editorArea">
           <!-- content -->
-          <h3>Report:&nbsp;Delivery Report</h3>
+          <h3>Report:&nbsp;Physical Stock Summary</h3>
+          <br />
           <br />
           <table style="width: 99%;">
             <tr>
-              <td class="td-heading"><label>Site:</label></td>
+              <td class="td-heading"><label>Drug:</label></td>
               <td><label id="selection-label" style="font-weight: bold;"></label></td>
             </tr>
             <tr>
-              <td class="td-heading"><label>Select Date:</label></td>
-              <td><input id="selected_date" type="text"/></td>
+              <td class="td-heading">Select site</td>
+              <%sites = []
+                Site.all.map do |s|
+                  sites << [s.name, s.id]
+                end
+              %>
+              <td>
+                <select id="sitename" name="sitename" class="form-control" placeholder="Region" required=""  >
+                  <option value="">[ - Select site - ]</option>
+                  <% (sites || []).each do |site, id| %>
+                      <option value="<%= id%>"><%= site %></option>
+                  <% end %>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td class="td-heading">Select date</td><td><input type="text" id="start_date" required="" /></td>
             </tr>
             <tr>
               <td class="td-heading">
-                <br />
                 <input type="submit" class="btn btn-success" value="Submit" onclick="display_report()" style="width: 100%;" />
               </td>
             </tr>
@@ -67,9 +83,7 @@
         </div>
       </div>
       <div class="well span13" id="reporter" style="margin-left: 0% !important;margin-bottom: 5%;">
-
-            <table id="records"></table>
-
+        <table id = 'records'></table>
       </div>
     </div>
   </div>
@@ -78,11 +92,8 @@
 <%#=javascript_include_tag "bootstrap-tree/jquery-1.8.2"%>
 <%=javascript_include_tag "bootstrap-tree/bootstrap.min"%>
 <%=javascript_include_tag "bootstrap-tree/bootstrap-tree"%>
-<%= stylesheet_link_tag "bootstrap-tree/bootstrap-tree" %>
 
 <script>
-
-
     function setSelectedValue(value) {
         label = document.getElementById('selection-label');
         label.innerHTML = value;
@@ -90,11 +101,13 @@
     function display_report(){
 
 
-        var site = document.getElementById('selection-label').innerHTML
-        var start_date = document.getElementById("selected_date").value
+        var site = document.getElementById('sitename').value
+        var report_date = document.getElementById("selected_date").value
+        var drug = document.getElementById('selection-label').innerHTML
+
 
         //document.getElementById('reporter').innerHTML = "Please wait ....";
-        document.getElementById('reporter').innerHTML = "Loading.......";
+
         if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
             xmlhttp=new XMLHttpRequest();
         }else{// code for IE6, IE5
@@ -107,34 +120,19 @@
                     document.getElementById('reporter').innerHTML = "....";
                     return;
                 }else if(results.length > 0){
-                    draw_table(results)
+
+
                 }else{
-                    document.getElementById('reporter').innerHTML = "No Deliveries Were Made On This Day";
+                    //document.getElementById('reporter').innerHTML = "....";
                     return;
                 }
             }
         }
-        xmlhttp.open("POST",'/report/delivery_report?site_name=' + site + "&start_date="+ start_date ,true);
+        xmlhttp.open("POST",'/report/physical_stock_summary?site_id=' + site + "&report_date="+ report_date + "&drug="+ drug ,true);
         xmlhttp.send();
 
 
 
-    }
-
-    function draw_table(results){
-        document.getElementById('reporter').innerHTML = results;
-
-        if (results != "No Deliveries Were Made On This Day")
-        {
-            $('#records').dataTable({
-                "aaSorting": [[ 0, "asc" ]],
-                'iDisplayLength': 20,
-                "bLengthChange": false,
-                "bPaginate": false,
-                "bFilter": false
-            });
-
-        }
     }
 </script>
 

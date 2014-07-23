@@ -72,6 +72,9 @@ DrugMonitoringProgram::Application.routes.draw do
   get "report/months_of_stock_main"
   get "report/stock_movement"
   get "report/delivery_report"
+  post "report/delivery_report"
+  get "report/physical_stock_summary"
+  post "report/physical_stock_summary"
   match 'report/:id' => 'report#menu', :as => :report
 
   ################### HOME ##############################

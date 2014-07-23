@@ -15,7 +15,7 @@ class ReportController < ApplicationController
     @tree["Drug categories"]['Antiviral'] = {}
     @tree["Drug categories"]['Antifungal'] = {}
     @tree["Drug categories"]['Antimalarial'] = {}
-    
+
     #@sheets["Sheets"] = {}
 
   end
@@ -49,10 +49,10 @@ class ReportController < ApplicationController
         redirect_to :action => 'site_report', :site => site, :start_date => start_date, :end_date => end_date
       when "stock movement"
         redirect_to :action => 'stock_out_estimates', :start_date => start_date, :end_date => end_date,
-          :type => "verified_by_supervision", :name => "stock_movement", :site_name => params[:site_name]
+          :type => "verified_by_supervision", :name => "stock_movement", :site_name => params[:sitename]
       when "delivery report"
         redirect_to :action => 'delivery_report', :start_date => start_date, :end_date => end_date,
-          :name => "delivery_report", :site_name => params[:site_name], :delivery_code => params[:delivery_code]
+          :name => "delivery_report", :site_name => params[:sitename], :delivery_code => params[:delivery_code]
     end
   end
 
@@ -341,12 +341,12 @@ class ReportController < ApplicationController
       latestcount = 0
       while n <= params[:end_date].to_date
       
-        if !data[n.to_date.strftime("%Y, %b %d")].blank? && data[n.to_date].to_i > 0
-          latestcount = data[n.to_date.strftime("%Y, %b %d")]
+        if !data[n.to_date].blank? && data[n.to_date].to_i > 0
+          latestcount = data[n.to_date]
         else
           latestcount = latestcount - Observation.dispensed(drug, (n.to_date - 1.days))
         end
-        @stocks[drug] << [n.strftime("%Y, %b %d"), latestcount] unless n.to_date < start_date.to_date
+        @stocks[drug] << [n, latestcount] unless n.to_date < start_date.to_date
         n = n + 1.day
       end
       n = controlled_bound
@@ -376,14 +376,24 @@ class ReportController < ApplicationController
   end
 
   def delivery_report
-    @site = "?"
-    site_id = -1
-    if params[:delivery_code].blank?
-      site = Site.find_by_name(params[:site_name])
-      return {} if site.blank?
-      site_id = site.id
+
+    if request.get?
+      @tree = {}
+      @tree["Available Sites"] = Site.all.collect{|x| x.name}
     else
-      
+      @site = Site.find_by_name(params[:site_name])
+      site_id = @site.id
+      start_date = params[:start_date] || nil
+      @stocks = Observation.day_deliveries(site_id, start_date)
+      render :text => view_context.deliveries(@stocks)
+    end
+
+
+=begin
+    #code from dmp 1.0 that is now redundant
+    if params[:delivery_code].blank?
+      site_id = Site.find_by_name(params[:site_name]).id
+    else
       site_id = Observation.site_by_code(params[:delivery_code])
     end
     
@@ -396,8 +406,9 @@ class ReportController < ApplicationController
       delivery_code = params[:delivery_code] || nil    
       @stocks = Observation.deliveries(site_id, start_date, end_date, delivery_code)
     end
-    
-   # render :layout => 'report_layout'
+
+    raise @stocks.inspect
+=end
   end
 
   def months_of_stock_main
@@ -469,4 +480,23 @@ class ReportController < ApplicationController
     render :layout => false
   end
 
+  def physical_stock_summary
+
+    if request.get?
+      @tree = {}
+      @tree["Drug categories"] = {}
+      hiv_unit_drugs = Definition.find_by_name("HIV Unit Drugs").id
+      @tree["Drug categories"]["ARVs"] = DrugSet.where(:definition_id =>hiv_unit_drugs ).order("weight asc").collect{|x| x.get_short_name}
+      @tree["Drug categories"]['Opportunistic Infection  medicine'] = {}
+      @tree["Drug categories"]['Antibiotics'] = {}
+      @tree["Drug categories"]['Analgesic'] = {}
+      @tree["Drug categories"]['Antiviral'] = {}
+      @tree["Drug categories"]['Antifungal'] = {}
+      @tree["Drug categories"]['Antimalarial'] = {}
+
+    else
+
+    end
+
+  end
 end

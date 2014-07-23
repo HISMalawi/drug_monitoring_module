@@ -1,3 +1,6 @@
+<!doctype html>
+<link href="/stylesheets/jquery.alerts.css" rel="stylesheet" type="text/css" media="screen" />
+
 <style type="text/css">
     td {
         padding: 10px !important;
@@ -12,13 +15,6 @@
     }
 </style>
 
-
-<script src="/javascripts/jquery.min.js"></script>
-<script src="/javascripts/bootstrap-datepicker.js"></script>
-<script language="javascript" type="text/javascript" src="/javascripts/jquery.alerts.js"></script>
-<script language="javascript" type="text/javascript" src="/javascripts/application.js"></script>
-<link rel="stylesheet" type="text/css" href="/stylesheets/application.css" />
-<link href="/stylesheets/jquery.alerts.css" rel="stylesheet" type="text/css" media="screen" />
 
 
 <div class="container theme-showcase" role="main">
@@ -82,7 +78,7 @@
                 </td>
                 <td>
                   <div style="width: 50% !important;" class="input-group date">
-                    <input id="start_date" name="start_date" type="text" class="form-control"><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+                    <input id="start_date" placeholder="Select date" name="start_date" type="text" class="form-control">
                   </div>
                 </td>
               </tr>
@@ -97,7 +93,7 @@
                 </td>
                 <td>
                   <div style="width: 50% !important;" class="input-group date">
-                    <input id="end_date" name="end_date" type="text" class="form-control"><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+                    <input id="end_date" name="end_date" type="text" placeholder="Select date" class="form-control">
                   </div>
                 </td>
               </tr>
@@ -141,13 +137,13 @@
     var day = ("0" + now.getDate()).slice(-2);
     var month = ("0" + (now.getMonth() + 1)).slice(-2);
     var today =  (day)+ "-" + (month) + "-" + now.getFullYear();
-
+/*
     $('.input-group.date').datepicker({
         format: "dd-MM-yyyy",
         todayBtn: "linked",
         autoclose: true,
         todayHighlight: true
-    });
+    });*/
 </script>
 
 <script type="text/javascript">
