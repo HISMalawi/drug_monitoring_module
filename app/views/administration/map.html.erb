@@ -6,7 +6,7 @@
     <div style="text-align: center; font-size: 12px; font-style: italic;"><%= (@label.nil? ? ((!params["cat"].nil? and params["cat"] == "Site") ? "[ Select site ]" : "[ Select region ]") : ((!params["cat"].nil? and params["cat"] == "Site") ? "" : "Click site location on the map")) %></div>
     <div id="main" style="padding: 20px; text-align: center;"></div>
   
-    <script src="/javascripts/d3.js" charset="utf-8"></script>
+    <script src="/javascripts/Charts/d3.js" charset="utf-8"></script>
     <script type="text/javascript">
       
       var loader = d3.xml("/images/<%= @region.downcase %>.svg", function(xml) {
