@@ -154,18 +154,37 @@ $(function () {
             tooltip: {
                 headerFormat: '<span></span>',
                 pointFormat: '{point.name}</b><br/>'
+            },
+            title: {
+                text: ''
             }
     });
 });
 //]]>
 
-
+function loadSites(){
+    paths = $('path');
+    for (i=0; i < paths.length; i++){
+      class_list = paths[i].classList;
+      if (class_list.length == 0) continue;
+      coordinates = paths[i].getBBox();
+      cx = parseInt(coordinates.x);
+      cy = parseInt(coordinates.y);
+      ch = parseInt(coordinates.height)/2
+      paper = Raphael(cx, cy, 100, 100);//x, y, width, height
+      circle = paper.circle(ch, ch, 5);
+      circle.attr("fill", "#f00");
+      circle.attr("stroke", "#fff");
+    }
+}
+window.setTimeout("loadSites();", 300);
 </script>
 
 
 </head>
 <body>
 <script src="/javascripts/highmaps.js"></script>
+<script src="/javascripts/raphael-min.js"></script>
 <div id="container" style="position: absolute; width: 100%; ">
 </div>
 </body>
