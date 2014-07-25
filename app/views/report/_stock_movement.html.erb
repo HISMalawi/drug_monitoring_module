@@ -14,7 +14,7 @@
 
     function plotGraph(drug) {
       results = document.getElementById('results').value;
-      results = JSON.parse(results);
+      results = JSON.parse(results)
 
     $(function () {
         $('#container-chart').highcharts({
@@ -33,8 +33,8 @@
                 dateTimeLabelFormats: {
                     day: '%e %b %y',
                     week: '%e %b %y'
-                }
-
+                },
+                minTickInterval: 24 * 3600 * 1000
             },
             yAxis: {
 
@@ -45,7 +45,8 @@
                     formatter: function() {
                         return this.value;
                     }
-                }
+                },
+                tickInterval: 1
 
             },
             tooltip: {
@@ -89,7 +90,15 @@
             data.push([Date.UTC(date.getFullYear(), date.getMonth(), date.getDay()) ,results[i][1]])
         }
 
-        return data
+        return data.sort(function(a, b) {
+            return a[0] > b[0]?1:-1;
+        });
+    }
+    function sort_results(myCoordinates)
+    {
+        myCoordinates.sort(function(a, b) {
+            return a[1] > b[1]?1:-1;
+        });
     }
     </script>
 
@@ -99,7 +108,8 @@
 
     <%=javascript_include_tag "Charts/Highcharts/highcharts"%>
     <%=javascript_include_tag "Charts/Highcharts/exporting"%>
-
+    <div id="wait" >
+    </div>
     <div id="container-chart" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
     <input type="hidden" id="results" />
   </body>

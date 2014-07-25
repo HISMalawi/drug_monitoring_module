@@ -97,12 +97,22 @@
 <%#=javascript_include_tag "bootstrap-tree/jquery-1.8.2"%>
 <%=javascript_include_tag "bootstrap-tree/bootstrap.min"%>
 <%=javascript_include_tag "bootstrap-tree/bootstrap-tree"%>
+<script type="text/javascript" src="/javascripts/zebra_datepicker.js"></script>
+<link rel="stylesheet" href="/stylesheets/default.css" type="text/css">
 
 <script>
 function setSelectedValue(value) {
   label = document.getElementById('selection-label');
   label.innerHTML = value;
 }
+function display_picker(e){
+
+    $('#start_date').Zebra_DatePicker({format: "d-M-Y", offset: [-220, (jQuery('#start_date').position().top * 1.4)]});
+    $('#end_date').Zebra_DatePicker({format: "d-M-Y", offset: [-220, (jQuery('#end_date').position().top * 1.2)]});
+
+}
+setTimeout(display_picker, 2);
+
 function display_report(){
 
 
@@ -111,8 +121,8 @@ function display_report(){
     var end_date = document.getElementById('end_date').value
     var drug = document.getElementById('selection-label').innerHTML
 
-
-    //document.getElementById('reporter').innerHTML = "Please wait ....";
+    document.getElementById('wait').innerHTML = "Loading chart. Please wait ......";
+    document.getElementById("container-chart").style.display = 'none';
 
     if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
         xmlhttp=new XMLHttpRequest();
@@ -122,11 +132,15 @@ function display_report(){
     xmlhttp.onreadystatechange=function() {
         if (xmlhttp.readyState==4 && xmlhttp.status==200) {
             var results = xmlhttp.responseText;
-            if(results == 'undefined' || results == '' || results == '"not validate"') {
-                document.getElementById('reporter').innerHTML = "....";
+
+            document.getElementById('reporter').style.display = 'block';
+            if(results == 'undefined' || results == '' || results == 'null' || results == '"not validate"') {
+                document.getElementById('wait').innerHTML = "No records where found in this period";
                 return;
             }else if(results.length > 0){
+                document.getElementById('wait').innerHTML = ""
                 document.getElementById('results').value = results;
+                document.getElementById("container-chart").style.display = 'block';
                 plotGraph(drug);
             }else{
                 //document.getElementById('reporter').innerHTML = "....";

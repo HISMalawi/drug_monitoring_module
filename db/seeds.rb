@@ -53,12 +53,17 @@ definitions = [["Prescription", "Describes the number of precriptions"],
 	["Antifungal", "anti-fungal medicine"],
 	["Antimalarial", "anti-malaria medicine"],
 	["Antiviral", "anti-viral medicine", ],
-	["Opportunistic infection medicine", "medicine for all other infections and diseases"]
+	["Opportunistic infection medicine", "medicine for all other infections and diseases"],
+  ["Unknown", "unknown", ]
 ]
 
 (definitions || []).each do |definition|
   new_definition = Definition.where({:name => definition[0], :description => definition[1]}).first_or_create
 end
+
+puts 'loading drugs'
+`rails runner #{Rails.root}/script/load_drug_maps.rb`
+
 
 definition = Definition.find_by_name("HIV Unit Drugs").id
 
@@ -86,8 +91,7 @@ drugs = [ ["ABC/3TC (Abacavir and Lamivudine 60/30mg tablet)",1],
          ["Cotrimoxazole (960mg)",20]]
 
 (drugs || []).each do |drug|
-  DrugSet.where({:definition_id => definition, :drug_name => drug[0], :weight => drug[1]}).first_or_create
+  drug_id = Drug.where("full_name = ? OR short_name = ?", "#{drug[0]}", "#{drug[0]}").first.id
+  DrugSet.where({:definition_id => definition, :drug_id => drug_id, :weight => drug[1]}).first_or_create
 end
 
-puts 'loading drug mappings'
-`rails runner #{Rails.root}/script/load_drug_maps.rb`

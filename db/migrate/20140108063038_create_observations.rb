@@ -6,7 +6,7 @@ class CreateObservations < ActiveRecord::Migration
       t.integer :value_numeric
       t.date :value_date
       t.string  :value_text
-      t.string :value_drug
+      t.integer :value_drug
       t.timestamps
     end
   end

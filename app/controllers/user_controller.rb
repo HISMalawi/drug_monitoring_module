@@ -24,14 +24,17 @@ class UserController < ApplicationController
   end
 
   def create
+    @nojquery = true
   end
 
   def edit
     @user = User.all
+    @nojquery = true
   end
 
   def edit_user
       @user = User.find(params[:user_id])
+      @nojquery = true
   end
 
   def delete
@@ -41,30 +44,32 @@ class UserController < ApplicationController
   end
 
   def save
-    exists = User.find(:first, :conditions => ["voided = 0 AND username = ?", params[:username]]) rescue nil
-
-    if !exists.nil?
-      render :text => "Username already taken!" and return
-      redirect_to "/user/new"
-      return
-    end
 
     new_user = User.new()
     new_user.password = params[:password]
     new_user.username = params[:username]
     new_user.save
-    role = Role.find_by_role(params[:role]).id
+    role = Role.find_by_role(params[:user_role]).id
     new_user_role = UserRole.create({:user_id => new_user.id, :role_id => role})
-    render :text =>  "User successfully created!" and return
+
+    redirect_to "/user/create" and return
 
   end
 
   def save_edit
     user = User.find(params[:user_id])
     user.update_attributes({:username => params[:username], :password => params[:password]})
-    role = Role.find_by_role(params[:role]).id
+    role = Role.find_by_role(params[:user_role]).id
     user_role = user.user_role
     user_role.update_attributes({:role_id => role})
-    render :text => "User successfully updated"
+
+    redirect_to "/user/edit" and return
+  end
+
+  def check_username
+
+      render :text => true and return
+
+
   end
 end

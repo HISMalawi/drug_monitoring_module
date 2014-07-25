@@ -22,6 +22,10 @@ DrugMonitoringProgram::Application.routes.draw do
 
   match '/verify_user' => "user#verify_user"
 
+  match '/new_user' => "user#create"
+
+  match '/check_username' => "user#check_username"
+
   get "user/index"
 
   get "user/login"
@@ -35,6 +39,8 @@ DrugMonitoringProgram::Application.routes.draw do
   get "user/edit_user"
 
   post "user/verify_user"
+
+  post "user/check_username"
 
   post "user/save"
 
