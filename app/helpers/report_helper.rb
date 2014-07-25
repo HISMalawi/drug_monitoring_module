@@ -39,10 +39,13 @@ EOF
     </thead>
     <tbody>"
 
-      (params || {}).each do |drug, values|
-      html += "<tr><td style='padding-left:10px'> #{drug} </td><td style='padding-left:15px'>#{number_with_delimiter(values['value'], :delimeter => ',')} </td>
+      (params || {}).each do |drug, records|
+        (records || []).each do |values|
+          html += "<tr><td style='padding-left:10px'> #{drug} </td><td style='padding-left:15px'>#{number_with_delimiter(values['value'], :delimeter => ',')} </td>
               <td style='text-align: center'>#{values['code']}</td></tr>"
+        end
       end
+
 
   html += " </tbody></table>"
 

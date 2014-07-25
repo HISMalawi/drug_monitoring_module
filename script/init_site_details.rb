@@ -62,9 +62,10 @@ end
 def record(site, date,data)
 
   (data['prescriptions'] || []).each do |key,prescription|
+
     pres_obs = Observation.where(:site_id => site.id,
       :definition_id => $prescription_id,
-      :value_drug => key,
+      :value_drug => Drug.check(key),
       :value_date => date
     ).first
 
@@ -72,7 +73,7 @@ def record(site, date,data)
       Observation.create({:site_id => site.id,
           :definition_id => $prescription_id,
           :value_numeric => prescription['bottles'],
-          :value_drug => key,
+          :value_drug => Drug.check(key),
           :value_date => date})
     else
       pres_obs.value_numeric = prescription['bottles']
@@ -81,7 +82,7 @@ def record(site, date,data)
 
     pres_to = Observation.where(:site_id => site.id,
       :definition_id => $drug_prescribed_id,
-      :value_drug => key,
+      :value_drug => Drug.check(key),
       :value_date => date
     ).first
 
@@ -89,7 +90,7 @@ def record(site, date,data)
       Observation.create({:site_id => site.id,
           :definition_id => $drug_prescribed_id,
           :value_numeric => prescription['total_patients'],
-          :value_drug => key,
+          :value_drug => Drug.check(key),
           :value_date => date})
     else
       pres_to.value_numeric = prescription['total_patients']
@@ -100,7 +101,7 @@ def record(site, date,data)
   (data['dispensations'] || []).each do |key,dispensation|
     disp_obs = Observation.where(:site_id => site.id,
       :definition_id => $dispensation_id,
-      :value_drug => key,
+      :value_drug => Drug.check(key),
       :value_date => date
     ).first
 
@@ -108,7 +109,7 @@ def record(site, date,data)
       Observation.create({:site_id => site.id,
           :definition_id => $dispensation_id,
           :value_numeric => dispensation['bottles'],
-          :value_drug => key,
+          :value_drug => Drug.check(key),
           :value_date => date})
     else
       disp_obs.value_numeric = dispensation['bottles']
@@ -117,7 +118,7 @@ def record(site, date,data)
 
     disp_to = Observation.where(:site_id => site.id,
       :definition_id => $drug_given_to_id,
-      :value_drug => key,
+      :value_drug => Drug.check(key),
       :value_date => date
     ).first
 
@@ -125,7 +126,7 @@ def record(site, date,data)
       Observation.create({:site_id => site.id,
           :definition_id => $drug_given_to_id,
           :value_numeric => dispensation['total_patients'],
-          :value_drug => key,
+          :value_drug => Drug.check(key),
           :value_date => date})
     else
       disp_to.value_numeric = dispensation['total_patients']
@@ -137,7 +138,7 @@ def record(site, date,data)
     next if relocation["relocated"] == 0
     relocation_obs = Observation.where(:site_id => site.id,
       :definition_id => $relocation_id,
-      :value_drug => key,
+      :value_drug => Drug.check(key),
       :value_date => date
     ).first
 
@@ -145,7 +146,7 @@ def record(site, date,data)
       Observation.create({:site_id => site.id,
           :definition_id => $relocation_id,
           :value_numeric => relocation['relocated'],
-          :value_drug => key,
+          :value_drug => Drug.check(key),
           :value_date => date})
     else
       relocation_obs.value_numeric = relocation['relocated']
@@ -170,14 +171,14 @@ def record(site, date,data)
             next if date_of_count.blank?
             stock_obs = Observation.where(:site_id => site.id,
               :definition_id => $definition_id,
-              :value_drug => drug,
+              :value_drug => Drug.check(drug),
               :value_date => date_of_count
             ).first
             if stock_obs.blank?
               Observation.create({:site_id => site.id,
                   :definition_id => $definition_id,
                   :value_numeric => pills,
-                  :value_drug => drug,
+                  :value_drug => Drug.check(drug),
                   :value_text => value_text,
                   :value_date => date_of_count})
             else
@@ -191,14 +192,14 @@ def record(site, date,data)
           next if date_of_count.blank?
           stock_obs = Observation.where(:site_id => site.id,
             :definition_id => $definition_id,
-            :value_drug => drug,
+            :value_drug => Drug.check(drug),
             :value_date => date_of_count
           ).first
           if stock_obs.blank?
             Observation.create({:site_id => site.id,
                 :definition_id => $definition_id,
                 :value_numeric => pills,
-                :value_drug => drug,
+                :value_drug => Drug.check(drug),
                 :value_date => date_of_count})
           else
             stock_obs.value_numeric = pills
@@ -209,14 +210,14 @@ def record(site, date,data)
 
         stock_single_obs = Observation.where(:site_id => site.id,
           :definition_id => $definition_id,
-          :value_drug => drug,
+          :value_drug => Drug.check(drug),
           :value_date => date
         ).first
         if stock_single_obs.blank?
           Observation.create({:site_id => site.id,
               :definition_id => $definition_id,
               :value_numeric => value,
-              :value_drug => drug,
+              :value_drug => Drug.check(drug),
               :value_date => date})
         else
           stock_single_obs.value_numeric = value

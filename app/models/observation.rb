@@ -2,6 +2,7 @@ class Observation < ActiveRecord::Base
   set_primary_key :observation_id
   belongs_to :site, :foreign_key => :site_id
   belongs_to :definition, :foreign_key => :definition_id
+  belongs_to :drug, :foreign_key => :value_drug
   validates_presence_of :site_id
   validates_presence_of :definition_id
 
@@ -142,7 +143,7 @@ class Observation < ActiveRecord::Base
     if site_id.blank?
       return  self.find_by_sql(
           "SELECT site_id, ROUND(AVG(value_numeric)) AS rate FROM observations
-        WHERE definition_id = #{dispensation_id} AND value_drug = '#{drug}'
+        WHERE definition_id = #{dispensation_id} AND value_drug = #{drug}
         GROUP BY site_id"
       ).inject({}){|result, obs|
         result[obs.site_id] = {} if result[obs.site_id].blank?; result[obs.site_id] = obs.rate; result
@@ -150,7 +151,7 @@ class Observation < ActiveRecord::Base
     else
       return  self.find_by_sql(
           "SELECT ROUND(AVG(value_numeric)) AS rate FROM observations
-        WHERE definition_id = #{dispensation_id} AND value_drug = '#{drug}'
+        WHERE definition_id = #{dispensation_id} AND value_drug = #{drug}
         AND site_id = #{site_id}"
       ).first.rate
     end
@@ -319,7 +320,7 @@ class Observation < ActiveRecord::Base
       if site_id.blank?
         return  self.find_by_sql(
             "SELECT MAX(value_numeric) AS value,site_id FROM observations
-        WHERE definition_id = #{dispensation_id} AND value_drug = '#{drug}'
+        WHERE definition_id = #{dispensation_id} AND value_drug = #{drug}
          AND value_date >= '#{date}' GROUP BY site_id"
         ).inject({}){|result, obs|
           result[obs.site_id] = obs.value; result
@@ -327,7 +328,7 @@ class Observation < ActiveRecord::Base
       else
         return  self.find_by_sql(
             "SELECT SUM(value_numeric) AS value FROM observations
-        WHERE definition_id = #{dispensation_id} AND value_drug = '#{drug}'
+        WHERE definition_id = #{dispensation_id} AND value_drug = #{drug}
         AND site_id = #{site_id} ").first.value
       end
     end
@@ -358,7 +359,7 @@ class Observation < ActiveRecord::Base
       if site_id.blank?
         return  self.find_by_sql(
             "SELECT MAX(value_numeric) AS value,site_id FROM observations
-        WHERE definition_id = #{removed_id} AND value_drug = '#{drug}'
+        WHERE definition_id = #{removed_id} AND value_drug = #{drug}
          AND value_date <= '#{date}' GROUP BY site_id"
         ).inject({}){|result, obs|
           result[obs.site_id] = obs.value; result
@@ -366,7 +367,7 @@ class Observation < ActiveRecord::Base
       else
         return  self.find_by_sql(
             "SELECT SUM(value_numeric) AS value FROM observations
-        WHERE definition_id = #{removed_id} AND value_drug = '#{drug}'
+        WHERE definition_id = #{removed_id} AND value_drug = #{drug}
         AND site_id = #{site_id} AND value_date >='#{date}'").first.value
       end
     end
@@ -377,7 +378,7 @@ class Observation < ActiveRecord::Base
     total_delivered_defn = Definition.find_by_name("supervision verification").id
 
     obs = Observation.find_by_sql("SELECT value_numeric, MAX(value_date) as date FROM observations WHERE voided = 0
-                                              AND definition_id = #{total_delivered_defn} AND value_drug = '#{drug}'
+                                              AND definition_id = #{total_delivered_defn} AND value_drug = #{drug}
                                               AND site_id = #{site_id} ORDER BY value_date").first
 
     total_delivered = obs.value_numeric
@@ -442,15 +443,23 @@ class Observation < ActiveRecord::Base
   def self.day_deliveries(site_id = 1, date = Date.today)
 
     definition_id = Definition.find_by_name("New Delivery").id
-    result = {}
+    results = {}
 
 
-      result = Observation.find_by_sql(["SELECT value_date d, value_drug dr, SUM(value_numeric) n, value_text t FROM observations
-                                    WHERE site_id = #{site_id} AND definition_id = #{definition_id} AND value_date = ?
-                                    GROUP BY value_drug, value_date, value_text", date.to_date]).inject({}){|r, o|
-         r[o.dr] = {} if !r.keys.include?(o.dr); r[o.dr]["value"] = o.n; r[o.dr]["code"] = o.t; r}
+      result = Observation.find_by_sql("SELECT value_date as date, value_drug, SUM(value_numeric) as value, value_text as code FROM observations
+                                    WHERE site_id = #{site_id} AND definition_id = #{definition_id} AND value_date = '#{date.to_date}'
+                                    GROUP BY value_drug, value_date, value_text")
 
+      (result || []).each do |record|
+        
+        results[Drug.find(record.value_drug).short_name] = [] if results[Drug.find(record.value_drug).short_name].blank?
+        results[Drug.find(record.value_drug).short_name] <<  {"value" => record.value, "code" => record.code}
+      end
 
-    return result
+    return results
+  end
+
+  def drug_name
+    self.drug.short_name
   end
 end

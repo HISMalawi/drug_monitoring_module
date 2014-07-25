@@ -4,7 +4,7 @@
  * http://bassistance.de/jquery-plugins/jquery-plugin-validation/
  * http://docs.jquery.com/Plugins/Validation
  *
- * Copyright (c) 2006 - 2011 Jörn Zaefferer
+ * Copyright (c) 2006 - 2011 JÃ¶rn Zaefferer
  *
  * Dual licensed under the MIT and GPL licenses:
  *   http://www.opensource.org/licenses/mit-license.php
@@ -267,7 +267,6 @@ $.extend($.validator, {
 	messages: {
 		required: "This field is required.",
 		remote: "Please fix this field.",
-		name: "Please enter a valid name address.",
 		email: "Please enter a valid email address.",
 		url: "Please enter a valid URL.",
 		date: "Please enter a valid date.",
@@ -1187,3 +1186,4 @@ $.format = $.validator.format;
 		}
 	});
 })(jQuery);
+

@@ -1,120 +1,98 @@
+<!DOCTYPE HTML >
+<html>
+<head>
+  <meta name="keywords" content="basic jquery validation form demo" />
+  <link rel="stylesheet" type="text/css" href="/stylesheets/application.css" />
+  <script type="text/javascript" src="/javascripts/jquery.js"></script>
+  <script type="text/javascript" src="/javascripts/jquery.validate.min.js"></script>
 
-<style type="text/css">
-    input{
-        width: auto;
-        font-size: 28px;
-    }
-    select{
-        width: auto;
-        font-size: 28px;
-    }
-    button{
-        width: auto;
-        font-size: 28px;
-    }
-    table.halfpage{
-        margin-left: auto;
-        margin-right: auto;
-        margin-top: 20px;
+  <style>
+  </style>
 
-    }
+  <script type="text/javascript">
+      $().ready(function(){
+                  $("#register-form").validate({
 
-</style>
+                      rules: {
+                          username: {required: true,
+                                     minlength: 5,
+                                     remote: {
+                                      url: "/check_username",
+                                      type: "post",
+                                      data: {
+                                          username: function() {
+                                              return $( "#username" ).val();
+                                          }
+                                      }
+                          }},
+                          password: {required: true, minlength: 5},
+                          confirm_password: {required: true,minlength: 5, equalTo: "#password"},
+                          role: {required: true}
+                      },
+                      messages: {
+                          username: {required: "Please provide username", minlength: "Username must have 5 or more characters", remote: "Username is already taken"},
+                          password: {required: "Please provide password", minlength: "Password must have 5 or more characters"},
+                          confirm_password: {required:"Please confirm password", equalTo: "Passwords do not match"},
+                          role: {required:"Please provide user role"}
+                      },
+                      submitHandler: function(form) {
+                          form.submit();
+                      },
+                      errorPlacement: function(error, element)
+                      {
+                          error.insertAfter(element);
 
+                          // Use jQuery UI's position function to get placement correct
+                          error.position ( {
+                              my: 'right bottom',
+                              at: 'right bottom',
+                              of: element
+                          } );
+                      }
+                  });
+              }
+      );
 
-<div class="main_container">
+  </script>
 
-  <table class="halfpage" cellspacing="10px" cellpadding="13px">
-    <form method="post" action="/user/save" >
-      <caption style="font-family: arial;font-size:34px;">New User Details</caption>
-      <tr>
-        <td id="username_lbl">User Name</td>
-        <td><input type="text" name="username" id='username'></td>
-      </tr>
-      <tr>
-        <td id='password_lbl'>Password</td>
-        <td><input name="password" type="password" id='password'></td>
-      </tr>
-      <tr>
-        <td id='repassword_lbl'>Re-enter Password</td>
-        <td><input name="repassword" type="password" id='repassword'></td>
-      </tr>
-      <tr>
-        <td>User Role</td>
-        <td>
-          <select id="user_role">
-            <option>Other</option>
-            <option>Administrator</option>
-          </select>
-        </td>
-      </tr>
-    </form>
-    <tr>
-      <td colspan="2" style="text-align: center;">
-        <button onclick="verify_form();" style="width: 300px;height:60px;border-radius: 30px;" class="main">Save</button>
-      </td>
-    </tr>
-  </table>
+</head>
+<body>
+    <div class="panel" >
+      <div class="panel-title">
+        <span> Add New User</span>
+      </div>
+      <div class="panel-content">
+        <form action="/user/save" method="post" id="register-form" novalidate="novalidate">
+            <table cellspacing="10px" cellpadding="10px">
+              <tr>
+                <td><label for="user_name" >Username</label></td>
+                <td><input type="text" name="username" id='username' style="padding-left: 10px;" required/></td>
+              </tr>
+              <tr>
+                <td><label for="password" >Password</label></td>
+                <td><input name="password" type="password" id='password'  required/></td>
+              </tr>
+              <tr>
+                <td > <label for="confirm_password" >Confirm Password</label> </td>
+                <td> <input type="password" name="confirm_password" id='confirm_password'  required/> </td>
+              </tr>
+              <tr>
+                <td><label for="user_role" >User Role</label></td>
+                <td>
+                  <select name="user_role" id="user_role" >
+                    <option>Other</option>
+                    <option>Administrator</option>
+                  </select>
+                </td>
+              </tr>
+            </table>
+          <div>
+            <input type="submit" style="width: 30%;" class="btn btn-success" value="Save" />
+          </div>
+        </form>
+      </div>
 
-</div>
+    </div>
 
-<script type="text/javascript">
-    <!--
-    function verify_form()
-    {
-
-        var username = document.getElementById('username').value;
-        var password = document.getElementById('password').value;
-        var password2 = document.getElementById('repassword').value;
-        var role = document.getElementById("user_role").value;
-
-        if (username.trim() == "")
-        {
-            jAlert("Username cannot be blank", "Incomplete Information");
-            highlight('username_lbl',true);
-        }
-        else if (password.trim() == "")
-        {
-            jAlert("A password cannot be blank", "Incomplete Information");
-            highlight('password_lbl',true);
-        }
-        else if (password2.trim() == "")
-        {
-            jAlert("Re enter password for confirmation", "Incomplete Information");
-            highlight('repassword_lbl',true);
-        }
-        else if (password != password2)
-        {
-            jAlert("Passwords provided do not match", "Incomplete Information");
-            highlight('repassword_lbl',true);
-            highlight('password_lbl',true);
-        }
-        else
-        {
-            jQuery.ajax({
-                url:  "/user/save?password=" + password + "&username=" + username +"&role=" +role,
-                type:"POST",
-                success: function(msg){
-                    jAlert(msg, "User Creation Outcome")
-                    clear()
-                },
-                error: function(){
-                    jAlert("Could not create user", "Unsuccessful!");
-                }
-
-            });
-        }
-
-
-    }
-
-    function clear()
-    {
-        document.getElementById('username').value = "";
-        document.getElementById('password').value = "";
-        document.getElementById('repassword').value = "";
-
-    }
-    //-->
-</script>
-
+</body>
+</html>
