@@ -436,7 +436,7 @@ class Observation < ActiveRecord::Base
                                :value_date => date,
                                :value_text => notice
       )
-      state = State.create(:observation_id => obs.id, :state => state_defn.name)
+      state = State.create(:observation_id => obs.id, :state => state_defn.id)
     end
   end
 
@@ -451,9 +451,9 @@ class Observation < ActiveRecord::Base
                                     GROUP BY value_drug, value_date, value_text")
 
       (result || []).each do |record|
-        
+
         results[Drug.find(record.value_drug).short_name] = [] if results[Drug.find(record.value_drug).short_name].blank?
-        results[Drug.find(record.value_drug).short_name] <<  {"value" => record.value, "code" => record.code}
+        results[Drug.find(record.value_drug).short_name] <<  {"value" => (record.value/60).round, "code" => record.code}
       end
 
     return results

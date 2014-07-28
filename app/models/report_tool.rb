@@ -73,4 +73,20 @@ class ReportTool < ActiveRecord::Base
   end
 
 
+  def self.get_notices_summary(site_id)
+    summary = Hash.new(0)
+    definitions = Definition.where("name in (?)", ["New", "Investigating"]).collect{|x| x.id}
+    notice_defn = Definition.find_by_name("Notice").id
+
+    notices = State.joins("INNER JOIN observations on states.observation_id = observations.observation_id
+                                AND observations.site_id = #{site_id} AND states.state in (#{definitions.join(',')})
+                                AND observations.definition_id = #{notice_defn}")
+
+
+    (notices || []).each do |notice|
+      summary[notice.state_name] += 1
+    end
+
+    return summary
+  end
 end

@@ -3,7 +3,11 @@
 <script type="text/javascript">
     function switch_site(site)
     {
-        document.getElementById("chart").setAttribute("src", "/report/months_of_stock?site_name="+ site);
+        if (site != "")
+        {
+            document.getElementById("chart").setAttribute("src", "/report/months_of_stock?site_name="+ site);
+        }
+
     }
 
 </script>
@@ -36,7 +40,7 @@
     <span style="color: lightblue; font-size: 16px;"><%=   params[:end_date].to_date.strftime("%d-%b- %Y") rescue ("") %></span>
 <%end%>
 
-<iframe id="chart" style="width: 95%;height:90vh;border: none; margin-right: auto; margin-left: auto;"></iframe>
+<iframe id="chart" style="background-color:#f5f5f5;width: 95%;height:90vh;border: none;border-radius: 15px; margin-right: auto; margin-left: auto;"></iframe>
 
 <script type="text/javascript">
     <!--

@@ -307,7 +307,8 @@ class HomeController < ApplicationController
           'x' => source["x"],
           'y' =>source["y"],
           'name' => source["name"],
-          'proportion' => 0
+          'proportion' => 0,
+          'notices' => ReportTool.get_notices_summary(source.id)
       }
 
       @sites << site

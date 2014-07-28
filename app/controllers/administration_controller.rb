@@ -2,7 +2,7 @@ class AdministrationController < ApplicationController
   def index
   end
   def add_site
-
+    @nojquery = true
   end
   def list_sites
     sites = YAML.load_file("#{Rails.root}/config/sites.yml")
@@ -13,6 +13,7 @@ class AdministrationController < ApplicationController
   end
   def edit_site
     @sites = Site.all
+    @nojquery = true
   end
 
   def delete_site

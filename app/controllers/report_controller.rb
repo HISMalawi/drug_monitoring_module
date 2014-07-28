@@ -8,14 +8,17 @@ class ReportController < ApplicationController
     @tree = {}
     @tree["Drug categories"] = {}
     hiv_unit_drugs = Definition.find_by_name("HIV Unit Drugs").id
-    @tree["Drug categories"]["ARVs"] = DrugSet.where(:definition_id =>hiv_unit_drugs ).order("weight asc").collect{|x| x.get_short_name}
-    @tree["Drug categories"]['Opportunistic Infection  medicine'] = {}
-    @tree["Drug categories"]['Antibiotics'] = {}
-    @tree["Drug categories"]['Analgesic'] = {}
-    @tree["Drug categories"]['Antiviral'] = {}
-    @tree["Drug categories"]['Antifungal'] = {}
-    @tree["Drug categories"]['Antimalarial'] = {}
+    @tree["Drug categories"]["ARV"] = []
+    @tree["Drug categories"]['Opportunistic Infection  medicine'] = []
+    @tree["Drug categories"]['Antibiotics'] = []
+    @tree["Drug categories"]['Analgesic'] = []
+    @tree["Drug categories"]['Antiviral'] = []
+    @tree["Drug categories"]['Antifungal'] = []
+    @tree["Drug categories"]['Antimalarial'] = []
 
+    DrugSet.where(:definition_id =>hiv_unit_drugs ).order("weight asc").each do |drug|
+      @tree["Drug categories"][drug.drug.get_category] << drug.drug.short_name
+    end
     #@sheets["Sheets"] = {}
 
   end
@@ -413,11 +416,12 @@ class ReportController < ApplicationController
     @site = Site.find_by_name(params[:site])
     @list = {}
 
-    month_of_stock_defn = Definition.find_by_name('Month of Stock').id
+    unless @site.blank?
+      month_of_stock_defn = Definition.find_by_name('Month of Stock').id
 
-    hiv_unit_drugs = DrugSet.where(:definition_id => Definition.find_by_name("HIV Unit Drugs").id)
+      hiv_unit_drugs = DrugSet.where(:definition_id => Definition.find_by_name("HIV Unit Drugs").id)
 
-    (hiv_unit_drugs || []).each do |drug|
+      (hiv_unit_drugs || []).each do |drug|
 
         stock_level = Observation.calculate_stock_level(drug.drug_id,@site.id)
         stock_level = stock_level / 60 # stock level comes in pills/day here we convert it to tins/month
@@ -426,9 +430,11 @@ class ReportController < ApplicationController
         month_of_stock = Observation.calculate_month_of_stock(drug.drug_id, @site.id).to_f
         puts stock_level
         @list[Drug.find(drug.drug_id).short_name] = {"month_of_stock" => month_of_stock,
-                       "stock_level" => stock_level, "consumption_rate" => disp_rate }
+                                                     "stock_level" => stock_level, "consumption_rate" => disp_rate }
 
+      end
     end
+
 
 =begin
 #This chunk of code was edited out cause it was a primitive way to get the values needed though it works fine
