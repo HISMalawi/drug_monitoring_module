@@ -19,7 +19,7 @@
     $(function () {
         $('#container-chart').highcharts({
             chart: {
-                type: 'line'
+                type: 'spline'
             },
             title: {
                 text: 'Stock Movement Report For ' +drug
@@ -45,8 +45,7 @@
                     formatter: function() {
                         return this.value;
                     }
-                },
-                tickInterval: 1
+                }
 
             },
             tooltip: {
@@ -87,7 +86,8 @@
         
         for (i = 0; i < results.length; i++){
             date = new Date(results[i][0])
-            data.push([Date.UTC(date.getFullYear(), date.getMonth(), date.getDay()) ,results[i][1]])
+		
+            data.push([Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) ,results[i][1]])
         }
 
         return data.sort(function(a, b) {
