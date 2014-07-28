@@ -82,14 +82,18 @@
           stroke-opacity: .8;
       }
 
+      svg {  transform:scale(1.5);  -webkit-transform:scale(2.0);
+      }
   </style>
 
   <%#=javascript_include_tag "Charts/d3"%>
   <%=javascript_include_tag "Charts/d3.min"%>
 
 </head>
-<body onresize="resizeSVG()">
-<div id="main" style="padding: 0px; text-align: center; height: 100vh; overflow: hidden; width: 100%;"></div>
+<body >
+<div id="main" style="padding-top: 400px; text-align: center; width: 100%;">
+
+</div>
 
 <script>
 
@@ -225,7 +229,7 @@
 
         ajaxTasks();
 
-        resizeSVG();
+
 
     });
 
@@ -479,7 +483,7 @@
         if(d3.select("#region").node() != null){
             var height = d3.select("#region").node().height.baseVal.value;
 
-            var scale = window.innerHeight / height;
+            var scale = window.innerHeight / (height);
 
             d3.select("#region").transition().delay(0).attr("transform", "scale(" + scale + ")");
         }

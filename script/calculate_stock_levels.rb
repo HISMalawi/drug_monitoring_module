@@ -24,7 +24,7 @@ def start
                             :value_drug => drug.value_drug,
                             :value_date => Date.today})
 
-        stock_level = Observation.calculate_stock_level(drug,site.id)
+        stock_level = Observation.calculate_stock_level(drug.value_drug,site.id)
 
         Observation.create({:site_id => site.id,
                             :definition_id => stock_level_defn,

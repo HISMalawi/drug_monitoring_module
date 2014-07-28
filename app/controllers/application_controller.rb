@@ -1,8 +1,6 @@
 class ApplicationController < ActionController::Base
   #protect_from_forgery
-  before_filter :check_logged_in, :except => ['login','logout','verify_user' ]
-
-
+  before_filter :check_logged_in, :except => ['login','logout','verify_user', 'notices', 'ajax_burdens']
 
   protected
 

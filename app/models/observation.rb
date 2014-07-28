@@ -390,7 +390,8 @@ class Observation < ActiveRecord::Base
     stock_level = total_delivered.to_i - (dispensed_total.to_i + removed_total.to_i)
 
     if stock_level < 0
-      notice = "Site has negative stock level for #{drug}. Verify with site for accurate values"
+      d = Drug.find(drug).short_name
+      notice = "Site has negative stock level for #{d}. Verify with site for accurate values"
       Observation.create_notification(site_id,obs.date, notice, drug)
     end
 
