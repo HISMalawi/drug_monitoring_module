@@ -7,9 +7,15 @@ $relocation_id = Definition.where(:name => "relocation").first.id
 $drug_given_to_id = Definition.where(:name => "People who received drugs").first.id
 $drug_prescribed_id = Definition.where(:name => "People prescribed drug").first.id
 
-def get_dates
-  dates = [] ; curr_date = "24 Jan 2014".to_date # Date.today
-  1.upto(90).collect do |n|
+def get_dates(site_name)
+  site = Site.where(:'name' => site_name).first
+  return if site.blank?
+  last_pulled = PullTracker.where(:'site_id' => site.id).first
+
+  dates = [] ; curr_date = Date.today ; last_pull_date = last_pulled.pulled_datetime.to_date rescue nil
+  last_pull_date = (curr_date - 20.day) if last_pull_date.blank?
+
+  while last_pull_date < curr_date 
     dates << curr_date
     curr_date -= 1.day
   end
@@ -17,26 +23,40 @@ def get_dates
 end
  
 def start
-  dates = get_dates
 
   sites = YAML.load_file("#{Rails.root.to_s}/config/sites.yml")
   (sites || []).each do |key, value|
-    (dates || []).each do |date|
-      next unless date.to_date > '2014-01-01'.to_date and date.to_date < '24 Jan 2014'.to_date
-      puts "Getting Data For Site #{key}, Date: #{date.strftime('%A, %d %B %Y')}"
+    dates = get_dates(key)
+    next if dates.blank?
+    (dates.sort || []).each do |date|
+      #puts "Getting Data For Site #{key}, Date: #{date.strftime('%A, %d %B %Y')}"
       unless value.blank?
 
         url = "http://#{value}/drug/art_summary_dispensation?date=#{date}"
         data = JSON.parse(RestClient::Request.execute(:method => :post, :url => url, :timeout => 100000000)) rescue (
           puts "**** Error when pulling data from site #{key}"
-         next
+         break
         )
         site = Site.where(:name => key).first_or_create
         record(site,date ,data)
       end
+      record_pulled_datetime(key, date)
     end
   end
 
+end
+
+def record_pulled_datetime(site_name, date)
+  site = Site.where(:'name' => site_name).first
+  pulled_time = PullTracker.where(:'site_id' => site.id).first
+  
+  if pulled_time.blank?
+    pulled_time = PullTracker.new() 
+    pulled_time.site_id = site.id
+  end
+  pulled_time.pulled_datetime = ("#{date.to_date} #{Time.now().strftime('%H:%M:%S')}")
+  pulled_time.save
+  puts "Recorded for :#{site_name}, Date: #{pulled_time.pulled_datetime}"
 end
 
 def record(site, date,data)
