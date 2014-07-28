@@ -498,4 +498,27 @@ class ReportController < ApplicationController
     end
 
   end
+
+  def notices
+    if request.get?
+      @tree = {}
+      @tree["Available Sites"] = Site.all.collect{|x| x.name}
+      @nojquery = true
+    else
+
+      @site = Site.find_by_name(params[:site_name])
+      site_id = @site.id
+
+      state = Definition.where(:name => params[:state]).first.id
+      notice_defn = Definition.find_by_name("Notice").id
+
+      notices = State.joins("INNER JOIN observations on states.observation_id = observations.observation_id
+                                AND observations.site_id = #{site_id} AND states.state = #{state}
+                                AND observations.definition_id = #{notice_defn}")
+
+
+      render :text => view_context.notices_format(notices,params[:state])
+    end
+
+  end
 end

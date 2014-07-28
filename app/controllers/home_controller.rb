@@ -196,8 +196,10 @@ class HomeController < ApplicationController
     @sites = []
     new_notices_by_site = {}
     notices_under_investigation_by_site = {}
-    new_notices = Observation.find_by_sql("SELECT * FROM observations INNNER JOIN states
-     USING(observation_id) WHERE state='New' ")
+    new_state = Definition.find_by_name("new").id
+    investigating = Definition.find_by_name("Investigating").id
+    new_notices = Observation.find_by_sql("SELECT * FROM observations INNER JOIN states
+     USING(observation_id) WHERE state=#{new_state} ")
 
     new_notices.each do |notice|
         site_id = notice.site_id
@@ -206,8 +208,8 @@ class HomeController < ApplicationController
         new_notices_by_site[site_id]["count"]+=1
     end
 
-    notices_under_investigation = Observation.find_by_sql("SELECT * FROM observations INNNER JOIN states
-     USING(observation_id) WHERE state='Investigating' ")
+    notices_under_investigation = Observation.find_by_sql("SELECT * FROM observations INNER JOIN states
+     USING(observation_id) WHERE state=#{investigating} ")
 
     notices_under_investigation.each do |notice|
         site_id = notice.site_id
@@ -288,11 +290,14 @@ class HomeController < ApplicationController
   def manage_notices
     @site_name = params[:site_name]
     site_id = Site.find_by_name(params[:site_name]).site_id
+    new_state = Definition.find_by_name("new").id
+    new_state = Definition.find_by_name("new").id
+    investigating = Definition.find_by_name("Investigating").id
     @new_notices = Observation.find_by_sql("SELECT * FROM observations INNNER JOIN states
-     USING(observation_id) WHERE state='New' AND site_id=#{site_id}")
+     USING(observation_id) WHERE state=#{new_state} AND site_id=#{site_id}")
 
     @under_investigations = Observation.find_by_sql("SELECT * FROM observations INNNER JOIN states
-     USING(observation_id) WHERE state='Investigating' AND site_id=#{site_id}")
+     USING(observation_id) WHERE state=#{investigating} AND site_id=#{site_id}")
 
     @resolved = Observation.find_by_sql("SELECT * FROM observations INNNER JOIN states
      USING(observation_id) WHERE state='Resolved' AND site_id=#{site_id}")
