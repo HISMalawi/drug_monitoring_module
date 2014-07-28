@@ -53,4 +53,87 @@ EOF
 
     html.html_safe
   end
+
+  def notices_format(results, state)
+
+    html = ""
+    case state
+      when "new"
+        if results.blank?
+          html ="<div style='font-size:120%;'> No new notices...</div>"
+        else
+         html += "<table id ='records' border='1' style='width: 99%;margin-right: auto; margin-left: auto'>
+    <thead>
+        <tr style='background-color: #206BA4'>
+          <td style='color:#ffffff; font-weight:bold;padding-left:10px;'>Notice</td>
+          <td style='color:#ffffff; font-weight:bold;padding-left:10px;'>Day Reported</td>
+          <td style='color:#ffffff; font-weight:bold; text-align:center'>Under Investigation?</td>
+          <td style='color:#ffffff; font-weight:bold; text-align:center'>Resolved?</td>
+        </tr>
+    </thead>
+    <tbody>"
+
+          (results || []).each do |notice|
+            html += "<tr><td style='padding-left:10px'> #{notice.observation.value_text} </td>
+                    <td style='padding-left:15px'>#{notice.created_at.strftime('%d, %B, %Y')} </td>
+                    <td style='text-align: center'><input type='radio' class='state_option' value='investigating:#{notice.id}' name='new_notice:#{notice.id}'/></td>
+                    <td style='text-align: center'><input type='radio' class='state_option' value='resolved:#{notice.id}' name='new_notice:#{notice.id}'/></td></tr>"
+          end
+
+         html += " </tbody></table><input type='submit' class='btn btn-success' value='Save Changes' onclick='saveNewNoticesChanges()' style='width: 100%;' />"
+        end
+      when "investigating"
+        if results.blank?
+          html ="<div style='font-size:120%;'> No notices are currently under investigation</div>"
+        else
+
+  html +="<table id ='records' border='1' style='width: 99%;margin-right: auto; margin-left: auto'>
+    <thead>
+        <tr style='background-color: #206BA4'>
+          <td style='color:#ffffff; font-weight:bold;padding-left:10px;'>Notice</td>
+          <td style='color:#ffffff; font-weight:bold;padding-left:10px;'>Day Reported</td>
+          <td style='color:#ffffff; font-weight:bold;padding-left:10px;'>Day Updated</td>
+          <td style='color:#ffffff; font-weight:bold; text-align:center'>Resolved?</td>
+        </tr>
+    </thead>
+    <tbody>"
+
+          (results || []).each do |notice|
+            html += "<tr><td style='padding-left:10px'> #{notice.observation.value_text} </td>
+              <td style='padding-left:15px'>#{notice.created_at.strftime('%d, %B, %Y')} </td>
+              <td style='text-align: center'>#{notice.updated_at.strftime('%d, %B, %Y')}</td>
+              <td style='text-align: center'><input type='radio' class='state_option' value='resolved:#{notice.id}' name='new_notice:#{notice.id}'/></td></tr>"
+          end
+
+          html += " </tbody></table><input type='submit' class='btn btn-success' value='Save Changes' onclick='saveNewNoticesChanges()' style='width: 100%;' />"
+
+        end
+      when "resolved"
+        if results.blank?
+          html ="<div style='font-size:120%;'>  No resolved notices are available</div>"
+        else
+          html += " <table id ='records' border='1' style='width: 99%;margin-right: auto; margin-left: auto'>
+    <thead>
+        <tr style='background-color: #206BA4'>
+          <td style='color:#ffffff; font-weight:bold;padding-left:10px;'>Notice</td>
+          <td style='color:#ffffff; font-weight:bold;padding-left:10px;'>Day Reported</td>
+          <td style='color:#ffffff; font-weight:bold; text-align:center'>Day Resolved </td>
+        </tr>
+    </thead>
+    <tbody>"
+
+          (results || []).each do |notice|
+              html += "<tr><td style='padding-left:10px'> #{notice.observation.value_text} </td><td style='padding-left:15px'>#{notice.created_at.strftime('%d, %B, %Y')} </td>
+              <td style='text-align: center'>#{notice.updated_at.strftime('%d, %B, %Y')}</td></tr>"
+          end
+
+          html += " </tbody></table>"
+
+        end
+    end
+
+    html.html_safe
+
+  end
 end
+

@@ -1,3 +1,6 @@
+<link rel="stylesheet" type="text/css" href="/stylesheets/application.css" xmlns="http://www.w3.org/1999/html"/>
+<script type="text/javascript" src="/javascripts/jquery.js"></script>
+<script type="text/javascript" src="/javascripts/jquery.validate.min.js"></script>
 <style type="text/css">
     td {
         padding: 10px !important;
@@ -13,12 +16,12 @@
     }
 </style>
 
-<div class="container theme-showcase" role="main">
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h3 class="panel-title">Add Site</h3>
+
+  <div class="panel" style="">
+    <div class="panel-title">
+      <span>Add Site</span>
     </div>
-    <div class="panel-body">
+    <div class="panel-content">
 
       <%= form_tag('/administration/save_site', :method => 'post', :enctype => 'multipart/form-data',
                    :id => 'site-form', :class => "form-horizontal", :autocomplete => "off",:role => "form", :novalidate=> "novalidate") do %>
@@ -54,7 +57,7 @@
                   <label class="control-label">Application Port:</label>&nbsp;&nbsp;&nbsp;
                 </td>
                 <td>
-                  <input name="port" class="form-control" placeholder="Site Application Port" id="username" required="" value="" type="text" />
+                  <input name="port" class="form-control" placeholder="Site Application Port" id="port" required="" value="" type="text" />
                 </td>
               </tr>
             </table>
@@ -106,7 +109,7 @@
 
     </div>
   </div>
-</div>
+
 
 <script defer="true">
 
@@ -140,7 +143,15 @@
 
         $('#site-form').validate({
             rules: {
-
+                sitename: {required: true},
+                ip_address: {required: true},
+                port: {required:true}
+            },
+            messages: {
+                sitename: {required: "Please provide a name for the site"},
+                ip_address: {required: "Please provide an IP Address for the site"},
+                port: {required: "Please provide the port for the application"},
+                region: {required: "Please select the region for the site"}
             },
             highlight: function(element) {
                 $(element).closest('.control-group').removeClass('success').addClass('error');

@@ -33,7 +33,7 @@
                     fontFamily: "'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif",
                     fontSize: '14px'
                 },
-                text: 'ARV Stock Levels At '+ '<%= @site.name %>'
+                text: 'ARV Stock Levels At '+ '<%= @site.name rescue "" %>'
             },
             xAxis: {
                 categories: drugs,

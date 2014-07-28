@@ -15,4 +15,8 @@ class Drug < ActiveRecord::Base
     drug = Drug.where(:full_name => name, :short_name => short_name, :category => category_id).first_or_create
     return drug.id
   end
+
+  def get_category
+    Definition.find_by_definition_id(self.category).name
+  end
 end

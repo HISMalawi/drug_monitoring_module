@@ -2,7 +2,7 @@ class AdministrationController < ApplicationController
   def index
   end
   def add_site
-
+    @nojquery = true
   end
   def list_sites
     sites = YAML.load_file("#{Rails.root}/config/sites.yml")
@@ -13,6 +13,7 @@ class AdministrationController < ApplicationController
   end
   def edit_site
     @sites = Site.all
+    @nojquery = true
   end
 
   def delete_site
@@ -78,19 +79,21 @@ class AdministrationController < ApplicationController
   def save_notice_changes
     to_be_resolved = params[:to_be_resolved].split(',')
     to_be_investigated = params[:to_be_investigated].split(',')
+    resolved = Definition.where(:name => "Resolved").first.id
+    investigating = Definition.where(:name => "Investigating").first.id
 
     unless (to_be_resolved.blank?)
-      to_be_resolved.each do |obs_id|
-        obs_state = State.find_by_observation_id(obs_id)
-        obs_state.state = 'Resolved'
+      to_be_resolved.each do |state_id|
+        obs_state = State.find(state_id)
+        obs_state.state = resolved
         obs_state.save!
       end
     end
 
     unless (to_be_investigated.blank?)
-      to_be_investigated.each do |obs_id|
-        obs_state = State.find_by_observation_id(obs_id)
-        obs_state.state = 'Investigating'
+      to_be_investigated.each do |state_id|
+        obs_state = State.find(state_id)
+        obs_state.state = investigating
         obs_state.save!
       end
     end
