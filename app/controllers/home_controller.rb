@@ -302,14 +302,16 @@ class HomeController < ApplicationController
   def map_main
     @sites = []
     (Site.all || []).each do |source|
+      notices = ReportTool.get_notices_summary(source.id)
       site = {
           'region' => source["region"],
           'x' => source["x"],
           'y' =>source["y"],
           'name' => source["name"],
           'proportion' => 0,
-          'notices' => ReportTool.get_notices_summary(source.id)
-      }
+          'new_notices' => notices["New"],
+          "not_investigating" => notices["Investigating"]
+       }
 
       @sites << site
     end

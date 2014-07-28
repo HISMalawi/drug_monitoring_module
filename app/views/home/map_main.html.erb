@@ -180,6 +180,8 @@
                     .attr("cx", xs)
                     .attr("cy", ys)
                     .attr("id", sites[i]["name"].toLowerCase())
+                    .attr("new", sites[i]["new_notices"])
+                    .attr("investigating", sites[i]["not_investigating"])
                     .attr("tag", sites[i]["name"])
                     .on("mouseover", function(){
                         d3.select("#" + this.id).attr("r", 6).style("z-index", "100")
@@ -187,10 +189,12 @@
                         return tooltip.style("visibility", "visible");
                     })
                     .on("mousemove", function(){
-                        return tooltip.style("top",
-                                        (d3.event.pageY-10)+"px")
+                        site_name = this.getAttribute('id')
+                        new_notices = this.getAttribute('new')
+                        investigating = this.getAttribute('investigating')
+                        return tooltip.style("top", (d3.event.pageY-10)+"px")
                                 .style("left", (d3.event.pageX+20)+"px")
-                                .text(getSiteInfo(this.id));
+                                .html("<center>" + site_name + '</center>New notices: ' + new_notices + " <br />Investigating: " + investigating);
                     })
 
                     .on("mouseout", function(){
