@@ -250,25 +250,28 @@ class ReportController < ApplicationController
 
     @site = Site.find_by_name(params[:site_name])
     @list = {}
+    
+    unless @site.blank?
+      month_of_stock_defn = Definition.find_by_name('Month of Stock').id
 
-    @list = {}
+      hiv_unit_drugs = DrugSet.where(:definition_id => Definition.find_by_name("HIV Unit Drugs").id).order("weight asc")
 
-    month_of_stock_defn = Definition.find_by_name('Month of Stock').id
+      #raise hiv_unit_drugs.collect{|x| x.drug.short_name}.inspect
+      (hiv_unit_drugs || []).each do |drug|
 
-    hiv_unit_drugs = DrugSet.where(:definition_id => Definition.find_by_name("HIV Unit Drugs").id)
+        stock_level = Observation.calculate_stock_level(drug.drug_id,@site.id)
+        stock_level = stock_level / 60 # stock level comes in pills/day here we convert it to tins/month
+        disp_rate = Observation.drug_dispensation_rates(drug.drug_id,@site.id)
+        disp_rate = (disp_rate.to_f * 0.5).round #rate is an avg of pills dispensed per day. here we convert it to tins per month
+        month_of_stock = Observation.calculate_month_of_stock(drug.drug_id, @site.id).to_f
+        puts stock_level
+        @list[Drug.find(drug.drug_id).short_name] = {"month_of_stock" => month_of_stock,"weight" => drug.weight,
+                                                     "stock_level" => stock_level, "consumption_rate" => disp_rate }
 
-    (hiv_unit_drugs || []).each do |drug|
-
-      stock_level = Observation.calculate_stock_level(drug.drug_id,@site.id)
-      stock_level = stock_level / 60 # stock level comes in pills/day here we convert it to tins/month
-      disp_rate = Observation.drug_dispensation_rates(drug.drug_id,@site.id)
-      disp_rate = (disp_rate.to_f * 0.5).round #rate is an avg of pills dispensed per day. here we convert it to tins per month
-      month_of_stock = Observation.calculate_month_of_stock(drug.drug_id, @site.id).to_f
-      puts stock_level
-      @list[Drug.find(drug.drug_id).short_name] = {"month_of_stock" => month_of_stock,
-                                                   "stock_level" => stock_level, "consumption_rate" => disp_rate }
-
+      end
     end
+
+    @list = @list.sort_by{|drug, values| values["weight"]}
 
     render :layout => false
   end
