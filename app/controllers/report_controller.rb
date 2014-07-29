@@ -250,7 +250,7 @@ class ReportController < ApplicationController
 
     @site = Site.find_by_name(params[:site_name])
     @list = {}
-    
+
     unless @site.blank?
       month_of_stock_defn = Definition.find_by_name('Month of Stock').id
 
