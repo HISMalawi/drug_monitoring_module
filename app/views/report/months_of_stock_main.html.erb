@@ -7,9 +7,9 @@
     var drugs = []
     var data_list = {}
 
-    <% (@list.keys || []).each do |key| %>
-        drugs.push('<%= key %>')
-        data_list['<%= key %>'] = { month_of_stock: <%= @list[key]['month_of_stock'] %>,stock_level:<%= @list[key]['stock_level'] %> ,consumption_rate: <%= @list[key]['consumption_rate'] %>}
+    <% (@list || []).each do |drug, values| %>
+        drugs.push('<%= drug %>')
+        data_list['<%= drug %>'] = { month_of_stock: <%= values['month_of_stock'] %>,stock_level:<%= values['stock_level'] %> ,consumption_rate: <%= values['consumption_rate'] %>}
 
     <% end %>
 
@@ -122,8 +122,8 @@
     function dataG() {
         var correctedWeights = [];
 
-        <% (@list.keys || []).each do |key| %>
-            var val = parseFloat(<%= @list[key]["month_of_stock"] %>);
+        <% (@list || []).each do |drug, values| %>
+            var val = parseFloat(<%= values["month_of_stock"] %>);
             var col = (val <= 2) ? 'red' : (val >= 5 ? 'green' : 'yellow');
             correctedWeights.push({y: val, color: col});
         <% end %>
