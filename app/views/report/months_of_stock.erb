@@ -124,7 +124,7 @@
 
         <% (@list || []).each do |drug, values| %>
         var val = parseFloat(<%= values["month_of_stock"] %>);
-        var col = (val <= 2) ? 'red' : (val >= 5 ? 'green' : 'yellow');
+        var col = (val <= 2) ? 'red' : (val >= 5 ? 'yellow' : 'green');
         correctedWeights.push({y: val, color: col});
         <% end %>
 
