@@ -13,7 +13,7 @@ def get_dates(site_name)
   last_pulled = PullTracker.where(:'site_id' => site.id).first
 
   dates = [] ; curr_date = Date.today ; last_pull_date = last_pulled.pulled_datetime.to_date rescue nil
-  last_pull_date = (curr_date - 20.day) if last_pull_date.blank?
+  last_pull_date = (curr_date - 30.day) if last_pull_date.blank?
 
   while last_pull_date < curr_date 
     dates << curr_date
