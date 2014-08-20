@@ -7,9 +7,14 @@
     var drugs = []
     var data_list = {}
 
-    <% (@list.keys || []).each do |key| %>
-    drugs.push('<%= key %>')
-    data_list['<%= key %>'] = { month_of_stock: <%= @list[key]['month_of_stock'] %>,stock_level:<%= @list[key]['stock_level'] %> ,consumption_rate: <%= @list[key]['consumption_rate'] %>}
+    <% (@list || []).each do |drug, values| %>
+    drugs.push('<%= drug %>')
+    data_list['<%= drug %>'] = { month_of_stock: <%= values['month_of_stock'] %>,
+        stock_level:<%= values['stock_level'] %> ,
+        consumption_rate: <%= values['consumption_rate'] %>,
+        stocked_out: <%= values['stocked_out'] %>,
+        active: <%= values['active'] %>
+    };
 
     <% end %>
 
@@ -48,7 +53,22 @@
                     style: {
                         color: '#000000',
                         font: "12px Arial, 'Helvetica Neue', Helvetica, sans-serif;"
+                    },
+                    formatter: function () {
+                        if (!data_list[this.value]["active"])
+                        {
+                            return '<span style="fill: grey;">' + this.value + '</span>';
+                        }
+                        else if (data_list[this.value]["stocked_out"]) {
+
+                            return '<span style="fill: red;">' + this.value + '</span>';
+
+                        }
+                        else {
+                            return this.value;
+                        }
                     }
+
                 }
             },
             yAxis: {
@@ -122,11 +142,12 @@
     function dataG() {
         var correctedWeights = [];
 
-        <% (@list.keys || []).each do |key| %>
-        var val = parseFloat(<%= @list[key]["month_of_stock"] %>);
-        var col = (val <= 2) ? 'red' : (val >= 5 ? 'green' : 'yellow');
+        <% (@list || []).each do |drug, values| %>
+        var val = parseFloat(<%= values["month_of_stock"] %>);
+        var col = (val <= 2) ? 'red' : (val >= 5 ? 'yellow' : 'green');
         correctedWeights.push({y: val, color: col});
         <% end %>
+
 
         return [{name: 'Month(s) of stock', showInLegend: true, data: correctedWeights, pointWidth: 20}];
     }
