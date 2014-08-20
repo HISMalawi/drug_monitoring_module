@@ -466,7 +466,7 @@ class Observation < ActiveRecord::Base
       (result || []).each do |record|
 
         results[Drug.find(record.value_drug).short_name] = [] if results[Drug.find(record.value_drug).short_name].blank?
-        results[Drug.find(record.value_drug).short_name] <<  {"value" => (record.value/60).round, "code" => record.code}
+        results[Drug.find(record.value_drug).short_name] <<  {"value" => (record.value.to_i/60).round, "code" => record.code}
       end
 
     return results
@@ -483,7 +483,7 @@ class Observation < ActiveRecord::Base
                                     GROUP BY value_drug, value_date")
 
     (result || []).each do |record|
-      results <<  {"value" => (record.value/60).round, "date" => record.date, "drug" => Drug.find(record.value_drug).short_name}
+      results <<  {"value" => (record.value.to_i/60).round, "date" => record.date, "drug" => Drug.find(record.value_drug).short_name}
     end
 
     return results
@@ -504,7 +504,7 @@ class Observation < ActiveRecord::Base
     (result || []).each do |record|
 
       results[Drug.find(record.value_drug).short_name] = [] if results[Drug.find(record.value_drug).short_name].blank?
-      results[Drug.find(record.value_drug).short_name] <<  {"value" => (record.value/60).round, "code" => record.code,
+      results[Drug.find(record.value_drug).short_name] <<  {"value" => (record.value.to_i/60).round, "code" => record.code,
                                                             "date" => record.date}
     end
 

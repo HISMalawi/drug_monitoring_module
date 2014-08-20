@@ -9,20 +9,19 @@ $drug_prescribed_id = Definition.where(:name => "People prescribed drug").first.
 
 def start
 
-  sites = YAML.load_file("#{Rails.root.to_s}/config/sites.yml")
-  (sites || []).each do |key, value|
-    puts "Getting Data For Site #{key}"
-    unless value.blank?
-      date = "01-04-2014".to_date
+  sites = Site.all
+  (sites || []).each do |site|
+    puts "Getting Data For Site #{site.name}"
 
-      url = "http://#{value}/drug/art_summary_dispensation?date=#{date}"
+      date = "12-07-2014".to_date
+
+      url = "http://#{site.ip_address}:#{site.port}/drug/art_summary_dispensation?date=#{date}"
       data = JSON.parse(RestClient::Request.execute(:method => :post, :url => url, :timeout => 100000000)) rescue (
         puts "**** Error when pulling data from site #{key}"
         next
       )
-      site = Site.where(:name => key).first_or_create
       record(site,date ,data)
-    end
+
   end
 
   puts "Calculating Stock Levels"

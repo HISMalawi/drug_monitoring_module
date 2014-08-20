@@ -40,20 +40,23 @@ EOF
         <tr style='background-color: #206BA4'>" +
           "<td style='color:#ffffff; font-weight:bold;padding-left:10px;'>Drug Name</td>
           <td style='color:#ffffff; font-weight:bold;padding-left:10px;'>Total Delivered</td>
-          <td style='color:#ffffff; font-weight:bold; text-align:center'>Delivery Code </td>"+
-            type.blank? ? "" : "<td style='color:#ffffff; font-weight:bold; text-align:center'>Date</td>"
-          +"</tr>
-    </thead>
-    <tbody>"
+          <td style='color:#ffffff; font-weight:bold; text-align:center'>Delivery Code </td>"
+     if !type.blank?
+       html += "<td style='color:#ffffff; font-weight:bold; text-align:center'>Date Delivered</td>"
+     end
+
+     html +=  "</tr></thead><tbody>"
 
       (params || {}).each do |drug, records|
         (records || []).each do |values|
-          html += "<tr>" +
-              "<td style='padding-left:10px'> #{drug} </td>
+          html += "<tr>
+              <td style='padding-left:10px'> #{drug} </td>
               <td style='padding-left:15px'>#{number_with_delimiter(values['value'], :delimeter => ',')} </td>
-              <td style='text-align: center'>#{values['code']}</td>" +
-              type.blank? ? "" : "<td style='color:#ffffff; font-weight:bold; text-align:center'>#{values['date']}</td>"
-              +"</tr>"
+              <td style='text-align: center'>#{values['code']}</td>"
+          if !type.blank?
+            html += "<td style='text-align:center'>#{values['date'].to_date.strftime("%d %B %Y")}</td>"
+          end
+          html += "</tr>"
         end
       end
 

@@ -58,11 +58,11 @@
             <tr>
               <td class="td-heading">Duration Type:</td>
               <td>
-                <input type="radio" name="duration" value="date" checked onmousedown="manage_type(this.value)"
-                id="date">Date
+                <input type="radio" name="duration" value="duration" onmousedown="manage_type(this.value)"
+                       checked id="duration">Duration
                 <span class="spacing">
-                  <input type="radio" name="duration" value="duration" onmousedown="manage_type(this.value)"
-                  id="duration">Duration
+                    <input type="radio" name="duration" value="date" onmousedown="manage_type(this.value)"
+                           id="date">Date
                 </span>
                 <span class="spacing">
                   <input type="radio" name="duration" value="delivery code"
@@ -72,11 +72,11 @@
             </tr>
             <tr id="start_date_row">
               <td class="td-heading"><label id="date">Select Date:</label></td>
-              <td><input id="selected_date" type="text" placeholder="Select Date" onclick="position_datepicker(this)"/></td>
+              <td><input id="selected_date" type="text" placeholder="Select Date" /></td>
             </tr>
-            <tr id="end_date_row" style="display:none">
+            <tr id="end_date_row" >
               <td class="td-heading"><label>End Date:</label></td>
-              <td><input id="end_date" type="text" placeholder="Select Date" onclick="position_datepicker(this)"/></td>
+              <td><input id="end_date" type="text" placeholder="Select Date"/></td>
             </tr>
             <tr id="dcode_row" style="display:none">
               <td class="td-heading"><label>Delivery Code:</label></td>
@@ -179,14 +179,12 @@
         if (results != "No Deliveries Were Made On This Day")
         {
             $('#records').dataTable({
-                "aaSorting": [[ 0, "asc" ]],
                 'iDisplayLength': 20,
                 "bLengthChange": false,
                 "bPaginate": false,
                 "bFilter": false,
-                "columnDefs": [
-                    { "type": "numeric-comma", targets: 1 }
-                ]
+                "bSort": true,
+                "order": [[ 0, "desc" ]]
             });
 
         }
