@@ -3,7 +3,9 @@
     .td-heading {
         width: 100px;
     }
-
+    span.spacing{
+        margin-left: 10px;
+    }
 </style>
 <%=javascript_include_tag "bootstrap-tree/jquery-1.8.2"%>
 <script type="text/javascript" src="/javascripts/zebra_datepicker.js"></script>
@@ -54,12 +56,34 @@
               <td><label id="selection-label" style="font-weight: bold;"></label></td>
             </tr>
             <tr>
-              <td class="td-heading"><label>Select Date:</label></td>
+              <td class="td-heading">Duration Type:</td>
+              <td>
+                <input type="radio" name="duration" value="date" checked onmousedown="manage_type(this.value)"
+                id="date">Date
+                <span class="spacing">
+                  <input type="radio" name="duration" value="duration" onmousedown="manage_type(this.value)"
+                  id="duration">Duration
+                </span>
+                <span class="spacing">
+                  <input type="radio" name="duration" value="delivery code"
+                         onmousedown="manage_type(this.value)" id="d_code">Delivery Code
+                </span>
+              </td>
+            </tr>
+            <tr id="start_date_row">
+              <td class="td-heading"><label id="date">Select Date:</label></td>
               <td><input id="selected_date" type="text" placeholder="Select Date" onclick="position_datepicker(this)"/></td>
+            </tr>
+            <tr id="end_date_row" style="display:none">
+              <td class="td-heading"><label>End Date:</label></td>
+              <td><input id="end_date" type="text" placeholder="Select Date" onclick="position_datepicker(this)"/></td>
+            </tr>
+            <tr id="dcode_row" style="display:none">
+              <td class="td-heading"><label>Delivery Code:</label></td>
+              <td><input id="delivery_code" type="text" placeholder="Enter delivery code"/></td>
             </tr>
             <tr>
               <td class="td-heading">
-
                 <input type="submit" class="btn btn-success" value="Submit" onclick="display_report()" style="width: 100%;" />
               </td>
             </tr>
@@ -89,24 +113,37 @@
 
     function display_picker(e){
 
-       $('#selected_date').Zebra_DatePicker({format: "d-M-Y", offset: [-220, (jQuery('#selected_date').position().top * 2)]});
-
+       $('#selected_date').Zebra_DatePicker({format: "d-M-Y", offset: [-220, (jQuery('#selected_date').position().top * 1.7)]});
+       $('#end_date').Zebra_DatePicker({format: "d-M-Y", offset: [-220, (jQuery('#end_date').position().top * 1.4)]});
     }
     setTimeout(display_picker, 2);
 
-    function position_datepicker(element)
-    {
-
-    }
     function setSelectedValue(value) {
         label = document.getElementById('selection-label');
         label.innerHTML = value;
     }
     function display_report(){
 
-
+        var url = ""
         var site = document.getElementById('selection-label').innerHTML
-        var start_date = document.getElementById("selected_date").value
+        if (document.getElementById("duration").checked)
+        {
+            var start_date = document.getElementById("selected_date").value
+            var end_date = document.getElementById("end_date").value
+            url = '/report/delivery_report?site_name=' + site + "&start_date="+ start_date +"&end_date="+end_date+
+                    "&type=duration"
+        }
+        else if (document.getElementById("d_code").checked)
+        {
+            var d_code = document.getElementById("delivery_code").value
+            url = '/report/delivery_report?site_name=' + site +"&d_code="+ d_code +"&type=delivery_code"
+        }
+        else
+        {
+            var start_date = document.getElementById("selected_date").value
+            url = '/report/delivery_report?site_name=' + site + "&start_date="+ start_date
+        }
+
 
         //document.getElementById('reporter').innerHTML = "Please wait ....";
         document.getElementById('reporter').innerHTML = "Loading.......";
@@ -129,7 +166,7 @@
                 }
             }
         }
-        xmlhttp.open("POST",'/report/delivery_report?site_name=' + site + "&start_date="+ start_date ,true);
+        xmlhttp.open("POST",url,true);
         xmlhttp.send();
 
 
@@ -153,6 +190,30 @@
             });
 
         }
+    }
+
+    function manage_type(value){
+
+        switch (value){
+            case "delivery code":
+                document.getElementById("start_date_row").style.display = "none";
+                document.getElementById("end_date_row").style.display = "none";
+                document.getElementById("dcode_row").style.display = "";
+                break;
+            case "duration":
+                document.getElementById("start_date_row").style.display = "";
+                document.getElementById("end_date_row").style.display = "";
+                document.getElementById("dcode_row").style.display = "none";
+                document.getElementById("date").innerHTML = "Start Date"
+                break;
+            default:
+                document.getElementById("start_date_row").style.display = "";
+                document.getElementById("end_date_row").style.display = "none";
+                document.getElementById("dcode_row").style.display = "none";
+                document.getElementById("date").innerHTML = "Select Date"
+        }
+
+
     }
 </script>
 

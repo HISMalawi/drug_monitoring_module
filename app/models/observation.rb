@@ -454,7 +454,7 @@ class Observation < ActiveRecord::Base
   end
 
   def self.day_deliveries(site_id = 1, date = Date.today)
-
+    #This function gets the deliveries to a site on a particular day
     definition_id = Definition.find_by_name("New Delivery").id
     results = {}
 
@@ -468,6 +468,45 @@ class Observation < ActiveRecord::Base
         results[Drug.find(record.value_drug).short_name] = [] if results[Drug.find(record.value_drug).short_name].blank?
         results[Drug.find(record.value_drug).short_name] <<  {"value" => (record.value/60).round, "code" => record.code}
       end
+
+    return results
+  end
+
+  def self.deliveries_by_code(site_id, code)
+      #This function gets deliveries based on the delivery code
+    definition_id = Definition.find_by_name("New Delivery").id
+    results = []
+
+
+    result = Observation.find_by_sql("SELECT value_date as date, value_drug, SUM(value_numeric) as value FROM observations
+                                    WHERE site_id = #{site_id} AND definition_id = #{definition_id} AND value_text = '#{code}'
+                                    GROUP BY value_drug, value_date")
+
+    (result || []).each do |record|
+      results <<  {"value" => (record.value/60).round, "date" => record.date, "drug" => Drug.find(record.value_drug).short_name}
+    end
+
+    return results
+  end
+
+
+  def self.deliveries_in_range(site_id = 1, start_date = Date.today, end_date = Date.today)
+    #This function gets the deliveries to a site within a given range
+    definition_id = Definition.find_by_name("New Delivery").id
+    results = {}
+
+
+    result = Observation.find_by_sql("SELECT value_date as date, value_drug, SUM(value_numeric) as value,
+                                      value_text as code FROM observations WHERE site_id = #{site_id} AND
+                                      definition_id = #{definition_id} AND value_date BETWEEN '#{start_date.to_date}'
+                                      AND '#{end_date.to_date}'GROUP BY value_drug, value_date, value_text")
+
+    (result || []).each do |record|
+
+      results[Drug.find(record.value_drug).short_name] = [] if results[Drug.find(record.value_drug).short_name].blank?
+      results[Drug.find(record.value_drug).short_name] <<  {"value" => (record.value/60).round, "code" => record.code,
+                                                            "date" => record.date}
+    end
 
     return results
   end

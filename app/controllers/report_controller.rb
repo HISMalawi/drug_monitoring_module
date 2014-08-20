@@ -387,9 +387,19 @@ class ReportController < ApplicationController
     else
       @site = Site.find_by_name(params[:site_name])
       site_id = @site.id
-      start_date = params[:start_date] || nil
-      @stocks = Observation.day_deliveries(site_id, start_date)
-      render :text => view_context.deliveries(@stocks)
+      if params[:type].blank?
+        start_date = params[:start_date] || nil
+        @stocks = Observation.day_deliveries(site_id, start_date)
+        result = view_context.day_deliveries(@stocks, nil)
+      elsif params[:type] == "duration"
+        @stocks = Observation.deliveries_in_range(site_id, params[:start_date],params[:end_date])
+        result = view_context.day_deliveries(@stocks, params[:type])
+      elsif params[:type] == "delivery_code"
+        @stocks = Observation.deliveries_by_code(site_id, params[:d_code])
+        result = view_context.code_deliveries(@stocks, params[:site_name])
+      end
+
+      render :text => result
     end
 
 
