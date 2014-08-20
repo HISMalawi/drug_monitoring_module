@@ -9,7 +9,12 @@
 
     <% (@list || []).each do |drug, values| %>
     drugs.push('<%= drug %>')
-    data_list['<%= drug %>'] = { month_of_stock: <%= values['month_of_stock'] %>,stock_level:<%= values['stock_level'] %> ,consumption_rate: <%= values['consumption_rate'] %>}
+    data_list['<%= drug %>'] = { month_of_stock: <%= values['month_of_stock'] %>,
+                                 stock_level:<%= values['stock_level'] %> ,
+                                 consumption_rate: <%= values['consumption_rate'] %>,
+                                 stocked_out: <%= values['stocked_out'] %>,
+                                 active: <%= values['active'] %>
+                               }
 
     <% end %>
 
@@ -48,6 +53,20 @@
                     style: {
                         color: '#000000',
                         font: "12px Arial, 'Helvetica Neue', Helvetica, sans-serif;"
+                    },
+                    formatter: function () {
+                        if (!data_list[this.value]["active"])
+                        {
+                            return '<span style="fill: grey;">' + this.value + '</span>';
+                        }
+                        else if (data_list[this.value]["stocked_out"]) {
+
+                            return '<span style="fill: red;">' + this.value + '</span>';
+
+                        }
+                        else {
+                            return this.value;
+                        }
                     }
                 }
             },

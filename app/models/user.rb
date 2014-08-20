@@ -6,7 +6,7 @@ class User < ActiveRecord::Base
 
   validates_presence_of :username, :password
   validates_uniqueness_of :username
-  set_primary_key :user_id
+  self.primary_key = :user_id
   has_one :user_role
   cattr_accessor :current
   before_save :encrypt_password
