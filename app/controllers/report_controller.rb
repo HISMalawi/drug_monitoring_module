@@ -250,7 +250,6 @@ class ReportController < ApplicationController
     @list = {}
 
     unless @site.blank?
-      month_of_stock_defn = Definition.find_by_name('Month of Stock').id
 
       hiv_unit_drugs = DrugSet.where(:definition_id => Definition.find_by_name("HIV Unit Drugs").id).order("weight asc")
 
@@ -264,7 +263,7 @@ class ReportController < ApplicationController
         month_of_stock = Observation.calculate_month_of_stock(drug.drug_id, @site.id).to_f
         stocked_out = (disp_rate.to_i != 0 && month_of_stock.to_f.round(3) == 0.00)
 
-        active = (disp_rate.to_i == 0 && stock_level.to_i == 0)? false : true
+        active = (disp_rate.to_i == 0 && stock_level.to_i != 0)? false : true
         @list[Drug.find(drug.drug_id).short_name] = {"month_of_stock" => month_of_stock,"weight" => drug.weight,
                                                      "stock_level" => stock_level, "consumption_rate" => disp_rate,
                                                      "stocked_out" => stocked_out, "active" => active
@@ -421,7 +420,7 @@ class ReportController < ApplicationController
     @list = {}
 
     unless @site.blank?
-      month_of_stock_defn = Definition.find_by_name('Month of Stock').id
+
 
       hiv_unit_drugs = DrugSet.where(:definition_id => Definition.find_by_name("HIV Unit Drugs").id).order("weight asc")
 
@@ -436,7 +435,7 @@ class ReportController < ApplicationController
 
         stocked_out = (disp_rate.to_i != 0 && month_of_stock.to_f.round(3) == 0.00)
 
-        active = (disp_rate.to_i == 0 && stock_level.to_i == 0)? false : true
+        active = (disp_rate.to_i == 0 && stock_level.to_i != 0)? false : true
         @list[Drug.find(drug.drug_id).short_name] = {"month_of_stock" => month_of_stock,"weight" => drug.weight,
                                                      "stock_level" => stock_level, "consumption_rate" => disp_rate,
                                                      "stocked_out" => stocked_out, "active" => active
