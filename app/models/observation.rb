@@ -3,6 +3,7 @@ class Observation < ActiveRecord::Base
   belongs_to :site, :foreign_key => :site_id
   belongs_to :definition, :foreign_key => :definition_id
   belongs_to :drug, :foreign_key => :value_drug
+  belongs_to :user, :foreign_key => :creator
   validates_presence_of :site_id
   validates_presence_of :definition_id
 
@@ -513,5 +514,9 @@ class Observation < ActiveRecord::Base
 
   def drug_name
     self.drug.short_name
+  end
+
+  def creator_name
+    self.user.username
   end
 end

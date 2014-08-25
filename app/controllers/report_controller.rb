@@ -537,9 +537,31 @@ class ReportController < ApplicationController
                                 AND observations.site_id = #{site_id} AND states.state = #{state}
                                 AND observations.definition_id = #{notice_defn}")
 
-
       render :text => view_context.notices_format(notices,params[:state])
     end
 
+  end
+
+  def get_comment
+
+  end
+
+  def update_notice
+
+    state = State.where("state_id = ?", params[:row]).first
+
+    unless state.blank?
+      state.state = Definition.find_by_name(params[:state]).id
+      state.save
+
+      Observation.create({:definition_id => Definition.find_by_name("comment").id,
+                          :value_text => params[:comment],
+                          :creator => User.find_by_username(params[:editor]).id,
+                          :value_numeric => state.id,
+                          :value_date => Date.today,
+                          :site_id => state.observation.site_id
+                         })
+    end
+    render :text => true and return
   end
 end

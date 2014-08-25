@@ -81,20 +81,23 @@ EOF
         <tr style='background-color: #206BA4'>
           <td style='color:#ffffff; font-weight:bold;padding-left:10px;'>Notice</td>
           <td style='color:#ffffff; font-weight:bold;padding-left:10px;'>Day Reported</td>
-          <td style='color:#ffffff; font-weight:bold; text-align:center'>Under Investigation?</td>
-          <td style='color:#ffffff; font-weight:bold; text-align:center'>Resolved?</td>
+          <td style='color:#ffffff; font-weight:bold; text-align:center'>Action</td>
+          <td style='color:#ffffff; font-weight:bold; text-align:center'>Action</td>
         </tr>
     </thead>
     <tbody>"
 
           (results || []).each do |notice|
-            html += "<tr><td style='padding-left:10px'> #{notice.observation.value_text} </td>
-                    <td style='padding-left:15px'>#{notice.created_at.strftime('%d, %B, %Y')} </td>
-                    <td style='text-align: center'><input type='radio' class='state_option' value='investigating:#{notice.id}' name='new_notice:#{notice.id}'/></td>
-                    <td style='text-align: center'><input type='radio' class='state_option' value='resolved:#{notice.id}' name='new_notice:#{notice.id}'/></td></tr>"
+            html += "<tr id=row#{notice.id}><td style='padding-left:10px'> #{notice.notice} </td>
+              <td style='padding-left:15px'>#{notice.created_at.strftime('%d, %B, %Y')} </td>
+              <td style='text-align: center'>
+                  <button class='btn btn-primary' value=#{notice.comments} onClick='viewComment(this.value)'>View Comments</button>
+              </td>
+              <td style='text-align: center'><input type='submit' class='btn btn-success' value='Manage Notice'
+                 onClick='manageNotice(#{notice.id})'/></td></tr>"
           end
 
-         html += " </tbody></table><input type='submit' class='btn btn-success' value='Save Changes' onclick='saveNewNoticesChanges()' style='width: 100%;' />"
+         html += " </tbody></table>"
         end
       when "investigating"
         if results.blank?
@@ -107,19 +110,24 @@ EOF
           <td style='color:#ffffff; font-weight:bold;padding-left:10px;'>Notice</td>
           <td style='color:#ffffff; font-weight:bold;padding-left:10px;'>Day Reported</td>
           <td style='color:#ffffff; font-weight:bold;padding-left:10px;'>Day Updated</td>
-          <td style='color:#ffffff; font-weight:bold; text-align:center'>Resolved?</td>
+          <td style='color:#ffffff; font-weight:bold;padding-left:10px;'>Comments</td>
+          <td style='color:#ffffff; font-weight:bold; text-align:center'>Action</td>
         </tr>
     </thead>
     <tbody>"
 
           (results || []).each do |notice|
-            html += "<tr><td style='padding-left:10px'> #{notice.observation.value_text} </td>
+            html += "<tr id=row#{notice.id}><td style='padding-left:10px'> #{notice.observation.value_text} </td>
               <td style='padding-left:15px'>#{notice.created_at.strftime('%d, %B, %Y')} </td>
               <td style='text-align: center'>#{notice.updated_at.strftime('%d, %B, %Y')}</td>
-              <td style='text-align: center'><input type='radio' class='state_option' value='resolved:#{notice.id}' name='new_notice:#{notice.id}'/></td></tr>"
+              <td style='text-align: center'>
+              <button class='btn btn-primary' value=#{notice.comments} onClick='viewComment(this.value)'>View Comments</button>
+              </td>
+              <td style='text-align: center'><input type='submit' class='btn btn-success' value='Manage Notice'
+                    onClick='manageNotice(#{notice.id})'/></td></tr>"
           end
 
-          html += " </tbody></table><input type='submit' class='btn btn-success' value='Save Changes' onclick='saveNewNoticesChanges()' style='width: 100%;' />"
+          html += " </tbody></table>"
 
         end
       when "resolved"
@@ -132,13 +140,20 @@ EOF
           <td style='color:#ffffff; font-weight:bold;padding-left:10px;'>Notice</td>
           <td style='color:#ffffff; font-weight:bold;padding-left:10px;'>Day Reported</td>
           <td style='color:#ffffff; font-weight:bold; text-align:center'>Day Resolved </td>
+          <td style='color:#ffffff; font-weight:bold; text-align:center'>Last Updated By</td>
+          <td style='color:#ffffff; font-weight:bold; text-align:center'>Action</td>
         </tr>
     </thead>
     <tbody>"
 
           (results || []).each do |notice|
-              html += "<tr><td style='padding-left:10px'> #{notice.observation.value_text} </td><td style='padding-left:15px'>#{notice.created_at.strftime('%d, %B, %Y')} </td>
-              <td style='text-align: center'>#{notice.updated_at.strftime('%d, %B, %Y')}</td></tr>"
+              html += "<tr id=row#{notice.id}><td style='padding-left:10px'> #{notice.observation.value_text} </td>
+                        <td style='padding-left:15px'>#{notice.created_at.strftime('%d, %B, %Y')} </td>
+                        <td style='text-align: center'>#{notice.updated_at.strftime('%d, %B, %Y')}</td>
+                        <td style='text-align: center'>#{notice.last_person_to_update}</td>
+                        <td style='text-align: center'>
+                            <button class='btn btn-primary' value=#{notice.comments} onClick='viewComment(this.value)'>
+                            View Comments</button></td></tr>"
           end
 
           html += " </tbody></table>"
