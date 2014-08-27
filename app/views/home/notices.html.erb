@@ -489,7 +489,9 @@
         }
     }
 
-     timerHnd = setTimeout("ajaxTasks()", pollInterval);
+    setInterval(function() {
+        window.location.reload();
+    }, 300000);
 
     /*
      d3.json("data.json")
