@@ -52,9 +52,10 @@ definitions = [["Prescription", "Describes the number of precriptions"],
 	["Antibiotics", "anti-bacteria drug"],
 	["Antifungal", "anti-fungal medicine"],
 	["Antimalarial", "anti-malaria medicine"],
-	["Antiviral", "anti-viral medicine", ],
+	["Antiviral", "anti-viral medicine" ],
 	["Opportunistic infection medicine", "medicine for all other infections and diseases"],
-  ["Unknown", "unknown", ]
+  ["Unknown", "unknown" ],
+  ["Comment", "descriptions added to observations"]
 ]
 
 (definitions || []).each do |definition|

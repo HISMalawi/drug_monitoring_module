@@ -13,8 +13,8 @@ class ReportTool < ActiveRecord::Base
 
     (dispensations || []).each do |dispensation|
       #Getting prescription for specific drug on given date
-      prescription = Observation.find(:first, :conditions => ["definition_id = ? AND value_date = ? AND value_drug = ? AND site_id = ?",
-                                       prescription_id, dispensation.value_date,dispensation.value_drug, dispensation.site_id])
+      prescription = Observation.where("definition_id = ? AND value_date = ? AND value_drug = ? AND site_id = ?",
+                                       [prescription_id, dispensation.value_date,dispensation.value_drug, dispensation.site_id]).first
       if prescription.blank?
         issues[dispensation.site.name] << "#{dispensation.get_short_form} has dispensation but no prescriptions on #{dispensation.value_date.strftime('%d %B %Y')}"
       end
@@ -59,8 +59,8 @@ class ReportTool < ActiveRecord::Base
 
     (dispensations || []).each do |dispensation|
       #Getting prescription for specific drug on given date
-      prescription = Observation.find(:first, :conditions => ["definition_id = ? AND value_date = ? AND value_drug = ? AND site_id = ?",
-                                                              prescription_id, dispensation.value_date,dispensation.value_drug, dispensation.site_id])
+      prescription = Observation.where("definition_id = ? AND value_date = ? AND value_drug = ? AND site_id = ?",
+                                       [prescription_id, dispensation.value_date,dispensation.value_drug, dispensation.site_id]).first
       if prescription.blank?
         issues[dispensation.site.name] = [] if issues[dispensation.site.name].blank?
         notice = "#{dispensation.get_short_form} has dispensation but no prescriptions on #{dispensation.value_date.strftime('%d %B %Y')}"

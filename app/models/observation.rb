@@ -3,6 +3,7 @@ class Observation < ActiveRecord::Base
   belongs_to :site, :foreign_key => :site_id
   belongs_to :definition, :foreign_key => :definition_id
   belongs_to :drug, :foreign_key => :value_drug
+  belongs_to :user, :foreign_key => :creator
   validates_presence_of :site_id
   validates_presence_of :definition_id
 
@@ -139,11 +140,13 @@ class Observation < ActiveRecord::Base
     # ** Of a specific drug per each site
 
     dispensation_id = Definition.where(:name => "dispensation").first.id
-
+    start_date = (Date.today - 90.days).strftime("%Y-%m-%d")
+    end_date = Date.today.strftime("%Y-%m-%d")
     if site_id.blank?
       return  self.find_by_sql(
           "SELECT site_id, ROUND(AVG(value_numeric)) AS rate FROM observations
         WHERE definition_id = #{dispensation_id} AND value_drug = #{drug}
+        AND value_date BETWEEN '#{start_date}' AND '#{end_date}'
         GROUP BY site_id"
       ).inject({}){|result, obs|
         result[obs.site_id] = {} if result[obs.site_id].blank?; result[obs.site_id] = obs.rate; result
@@ -152,7 +155,7 @@ class Observation < ActiveRecord::Base
       return  self.find_by_sql(
           "SELECT ROUND(AVG(value_numeric)) AS rate FROM observations
         WHERE definition_id = #{dispensation_id} AND value_drug = #{drug}
-        AND site_id = #{site_id}"
+        AND site_id = #{site_id} AND value_date BETWEEN '#{start_date}' AND '#{end_date}'"
       ).first.rate
     end
 
@@ -187,6 +190,17 @@ class Observation < ActiveRecord::Base
       :select => ["value_numeric"],
       :conditions => ["definition_id = ? AND value_drug = ? AND value_date = ?",
         definition_id, drug_name, date]).value_numeric.to_i rescue 0
+    puts (d/60).to_yaml if (d/60) > 0
+    return (d/60)
+  end
+
+  def self.relocated(drug_name, date)
+
+    definition_id = Definition.find_by_name("Relocation").id
+    d = Observation.find(:last,
+                         :select => ["value_numeric"],
+                         :conditions => ["definition_id = ? AND value_drug = ? AND value_date = ?",
+                                         definition_id, drug_name, date]).value_numeric.to_i rescue 0
     puts (d/60).to_yaml if (d/60) > 0
     return (d/60)
   end
@@ -399,7 +413,7 @@ class Observation < ActiveRecord::Base
 
   end
 
-  def self.calculate_month_of_stock(drug, site_id = nil)
+  def self.calculate_month_of_stock(drug, site_id)
 
     stock_level = Observation.calculate_stock_level(drug, site_id).to_i
 
@@ -413,7 +427,17 @@ class Observation < ActiveRecord::Base
 
       expected = (stock_level/ 60)
 
-      return (expected/ consumption_rate)
+      month_of_stock = (expected/ consumption_rate)
+
+      if month_of_stock <= 2.0
+        notice = "#{Drug.find(drug).short_name} stock is running low. Please ensure site is listed for new stock delivery"
+        Observation.create_notification(site_id,Date.today,notice,drug)
+      elsif month_of_stock >= 7.0
+        notice = "#{Site.find(site_id).name} has excess #{Drug.find(drug).short_name} stock. Consider relocating some stock"
+        Observation.create_notification(site_id,Date.today,notice,drug)
+      end
+
+      return month_of_stock
     end
 
   end
@@ -422,12 +446,12 @@ class Observation < ActiveRecord::Base
 
     notice_defn = Definition.find_by_name("Notice")
     state_defn = Definition.find_by_name("New")
+    states = Definition.where(:name => ["new", "investigating"]).collect{|x| x.id}
 
-    obs = Observation.where(:site_id => site_id,
-                            :definition_id => notice_defn.id,
-                            :value_drug => drug,
-                            :value_date => date,
-                            :value_text => notice
+    obs = State.joins(:observation).where("observations.site_id" => site_id,
+                            "observations.value_drug" => drug,
+                            "observations.value_text" => notice,
+                            :state => states
     ).first
 
     if obs.blank?
@@ -442,7 +466,7 @@ class Observation < ActiveRecord::Base
   end
 
   def self.day_deliveries(site_id = 1, date = Date.today)
-
+    #This function gets the deliveries to a site on a particular day
     definition_id = Definition.find_by_name("New Delivery").id
     results = {}
 
@@ -454,13 +478,56 @@ class Observation < ActiveRecord::Base
       (result || []).each do |record|
 
         results[Drug.find(record.value_drug).short_name] = [] if results[Drug.find(record.value_drug).short_name].blank?
-        results[Drug.find(record.value_drug).short_name] <<  {"value" => (record.value/60).round, "code" => record.code}
+        results[Drug.find(record.value_drug).short_name] <<  {"value" => (record.value.to_i/60).round, "code" => record.code}
       end
+
+    return results
+  end
+
+  def self.deliveries_by_code(site_id, code)
+      #This function gets deliveries based on the delivery code
+    definition_id = Definition.find_by_name("New Delivery").id
+    results = []
+
+
+    result = Observation.find_by_sql("SELECT value_date as date, value_drug, SUM(value_numeric) as value FROM observations
+                                    WHERE site_id = #{site_id} AND definition_id = #{definition_id} AND value_text = '#{code}'
+                                    GROUP BY value_drug, value_date")
+
+    (result || []).each do |record|
+      results <<  {"value" => (record.value.to_i/60).round, "date" => record.date, "drug" => Drug.find(record.value_drug).short_name}
+    end
+
+    return results
+  end
+
+
+  def self.deliveries_in_range(site_id = 1, start_date = Date.today, end_date = Date.today)
+    #This function gets the deliveries to a site within a given range
+    definition_id = Definition.find_by_name("New Delivery").id
+    results = {}
+
+
+    result = Observation.find_by_sql("SELECT value_date as date, value_drug, SUM(value_numeric) as value,
+                                      value_text as code FROM observations WHERE site_id = #{site_id} AND
+                                      definition_id = #{definition_id} AND value_date BETWEEN '#{start_date.to_date}'
+                                      AND '#{end_date.to_date}'GROUP BY value_drug, value_date, value_text")
+
+    (result || []).each do |record|
+
+      results[Drug.find(record.value_drug).short_name] = [] if results[Drug.find(record.value_drug).short_name].blank?
+      results[Drug.find(record.value_drug).short_name] <<  {"value" => (record.value.to_i/60).round, "code" => record.code,
+                                                            "date" => record.date}
+    end
 
     return results
   end
 
   def drug_name
     self.drug.short_name
+  end
+
+  def creator_name
+    self.user.username
   end
 end

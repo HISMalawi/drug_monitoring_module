@@ -70,9 +70,9 @@ class ReportController < ApplicationController
     site = Site.find_by_name(params[:site])
 
     @values = {}
-    obs = Observation.find(:all,:order => "value_date DESC",
-      :conditions => ["definition_id in (?) AND site_id = ? AND value_date >= ? AND value_date <= ?",
-        defns,site.id,params[:start_date],params[:end_date]])
+    obs = Observation.where("definition_id in (?) AND site_id = ? AND value_date >= ? AND value_date <= ?",
+                             [defns,site.id,params[:start_date],params[:end_date]]).order("value_date DESC")
+
     (obs || []).each do |record|
 
       @values[record.value_date] = {} unless !@values[record.value_date].blank?
@@ -141,9 +141,9 @@ class ReportController < ApplicationController
     @values = Hash.new()
     @values["All"] = {}
 
-    obs = Observation.find(:all,:order => "value_date ASC",
-                           :conditions => ["definition_id in (?) AND value_drug = ? AND value_date >= ? AND value_date <= ?",
-                                           defns,params[:drug],params[:start_date],params[:end_date]])
+    obs = Observation.where("definition_id in (?) AND value_drug = ? AND value_date >= ? AND value_date <= ?",
+                            [defns,params[:drug],params[:start_date],params[:end_date]]).order("value_date ASC")
+
 
     (obs || []).each do |record|
       @values[record.site.name] = {} unless !@values[record.site.name].blank?
@@ -176,7 +176,8 @@ class ReportController < ApplicationController
   end
 
   def drug_utilization_report
-    @title = "Drug Utilization Report For #{params[:drug]} From #{params["start_date"].to_date.strftime("%d %B %Y")} To #{params["end_date"].to_date.strftime("%d %B %Y")}"
+    @title = "Drug Utilization Report For #{params[:drug]} From #{params["start_date"].to_date.strftime("%d %B %Y")} To
+              #{params["end_date"].to_date.strftime("%d %B %Y")}"
 
     defns = Definition.where(:name => ["prescription","dispensation","relocation", "People who received drugs",
                                        "People prescribed drug"]).collect{|x| x.definition_id}
@@ -184,9 +185,9 @@ class ReportController < ApplicationController
     @values = Hash.new()
     @values["All"] = {}
 
-    obs = Observation.find(:all,:order => "value_date ASC",
-      :conditions => ["definition_id in (?) AND value_drug = ? AND value_date >= ? AND value_date <= ?",
-        defns,params[:drug],params[:start_date],params[:end_date]])
+    obs = Observation.find("definition_id in (?) AND value_drug = ? AND value_date >= ? AND value_date <= ?",
+                           [defns,params[:drug],params[:start_date],params[:end_date]]).order("value_date ASC")
+
 
     (obs || []).each do |record|
       @values[record.site.name] = {} unless !@values[record.site.name].blank?
@@ -234,11 +235,8 @@ class ReportController < ApplicationController
     if params[:name] == "stock_movement"
       definition_id = Definition.where(:name => "Supervision verification").first.id
       site_id = Site.find_by_name(params[:site_name]).id
-      @drugs = Observation.find(:all,
-        :select => ["value_drug"],
-        :order => ["value_date"],
-        :conditions => ["site_id = ? AND definition_id = ? AND value_date < ?",
-          site_id, definition_id, params[:end_date].to_date]).map(&:value_drug).uniq
+      @drugs = Observation.where("site_id = ? AND definition_id = ? AND value_date < ?",
+                                 [site_id, definition_id, params[:end_date].to_date]).order("value_date").map(&:value_drug).uniq
     end
 
     @drug_map = drug_map
@@ -252,7 +250,6 @@ class ReportController < ApplicationController
     @list = {}
 
     unless @site.blank?
-      month_of_stock_defn = Definition.find_by_name('Month of Stock').id
 
       hiv_unit_drugs = DrugSet.where(:definition_id => Definition.find_by_name("HIV Unit Drugs").id).order("weight asc")
 
@@ -264,10 +261,13 @@ class ReportController < ApplicationController
         disp_rate = Observation.drug_dispensation_rates(drug.drug_id,@site.id)
         disp_rate = (disp_rate.to_f * 0.5).round #rate is an avg of pills dispensed per day. here we convert it to tins per month
         month_of_stock = Observation.calculate_month_of_stock(drug.drug_id, @site.id).to_f
-        puts stock_level
-        @list[Drug.find(drug.drug_id).short_name] = {"month_of_stock" => month_of_stock,"weight" => drug.weight,
-                                                     "stock_level" => stock_level, "consumption_rate" => disp_rate }
+        stocked_out = (disp_rate.to_i != 0 && month_of_stock.to_f.round(3) == 0.00)
 
+        active = (disp_rate.to_i == 0 && stock_level.to_i != 0)? false : true
+        @list[Drug.find(drug.drug_id).short_name] = {"month_of_stock" => month_of_stock,"weight" => drug.weight,
+                                                     "stock_level" => stock_level, "consumption_rate" => disp_rate,
+                                                     "stocked_out" => stocked_out, "active" => active
+                                                    }
       end
     end
 
@@ -339,26 +339,30 @@ class ReportController < ApplicationController
     @stocks = {}
     stocks.each do |drug, data|
 
-      @stocks[drug] = [] unless @stocks.keys.include?(drug)
+      @stocks[drug] = {} unless @stocks.keys.include?(drug)
 
       latestcount = 0
       while n <= params[:end_date].to_date
       
         if !data[n.to_date].blank? && data[n.to_date].to_i > 0
           latestcount = data[n.to_date]
+          @stocks[drug][n.to_date]= {"stock_count" => latestcount}
         else
-          latestcount = latestcount - Observation.dispensed(drug, (n.to_date - 1.days))
+          dispensed = Observation.dispensed(drug, (n.to_date - 1.days))
+          relocated = Observation.relocated(drug, (n.to_date - 1.days))
+          latestcount = latestcount - (dispensed + relocated)
+          @stocks[drug][n.to_date]= {"stock_count" => latestcount, "dispensed" => dispensed, "relocated" => relocated}
         end
-        @stocks[drug] << [n, latestcount] unless n.to_date < start_date.to_date
+
         n = n + 1.day
       end
       n = controlled_bound
     end
-   
+=begin
     @stocks.each{|k, arr|
       @stocks[k] = arr.sort{|a,b|a[0].to_date <=> b[0].to_date}
     }
-
+=end
     puts "#{params[:drug_name]}"
 
     render :text => @stocks[drug].to_json
@@ -387,9 +391,19 @@ class ReportController < ApplicationController
     else
       @site = Site.find_by_name(params[:site_name])
       site_id = @site.id
-      start_date = params[:start_date] || nil
-      @stocks = Observation.day_deliveries(site_id, start_date)
-      render :text => view_context.deliveries(@stocks)
+      if params[:type].blank?
+        start_date = params[:start_date] || nil
+        @stocks = Observation.day_deliveries(site_id, start_date)
+        result = view_context.day_deliveries(@stocks, nil)
+      elsif params[:type] == "duration"
+        @stocks = Observation.deliveries_in_range(site_id, params[:start_date],params[:end_date])
+        result = view_context.day_deliveries(@stocks, params[:type])
+      elsif params[:type] == "delivery_code"
+        @stocks = Observation.deliveries_by_code(site_id, params[:d_code])
+        result = view_context.code_deliveries(@stocks, params[:site_name])
+      end
+
+      render :text => result
     end
 
 
@@ -420,7 +434,7 @@ class ReportController < ApplicationController
     @list = {}
 
     unless @site.blank?
-      month_of_stock_defn = Definition.find_by_name('Month of Stock').id
+
 
       hiv_unit_drugs = DrugSet.where(:definition_id => Definition.find_by_name("HIV Unit Drugs").id).order("weight asc")
 
@@ -432,9 +446,14 @@ class ReportController < ApplicationController
         disp_rate = Observation.drug_dispensation_rates(drug.drug_id,@site.id)
         disp_rate = (disp_rate.to_f * 0.5).round #rate is an avg of pills dispensed per day. here we convert it to tins per month
         month_of_stock = Observation.calculate_month_of_stock(drug.drug_id, @site.id).to_f
-        puts stock_level
+
+        stocked_out = (disp_rate.to_i != 0 && month_of_stock.to_f.round(3) == 0.00)
+
+        active = (disp_rate.to_i == 0 && stock_level.to_i != 0)? false : true
         @list[Drug.find(drug.drug_id).short_name] = {"month_of_stock" => month_of_stock,"weight" => drug.weight,
-                                                     "stock_level" => stock_level, "consumption_rate" => disp_rate }
+                                                     "stock_level" => stock_level, "consumption_rate" => disp_rate,
+                                                     "stocked_out" => stocked_out, "active" => active
+                                                    }
 
       end
     end
@@ -522,9 +541,31 @@ class ReportController < ApplicationController
                                 AND observations.site_id = #{site_id} AND states.state = #{state}
                                 AND observations.definition_id = #{notice_defn}")
 
-
       render :text => view_context.notices_format(notices,params[:state])
     end
 
+  end
+
+  def get_comment
+
+  end
+
+  def update_notice
+
+    state = State.where("state_id = ?", params[:row]).first
+
+    unless state.blank?
+      state.state = Definition.find_by_name(params[:state]).id
+      state.save
+
+      Observation.create({:definition_id => Definition.find_by_name("comment").id,
+                          :value_text => params[:comment],
+                          :creator => User.find_by_username(params[:editor]).id,
+                          :value_numeric => state.id,
+                          :value_date => Date.today,
+                          :site_id => state.observation.site_id
+                         })
+    end
+    render :text => true and return
   end
 end

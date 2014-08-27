@@ -3,10 +3,16 @@
     .td-heading {
         width: 100px;
     }
-
+    textarea.comment{
+       width: 98%;
+       height:70% !important;
+       margin-left: auto;
+       margin-right:auto;
+       resize: none;
+    }
 </style>
 <%=javascript_include_tag "bootstrap-tree/jquery-1.8.2"%>
-
+<script type="text/javascript" src="/javascripts/jquery.validate.min.js"></script>
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span3">
@@ -64,7 +70,6 @@
             </tr>
             <tr>
               <td class="td-heading">
-
                 <input type="submit" class="btn btn-success" value="Submit" onclick="display_report()" style="width: 100%;" />
               </td>
             </tr>
@@ -82,16 +87,50 @@
   </div>
 </div>
 
+<div id="shadow" class="shadowLayer"> </div>
+    <div id="question" class="dialogLayer" style="font-size: 0.9em;overflow: auto;background-color:#e0e0e0;">
+          <div class="modal-header" >
+            <button type="button" class="close" onmousedown="hideLayer()"><span aria-hidden="true" >&times;</span></button>
+            <h2 id="popup_title">Modal title</h2>
+          </div>
+          <div >
+            <div id="comment_container" style="text-align: justify;background-color: #ebebeb;">
+
+            </div>
+            <div id="notice_container" style="text-align: left;">
+                <form method="post" action="update_notice">
+                  New     State <br/>
+                  <select name="new_state" id="new_state"  required="">
+                    <option value="new">New</option>
+                    <option value="investigating">Under Investigation</option>
+                    <option value="resolved">Resolved</option>
+                  </select><br/>
+                  Comment<br/>
+                  <textarea rows="4" name="comment" id="comment" class ="comment" minlength="10"></textarea>
+                  <span id="error_message" style="color: #ff0000;">Please Fill In What You Did</span><br/>
+                  Updated By: <span style="font-weight: bold;"><%= User.current.username %></span>
+                  <hr>
+                  <input type='button' style="float: right;" class="btn btn-success" value="Save changes" onmousedown="saveNewNoticesChanges()" id="save_changes">
+                  <button  class="btn btn-danger" style="float: right;margin-right: 10px;" onmousedown="hideLayer()">Close</button>
+                </form>
+            </div>
+          </div>
+
+
+
+    </div>
+</div>
 <%#=javascript_include_tag "bootstrap-tree/jquery-1.8.2"%>
 <%=javascript_include_tag "bootstrap-tree/bootstrap.min"%>
 <%=javascript_include_tag "bootstrap-tree/bootstrap-tree"%>
+<%=javascript_include_tag "application"%>
 <%= stylesheet_link_tag "bootstrap-tree/bootstrap-tree" %>
 <%= stylesheet_link_tag "data_tables" %>
 <script type="text/javascript" language="javascript" src="/javascripts/DataTables/jquery.dataTables.js"></script>
 
 <script>
 
-
+    var row = "";
     function setSelectedValue(value) {
         label = document.getElementById('selection-label');
         label.innerHTML = value;
@@ -102,8 +141,7 @@
         var site = document.getElementById('selection-label').innerHTML
         var state = document.getElementById("state").value
 
-        //document.getElementById('reporter').innerHTML = "Please wait ....";
-        document.getElementById('reporter').innerHTML = "Loading.......";
+        document.getElementById('reporter').innerHTML = "Loading, please wait.......";
         if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
             xmlhttp=new XMLHttpRequest();
         }else{// code for IE6, IE5
@@ -139,7 +177,7 @@
                 "aaSorting": [[ 1, "asc" ]],
                 'iDisplayLength': 10,
                 "bLengthChange": false,
-                "bPaginate": false,
+                "bPaginate": true,
                 "bFilter": false
             });
 
@@ -147,30 +185,47 @@
     }
     function saveNewNoticesChanges(){
 
-        form_elements =  document.getElementsByClassName("state_option");
-        resolved = [];
-        investigating = [];
-        for(i=0; i<form_elements.length; i++){
-            if (form_elements[i].type == 'radio'){
-                if (form_elements[i].checked){
-                    values = form_elements[i].value.split(/:/);
-                    mark_type = values[0];
-                    obs_id = values[1];
-                    if (mark_type.match(/resolved/i))resolved.push(obs_id);
-                    if (mark_type.match(/investigating/i))investigating.push(obs_id);
+        var comment_text = document.getElementById("comment").value
+        var new_state = document.getElementById("new_state").value
+
+        if (comment_text.trim() == "")
+        {
+            document.getElementById("error_message").style.display = "";
+        }
+        else
+        {
+            jQuery.ajax({
+                type: "POST",
+                url: "update_notice",
+                data: "row=" + row + "&state=" + new_state +"&comment="+comment_text +"&editor=" +'<%= User.current.username %>',
+                success: function(){
+                    hideLayer();
+                    row_element = document.getElementById('row'+row);
+                    row_element.parentNode.removeChild(row_element);
                 }
-            }
+
+            });
+        }
+    }
+        function manageNotice(id){
+            document.getElementById("popup_title").innerHTML = "Manage Notice";
+            document.getElementById("comment_container").style.display = "none";
+            document.getElementById("notice_container").style.display = "";
+            document.getElementById("new_state").value = document.getElementById("state").value;
+            document.getElementById("comment").value = "";
+            document.getElementById("save_changes").style.display = "";
+            document.getElementById("error_message").style.display = "none";
+            row = id;
+            showLayer();
         }
 
-        jQuery.ajax({
-            type: "POST",
-            url: "/administration/save_notice_changes",
-            data: "to_be_resolved=" + resolved + "&to_be_investigated=" + investigating,
-            success: function(){
-                display_report();
-            }
-
-        });
-    }
+        function viewComment(comments){
+            document.getElementById("popup_title").innerHTML = "Notice Comments"
+            document.getElementById("comment_container").style.display = "";
+            document.getElementById("notice_container").style.display = "none";
+            document.getElementById("save_changes").style.display = "none";
+            document.getElementById("comment_container").innerHTML = comments;
+            showLayer();
+        }
 </script>
 
