@@ -21,7 +21,7 @@
     %>
 </script>
 
-<%if params[:name] == "months_of_stock"%>
+
   Site name :  <select id="sites" style="margin-top:1%;  width: <%= (@stocks.blank? ? "25%" : "50%")%>;" name="site_name"
             onchange="switch_site(this.value)">
   <option value="">[ - Select site - ]</option>
@@ -29,18 +29,8 @@
           <option><%= site %></option>
       <% end %>
     </select>
-<%else%>
-    <select id="sites" style="margin-left: 3%; width: <%= (@stocks.blank? ? "25%" : "50%")%>;" name="site_name"
-            onchange="loadSiteChart(this.value)">
-      <% (@drugs || []).each do |dg| %>
-          <option value="<%= dg%>"><%= @d_map[dg] %></option>
-      <% end %>
-    </select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: lightblue; font-size: 16px;"><%=  params[:start_date].to_date.strftime("%d-%b-%Y") %></span>
-    <span style="color: rosybrown; font-size: 14px"> To </span>
-    <span style="color: lightblue; font-size: 16px;"><%=   params[:end_date].to_date.strftime("%d-%b- %Y") rescue ("") %></span>
-<%end%>
 
-<iframe id="chart" style="background-color:#f5f5f5;width: 95%;height:90vh;border: none;border-radius: 15px; margin-right: auto; margin-left: auto;"></iframe>
+<iframe id="chart" style="background-color:#f5f5f5;width: 98%;height:80vh;border: 1px solid #000000;border-radius: 15px;margin-left:1%;"></iframe>
 
 <script type="text/javascript">
     <!--
