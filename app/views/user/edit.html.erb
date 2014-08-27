@@ -38,7 +38,7 @@
         <tr id="<%= user.id%>" class='<%= cycle("even gradeC", "odd gradeX") %>'>
            <td><%= user.username %></td>
            <td><%= user.user_role.role.role rescue " " %></td>
-          <td><%= user.updated_at.to_date %></td>
+          <td><%= user.updated_at.to_date.strftime('%d %B %Y') %></td>
           <td style="text-align: center;">
             <img onmousedown="delete_user(<%= user.id%>)" class="icon" src="/images/close.png" alt="view">
           </td>
