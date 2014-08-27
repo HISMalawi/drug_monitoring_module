@@ -339,26 +339,30 @@ class ReportController < ApplicationController
     @stocks = {}
     stocks.each do |drug, data|
 
-      @stocks[drug] = [] unless @stocks.keys.include?(drug)
+      @stocks[drug] = {} unless @stocks.keys.include?(drug)
 
       latestcount = 0
       while n <= params[:end_date].to_date
       
         if !data[n.to_date].blank? && data[n.to_date].to_i > 0
           latestcount = data[n.to_date]
+          @stocks[drug][n.to_date]= {"stock_count" => latestcount}
         else
-          latestcount = latestcount - Observation.dispensed(drug, (n.to_date - 1.days))
+          dispensed = Observation.dispensed(drug, (n.to_date - 1.days))
+          relocated = Observation.relocated(drug, (n.to_date - 1.days))
+          latestcount = latestcount - (dispensed + relocated)
+          @stocks[drug][n.to_date]= {"stock_count" => latestcount, "dispensed" => dispensed, "relocated" => relocated}
         end
-        @stocks[drug] << [n, latestcount] unless n.to_date < start_date.to_date
+
         n = n + 1.day
       end
       n = controlled_bound
     end
-   
+=begin
     @stocks.each{|k, arr|
       @stocks[k] = arr.sort{|a,b|a[0].to_date <=> b[0].to_date}
     }
-
+=end
     puts "#{params[:drug_name]}"
 
     render :text => @stocks[drug].to_json
