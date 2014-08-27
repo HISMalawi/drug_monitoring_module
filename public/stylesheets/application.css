@@ -34,6 +34,15 @@ label.error {
     padding-left: 22px;
     float: right;
 }
+
+label.success {
+    color: green;
+    background: url("/images/valid.png") no-repeat 0px 0px;
+    padding-left: 22px;
+    float: right;
+    height: 25px;
+}
+
 .shadowLayer
 {
     display:none;

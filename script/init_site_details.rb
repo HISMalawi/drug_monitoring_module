@@ -7,8 +7,8 @@ $relocation_id = Definition.where(:name => "relocation").first.id
 $drug_given_to_id = Definition.where(:name => "People who received drugs").first.id
 $drug_prescribed_id = Definition.where(:name => "People prescribed drug").first.id
 
-def get_dates(site_name)
-  site = Site.where(:'name' => site_name).first
+def get_dates(site)
+
   return if site.blank?
   last_pulled = PullTracker.where(:'site_id' => site.id).first
 
@@ -24,30 +24,29 @@ end
  
 def start
 
-  sites = YAML.load_file("#{Rails.root.to_s}/config/sites.yml")
-  (sites || []).each do |key, value|
-    dates = get_dates(key)
+  sites = Site.all
+  (sites || []).each do |site|
+    dates = get_dates(site)
     next if dates.blank?
     (dates.sort || []).each do |date|
       #puts "Getting Data For Site #{key}, Date: #{date.strftime('%A, %d %B %Y')}"
-      unless value.blank?
+      unless site.ip_address.blank?
 
-        url = "http://#{value}/drug/art_summary_dispensation?date=#{date}"
+        url = "http://#{site.ip_address}:#{site.port}/drug/art_summary_dispensation?date=#{date}"
         data = JSON.parse(RestClient::Request.execute(:method => :post, :url => url, :timeout => 100000000)) rescue (
-          puts "**** Error when pulling data from site #{key}"
+          puts "**** Error when pulling data from site #{site.name}"
          break
         )
-        site = Site.where(:name => key).first_or_create
         record(site,date ,data)
       end
-      record_pulled_datetime(key, date)
+      record_pulled_datetime(site, date)
     end
   end
 
 end
 
-def record_pulled_datetime(site_name, date)
-  site = Site.where(:'name' => site_name).first
+def record_pulled_datetime(site, date)
+
   pulled_time = PullTracker.where(:'site_id' => site.id).first
   
   if pulled_time.blank?
@@ -56,7 +55,7 @@ def record_pulled_datetime(site_name, date)
   end
   pulled_time.pulled_datetime = ("#{date.to_date} #{Time.now().strftime('%H:%M:%S')}")
   pulled_time.save
-  puts "Recorded for :#{site_name}, Date: #{pulled_time.pulled_datetime}"
+  puts "Recorded for :#{site.name}, Date: #{pulled_time.pulled_datetime}"
 end
 
 def record(site, date,data)

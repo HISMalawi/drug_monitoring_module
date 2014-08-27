@@ -17,7 +17,7 @@ def start
 
       url = "http://#{site.ip_address}:#{site.port}/drug/art_summary_dispensation?date=#{date}"
       data = JSON.parse(RestClient::Request.execute(:method => :post, :url => url, :timeout => 100000000)) rescue (
-        puts "**** Error when pulling data from site #{key}"
+        puts "**** Error when pulling data from site #{site.name}"
         next
       )
       record(site,date ,data)
