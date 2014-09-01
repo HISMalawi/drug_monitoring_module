@@ -141,13 +141,13 @@
                 .attr("fill", "green")
                 .style("font-size", "24px")
                 .text("Site Notices")
-                .attr("x", 25);
+                .attr("x", 10);
 
         tsvg.append("rect")
                 .style("stroke", "green")
                 .style("stroke-width", "1px")
                 .style("fill", "none")
-                .attr("width", 230)
+                .attr("width", 200)
                 .attr("height", 55)
                 .attr("x", -95)
                 .attr("y", -15);
@@ -489,7 +489,9 @@
         }
     }
 
-     timerHnd = setTimeout("ajaxTasks()", pollInterval);
+    setInterval(function() {
+        window.location.reload();
+    }, 300000);
 
     /*
      d3.json("data.json")

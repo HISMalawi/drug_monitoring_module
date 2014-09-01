@@ -30,7 +30,7 @@
                 spacingLeft: 10,
                 spacingRight: 10,
                 // Explicitly tell the width and height of a chart
-                height: (window.innerHeight - 70)
+                height: (window.innerHeight - 20)
 
             },
             title: {
@@ -149,12 +149,12 @@
         <% end %>
 
 
-        return [{name: 'Month(s) of stock', showInLegend: true, data: correctedWeights, pointWidth: 20}];
+        return [{name: 'Month(s) of stock', showInLegend: false, data: correctedWeights, pointWidth: 20}];
     }
 
 </script>
 
 
-<div id="container" style="width: 100%;margin-right: auto; margin-left: auto;margin-bottom: 10vh;">
+<div id="container" style="width: 100%;margin-right: auto; margin-left: auto;">
 
 </div>
