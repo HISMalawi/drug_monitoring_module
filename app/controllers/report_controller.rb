@@ -248,6 +248,9 @@ class ReportController < ApplicationController
 
     @site = Site.find_by_name(params[:site_name])
     @list = {}
+    @unitQty = (params[:qty] || preferred_units.scan(/\d+/)[0]).to_i rescue 60
+    @unitQty =  60 if @unitQty == 0
+    @unitQty = @unitQty.to_f
 
     unless @site.blank?
 
@@ -257,9 +260,9 @@ class ReportController < ApplicationController
       (hiv_unit_drugs || []).each do |drug|
 
         stock_level = Observation.calculate_stock_level(drug.drug_id,@site.id)
-        stock_level = stock_level / 60 # stock level comes in pills/day here we convert it to tins/month
+        stock_level = (stock_level / @unitQty).round # stock level comes in pills/day here we convert it to tins/month
         disp_rate = Observation.drug_dispensation_rates(drug.drug_id,@site.id)
-        disp_rate = (disp_rate.to_f * 0.5).round #rate is an avg of pills dispensed per day. here we convert it to tins per month
+        disp_rate = ((disp_rate.to_f * 0.5) * 60.0/@unitQty).round #rate is an avg of pills dispensed per day. here we convert it to tins per month
         month_of_stock = Observation.calculate_month_of_stock(drug.drug_id, @site.id).to_f
         stocked_out = (disp_rate.to_i != 0 && month_of_stock.to_f.round(3) == 0.00)
 
@@ -384,6 +387,10 @@ class ReportController < ApplicationController
 
   def delivery_report
 
+    @unitQty = (params[:unitQty] || preferred_units.scan(/\d+/)[0]).to_i rescue 60
+    @unitQty =  60 if @unitQty == 0
+    @unitQty = @unitQty.to_f
+
     if request.get?
       @tree = {}
       @tree["Available Sites"] = Site.all.collect{|x| x.name}
@@ -393,13 +400,13 @@ class ReportController < ApplicationController
       site_id = @site.id
       if params[:type].blank?
         start_date = params[:start_date] || nil
-        @stocks = Observation.day_deliveries(site_id, start_date)
+        @stocks = Observation.day_deliveries(site_id, start_date, @unitQty)
         result = view_context.day_deliveries(@stocks, nil)
       elsif params[:type] == "duration"
-        @stocks = Observation.deliveries_in_range(site_id, params[:start_date],params[:end_date])
+        @stocks = Observation.deliveries_in_range(site_id, params[:start_date],params[:end_date], @unitQty)
         result = view_context.day_deliveries(@stocks, params[:type])
       elsif params[:type] == "delivery_code"
-        @stocks = Observation.deliveries_by_code(site_id, params[:d_code])
+        @stocks = Observation.deliveries_by_code(site_id, params[:d_code], @unitQty)
         result = view_context.code_deliveries(@stocks, params[:site_name])
       end
 
@@ -568,4 +575,10 @@ class ReportController < ApplicationController
     end
     render :text => true and return
   end
+
+  def update_display_units
+    preferred_units(params[:units])
+    render :text => "ok"
+  end
+
 end

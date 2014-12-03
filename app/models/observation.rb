@@ -183,26 +183,26 @@ class Observation < ActiveRecord::Base
     return result
   end
 
-  def self.dispensed(drug_name, date)
+  def self.dispensed(drug_name, date, unitQty=60)
 
     definition_id = Definition.find_by_name("Dispensation").id
     d = Observation.find(:last,
       :select => ["value_numeric"],
       :conditions => ["definition_id = ? AND value_drug = ? AND value_date = ?",
         definition_id, drug_name, date]).value_numeric.to_i rescue 0
-    puts (d/60).to_yaml if (d/60) > 0
-    return (d/60)
+
+    return (d/unitQty.to_f).round
   end
 
-  def self.relocated(drug_name, date)
+  def self.relocated(drug_name, date, unitQty = 60)
 
     definition_id = Definition.find_by_name("Relocation").id
     d = Observation.find(:last,
                          :select => ["value_numeric"],
                          :conditions => ["definition_id = ? AND value_drug = ? AND value_date = ?",
                                          definition_id, drug_name, date]).value_numeric.to_i rescue 0
-    puts (d/60).to_yaml if (d/60) > 0
-    return (d/60)
+
+    return (d/unitQty.to_f).round
   end
 
   def self.deliveries(site_id = 1, start_date = Date.today, end_date = Date.today, delivery_code = nil)
@@ -413,7 +413,7 @@ class Observation < ActiveRecord::Base
 
   end
 
-  def self.calculate_month_of_stock(drug, site_id)
+  def self.calculate_month_of_stock(drug, site_id, unitQty = 60)
 
     stock_level = Observation.calculate_stock_level(drug, site_id).to_i
 
@@ -423,9 +423,9 @@ class Observation < ActiveRecord::Base
       return "Unknown"
 
     else
-      consumption_rate = (dispensation_rate.to_f * 0.5)
+      consumption_rate = (dispensation_rate.to_f * 0.5) * (60.0/unitQty.to_f).round
 
-      expected = (stock_level/ 60)
+      expected = (stock_level/ unitQty.to_f).round
 
       month_of_stock = (expected/ consumption_rate)
 
@@ -465,7 +465,7 @@ class Observation < ActiveRecord::Base
     end
   end
 
-  def self.day_deliveries(site_id = 1, date = Date.today)
+  def self.day_deliveries(site_id = 1, date = Date.today, unitQty=60)
     #This function gets the deliveries to a site on a particular day
     definition_id = Definition.find_by_name("New Delivery").id
     results = {}
@@ -478,13 +478,13 @@ class Observation < ActiveRecord::Base
       (result || []).each do |record|
 
         results[Drug.find(record.value_drug).short_name] = [] if results[Drug.find(record.value_drug).short_name].blank?
-        results[Drug.find(record.value_drug).short_name] <<  {"value" => (record.value.to_i/60).round, "code" => record.code}
+        results[Drug.find(record.value_drug).short_name] <<  {"value" => (record.value.to_i/unitQty.to_f).round, "code" => record.code}
       end
 
     return results
   end
 
-  def self.deliveries_by_code(site_id, code)
+  def self.deliveries_by_code(site_id, code, unitQty=60)
       #This function gets deliveries based on the delivery code
     definition_id = Definition.find_by_name("New Delivery").id
     results = []
@@ -495,14 +495,14 @@ class Observation < ActiveRecord::Base
                                     GROUP BY value_drug, value_date")
 
     (result || []).each do |record|
-      results <<  {"value" => (record.value.to_i/60).round, "date" => record.date, "drug" => Drug.find(record.value_drug).short_name}
+      results <<  {"value" => (record.value.to_i/unitQty.to_f).round, "date" => record.date, "drug" => Drug.find(record.value_drug).short_name}
     end
 
     return results
   end
 
 
-  def self.deliveries_in_range(site_id = 1, start_date = Date.today, end_date = Date.today)
+  def self.deliveries_in_range(site_id = 1, start_date = Date.today, end_date = Date.today, unitQty=60)
     #This function gets the deliveries to a site within a given range
     definition_id = Definition.find_by_name("New Delivery").id
     results = {}
@@ -516,7 +516,7 @@ class Observation < ActiveRecord::Base
     (result || []).each do |record|
 
       results[Drug.find(record.value_drug).short_name] = [] if results[Drug.find(record.value_drug).short_name].blank?
-      results[Drug.find(record.value_drug).short_name] <<  {"value" => (record.value.to_i/60).round, "code" => record.code,
+      results[Drug.find(record.value_drug).short_name] <<  {"value" => (record.value.to_i/unitQty.to_f).round, "code" => record.code,
                                                             "date" => record.date}
     end
 
