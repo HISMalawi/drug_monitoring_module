@@ -12,6 +12,7 @@
 
     <script type="text/javascript">
 
+
     function plotGraph(drug) {
 
         $(function () {
@@ -30,15 +31,21 @@
                 title: {
                     text: 'Stock Movement Report For ' +drug
                 },
+                yAxis: {
+                  min: 0
+                },
                 tooltip: {
                     shared: true,
                     useHTML: true,
                     valueSuffix: ' ',
                     formatter: function() {
+                        var unit = document.getElementById("qty").value;
+
+                        var labl = (unit == 1) ? " pills " : (" tins of " + unit);
 
                         main_text = '<span  style= "font-weight: bold; font-size : 10px;">' +
                                 'Date:  &nbsp&nbsp&nbsp&nbsp<span style="color: #097054; " >' + Highcharts.dateFormat('%A, %e %B %Y', this.x) + '</span> <br />' +
-                                'Stock Level:  &nbsp&nbsp&nbsp<span style="color: #097054; " >' + this.y + '</span> <br />'
+                                'Stock Level:  &nbsp&nbsp&nbsp<span style="color: #097054; " >' + this.y + labl + '</span> <br />'
                         if (results[Highcharts.dateFormat('%Y-%m-%d', this.x)]["dispensed"] == null)
                         {
                             return '<span style="color: #ff0000;" >Supervision Visit </span><br/>' +main_text
@@ -46,9 +53,9 @@
                         else
                         {
                             return main_text + 'Dispensed:  &nbsp&nbsp&nbsp&nbsp<span style="color: #097054; " >' +
-                                    results[Highcharts.dateFormat('%Y-%m-%d', this.x)]["dispensed"] + '</span> <br />' +
+                                    results[Highcharts.dateFormat('%Y-%m-%d', this.x)]["dispensed"] + labl + '</span> <br />' +
                                     'Relocated:  &nbsp&nbsp&nbsp&nbsp<span style="color: #097054; " >' +
-                                    results[Highcharts.dateFormat('%Y-%m-%d', this.x)]["relocated"] + '</span> <br />'
+                                    results[Highcharts.dateFormat('%Y-%m-%d', this.x)]["relocated"] + labl + '</span> <br />'
                         }
 
 

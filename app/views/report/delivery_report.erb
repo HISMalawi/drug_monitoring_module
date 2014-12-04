@@ -232,7 +232,21 @@
         jQuery.ajax({
             url: "update_display_units?units=" + value,
             success: function(result){
-                display_report(true);
+                var site = document.getElementById('selection-label').innerHTML;
+                var validInput = ["selected_date", "end_date", "delivery_code"];
+
+                var complete = true;
+                for (var i in validInput){
+                    var check = document.getElementById(validInput[i])
+                    if ((site.length == 0) || (jQuery(check).is(":visible") &&
+                            check.value.length == 0)){
+                        complete = false;
+                        break;
+                    }
+                }
+                if (complete) {
+                    display_report(true);
+                }
             }
         })
     }

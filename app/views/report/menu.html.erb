@@ -51,8 +51,6 @@
                           <tr>
                             <td class="td-heading"><label>Drug:</label></td>
                             <td><label id="selection-label" style="font-weight: bold;"></label></td>
-                          </tr>
-                          <tr>
                             <td class="td-heading">Select site</td>
                             <%sites = []
                               Site.all.map do |s|
@@ -62,22 +60,37 @@
                             <td>
                               <select id="sitename" name="sitename" class="form-control" placeholder="Region" required=""  >
                                 <option value="">[ - Select site - ]</option>
-                                  <% (sites || []).each do |site, id| %>
+                                <% (sites || []).each do |site, id| %>
                                     <option value="<%= id%>"><%= site %></option>
-                                  <% end %>
+                                <% end %>
                               </select>
                             </td>
-                          </tr>
-                          <tr>
-                            <td class="td-heading">Start date</td><td><input type="text" id="start_date" required="" /></td>
-                          </tr>
-                          <tr>
-                            <td class="td-heading">End date</td><td><input type="text" id="end_date" required="" /></td>
-                          </tr>
-                          <tr>
                             <td class="td-heading">
                               <input type="submit" class="btn btn-success" value="Submit" onclick="display_report()" style="width: 100%;" />
                             </td>
+                          </tr>
+
+                          <tr>
+                            <td class="td-heading">Display Units:</td>
+                                            <td style>
+                                <span class="spacing">
+                                    <select id = "qty" style="width: 95px;height:28px;border-radius: 2.5px; margin-top: 8px;" type="select"
+                                            name="pack-size" value="text" onchange="switchUnits(this.value)">
+                                      <option value="1">Pills</option>
+                                      <option value="30">Tins of 30</option>
+                                      <option value="60" selected="true">Tins of 60</option>
+                                      <option value="90">Tins of 90</option>
+                                      <option value="120">Tins of 120</option>
+                                    </select>
+                                </span>
+                            </td>
+
+                            <td class="td-heading">Start date</td><td><input type="text" id="start_date" required="" /></td>
+                          </tr>
+                          <tr>
+                            <td class="td-heading"></td><td></td>
+
+                            <td class="td-heading">End date</td><td><input type="text" id="end_date" required="" /></td>
                           </tr>
                         </table>
 
@@ -101,6 +114,30 @@
 <link rel="stylesheet" href="/stylesheets/default.css" type="text/css">
 
 <script>
+
+function switchUnits(value) {
+
+    jQuery.ajax({
+        url: "update_display_units?units=" + value,
+        success: function(result){
+            var site = document.getElementById('selection-label').innerHTML;
+            var validInput = ["start_date", "end_date", "sitename"];
+
+            var complete = true;
+            for (var i in validInput){
+                var check = document.getElementById(validInput[i])
+                if ((site.length == 0) || (jQuery(check).is(":visible") &&
+                        check.value.length == 0)){
+                    complete = false;
+                    break;
+                }
+            }
+            if (complete) {
+                display_report(true);
+            }
+        }
+    })
+}
 function setSelectedValue(value) {
   label = document.getElementById('selection-label');
   label.innerHTML = value;
@@ -115,11 +152,11 @@ setTimeout(display_picker, 2);
 
 function display_report(){
 
-
     var site = document.getElementById('sitename').value
     var start_date = document.getElementById("start_date").value
     var end_date = document.getElementById('end_date').value
     var drug = document.getElementById('selection-label').innerHTML
+    var qty = document.getElementById('qty').value
 
     document.getElementById('wait').innerHTML = "Loading chart. Please wait ......";
     document.getElementById("container-chart").style.display = 'none';
@@ -148,11 +185,9 @@ function display_report(){
             }
         }
     }
-    xmlhttp.open("GET",'/report/stock_movement?site_id=' + site + "&start_date="+ start_date + "&end_date="+end_date + "&drug="+ drug ,true);
+    xmlhttp.open("GET",'/report/stock_movement?site_id=' + site + "&start_date="+
+            start_date + "&end_date="+end_date + "&drug="+ drug + "&qty=" + qty ,true);
     xmlhttp.send();
-
-
-
 }
 </script>
 

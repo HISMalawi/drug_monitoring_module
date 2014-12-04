@@ -7,7 +7,17 @@
     }
 
 </style>
+<script>
+    function switchUnits(value) {
 
+        jQuery.ajax({
+            url: "update_display_units?units=" + value,
+            success: function(result){
+                display_report(true);
+            }
+        })
+    }
+ </script>
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span3">
@@ -52,8 +62,6 @@
             <tr>
               <td class="td-heading"><label>Drug:</label></td>
               <td><label id="selection-label" style="font-weight: bold;"></label></td>
-            </tr>
-            <tr>
               <td class="td-heading">Select site</td>
               <%sites = []
                 Site.all.map do |s|
@@ -68,15 +76,27 @@
                   <% end %>
                 </select>
               </td>
-            </tr>
-            <tr>
-              <td class="td-heading">Select date</td><td><input type="text" id="start_date" required="" /></td>
-            </tr>
-            <tr>
               <td class="td-heading">
                 <input type="submit" class="btn btn-success" value="Submit" onclick="display_report()" style="width: 100%;" />
               </td>
             </tr>
+            <tr>
+              <td class="td-heading">Display Units:</td>
+              <td style>
+                <span class="spacing">
+                    <select id = "qty" style="width: 95px;height:28px;border-radius: 2.5px; margin-top: 8px;" type="select"
+                            name="pack-size" value="text" onchange="switchUnits(this.value)">
+                      <option value="1">Pills</option>
+                      <option value="30">Tins of 30</option>
+                      <option value="60" selected="true">Tins of 60</option>
+                      <option value="90">Tins of 90</option>
+                      <option value="120">Tins of 120</option>
+                    </select>
+                </span>
+              </td>
+              <td class="td-heading">Select date</td><td><input type="text" id="start_date" required="" /></td>
+            </tr>
+
           </table>
 
           <!-- content ends -->
@@ -96,6 +116,7 @@
 <link rel="stylesheet" href="/stylesheets/default.css" type="text/css">
 
 <script>
+
     function display_picker(e){
 
         $('#start_date').Zebra_DatePicker({format: "d-M-Y", offset: [-220, (jQuery('#start_date').position().top * 1.4)]});
@@ -109,11 +130,10 @@
     }
     function display_report(){
 
-
         var site = document.getElementById('sitename').value
+        var qty = document.getElementById('qty').value;
         var report_date = document.getElementById("start_date").value
         var drug = document.getElementById('selection-label').innerHTML
-
 
         //document.getElementById('reporter').innerHTML = "Please wait ....";
 
@@ -137,11 +157,8 @@
                 }
             }
         }
-        xmlhttp.open("POST",'/report/physical_stock_summary?site_id=' + site + "&report_date="+ report_date + "&drug="+ drug ,true);
+        xmlhttp.open("POST",'/report/physical_stock_summary?site_id=' + site + "&report_date="+ report_date + "&drug="+ drug + "&qty=" + qty ,true);
         xmlhttp.send();
-
-
-
     }
 </script>
 

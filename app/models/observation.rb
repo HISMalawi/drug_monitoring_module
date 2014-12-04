@@ -405,7 +405,7 @@ class Observation < ActiveRecord::Base
 
     if stock_level < 0
       d = Drug.find(drug).short_name
-      notice = "Site has negative stock level for #{d}. Verify with site for accurate values"
+      notice = "negative stock for #{d}"
       Observation.create_notification(site_id,obs.date, notice, drug)
     end
 
@@ -430,10 +430,10 @@ class Observation < ActiveRecord::Base
       month_of_stock = (expected/ consumption_rate)
 
       if month_of_stock <= 2.0
-        notice = "#{Drug.find(drug).short_name} stock is running low. Please ensure site is listed for new stock delivery"
+        notice = "#{Drug.find(drug).short_name} stock running low"
         Observation.create_notification(site_id,Date.today,notice,drug)
       elsif month_of_stock >= 7.0
-        notice = "#{Site.find(site_id).name} has excess #{Drug.find(drug).short_name} stock. Consider relocating some stock"
+        notice = "#{Site.find(site_id).name} has excess #{Drug.find(drug).short_name} stock"
         Observation.create_notification(site_id,Date.today,notice,drug)
       end
 

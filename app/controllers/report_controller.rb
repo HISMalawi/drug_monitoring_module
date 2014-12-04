@@ -311,6 +311,10 @@ class ReportController < ApplicationController
 
   def stock_movement
 
+    @unitQty = (params[:qty] || preferred_units.scan(/\d+/)[0]).to_i rescue 60
+    @unitQty =  60 if @unitQty == 0
+    @unitQty = @unitQty.to_f
+
     start_date = params[:start_date].to_date
     end_date = params[:end_date].to_date
 
@@ -333,7 +337,7 @@ class ReportController < ApplicationController
     data.each do |data|
     
       stocks[data.value_drug] = {} unless stocks.keys.include?(data.value_drug)
-      value = data.value_numeric/60 rescue 0
+      value = (data.value_numeric/@unitQty).round rescue 0
       
       stocks[data.value_drug][data.value_date.to_date] = value
     end
@@ -351,8 +355,8 @@ class ReportController < ApplicationController
           latestcount = data[n.to_date]
           @stocks[drug][n.to_date]= {"stock_count" => latestcount}
         else
-          dispensed = Observation.dispensed(drug, (n.to_date - 1.days))
-          relocated = Observation.relocated(drug, (n.to_date - 1.days))
+          dispensed = Observation.dispensed(drug, (n.to_date - 1.days), @unitQty)
+          relocated = Observation.relocated(drug, (n.to_date - 1.days), @unitQty)
           latestcount = latestcount - (dispensed + relocated)
           @stocks[drug][n.to_date]= {"stock_count" => latestcount, "dispensed" => dispensed, "relocated" => relocated}
         end
@@ -512,6 +516,10 @@ class ReportController < ApplicationController
   end
 
   def physical_stock_summary
+
+    @unitQty = (params[:qty] || preferred_units.scan(/\d+/)[0]).to_i rescue 60
+    @unitQty =  60 if @unitQty == 0
+    @unitQty = @unitQty.to_f
 
     if request.get?
       @tree = {}
