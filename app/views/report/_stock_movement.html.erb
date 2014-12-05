@@ -21,6 +21,9 @@
             results = JSON.parse(results);
 
             // Create the chart
+            var unit = document.getElementById("qty").value;
+
+            var labl = (unit == 1) ? " pills " : (" tins of " + unit);
             $('#container-chart').highcharts('StockChart', {
 
                 rangeSelector: {
@@ -32,7 +35,8 @@
                     text: 'Stock Movement Report For ' +drug
                 },
                 yAxis: {
-                  min: 0
+                    min: 0,
+                    title: { text: labl }
                 },
                 tooltip: {
                     shared: true,
@@ -63,10 +67,31 @@
                 },
                 series: [
                     {
+                        id: drug,
                         name: drug,
                         data: dataG(),
                         negativeColor: 'red',
                         step: true
+                    },
+
+                    {
+                        type: 'flags',
+                        name: 'Stock fluctuations1',
+                        data: deliveryFlags(),
+                        onSeries: drug,
+                        shape: 'flag',
+                        y: -30,
+                        fillColor : Highcharts.getOptions().colors[0]
+                    },
+
+                    {
+                        type: 'flags',
+                        name: 'Stock fluctuations2',
+                        data: relocationFlags(),
+                        onSeries: drug,
+                        shape: 'flag',
+                        y: -50,
+                        fillColor : Highcharts.getOptions().colors[3]
                     }
                 ],
                 exporting: { enabled: false },
@@ -75,6 +100,32 @@
 
         });
     }
+
+    function deliveryFlags(){
+        var data = [];
+        results = document.getElementById('results').value;
+        results = JSON.parse(results);
+        results = results["delivery_dates"];
+        for (var i in results){
+            var date = new Date(dates[i])
+            data.push({x: Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()), title: "D"})
+        }
+        return data;
+    }
+
+    function relocationFlags(){
+        var data = [];
+        results = document.getElementById('results').value;
+        results = JSON.parse(results);
+        results = results["relocation_dates"];
+        for (var i in results){
+            var date = new Date(dates[i])
+            data.push({x: Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()), title: "L"})
+        }
+        console.log(data)
+        return data;
+    }
+
     function dataG() {
         results = document.getElementById('results').value;
         results = JSON.parse(results);

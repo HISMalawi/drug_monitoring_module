@@ -332,7 +332,16 @@ class ReportController < ApplicationController
     data = Observation.where("value_drug = ? and site_id = ?  and definition_id = ? and value_date BETWEEN ? AND ?",
                              drug,site_id,definition_id, controlled_bound,end_date).select("value_drug, value_numeric, value_date").order("value_date")
 
-    
+    delivery_flags =  Observation.where("value_drug = ? and site_id = ?  and definition_id IN (?) and value_date BETWEEN ? AND ? AND value_numeric > 0",
+                                        drug, site_id, Definition.where(:name => "New Delivery").first.id,
+                                        controlled_bound,end_date).select("value_date").order("value_date"
+    ).map(&:value_date)
+
+    relocation_flags = Observation.where("value_drug = ? and site_id = ?  and definition_id IN (?) and value_date BETWEEN ? AND ? AND value_numeric > 0",
+                                       drug, site_id, Definition.where(:name => "Relocation").first.id,
+                                       controlled_bound,end_date).select("value_date").order("value_date"
+    ).map(&:value_date)
+
     @drugs = data.map(&:value_drug).uniq
     data.each do |data|
     
@@ -342,23 +351,24 @@ class ReportController < ApplicationController
       stocks[data.value_drug][data.value_date.to_date] = value
     end
 
-    n = controlled_bound
     @stocks = {}
-    stocks.each do |drug, data|
+    n = controlled_bound
 
-      @stocks[drug] = {} unless @stocks.keys.include?(drug)
+    stocks.each do |drg, data|
+     # next if drug.present? and drg != drug
+      @stocks[drg] = {} unless @stocks.keys.include?(drg)
 
       latestcount = 0
       while n <= params[:end_date].to_date
       
         if !data[n.to_date].blank? && data[n.to_date].to_i > 0
           latestcount = data[n.to_date]
-          @stocks[drug][n.to_date]= {"stock_count" => latestcount}
+          @stocks[drg][n.to_date]= {"stock_count" => latestcount}
         else
-          dispensed = Observation.dispensed(drug, (n.to_date - 1.days), @unitQty)
-          relocated = Observation.relocated(drug, (n.to_date - 1.days), @unitQty)
+          dispensed = Observation.dispensed(drg, (n.to_date - 1.days), @unitQty)
+          relocated = Observation.relocated(drg, (n.to_date - 1.days), @unitQty)
           latestcount = latestcount - (dispensed + relocated)
-          @stocks[drug][n.to_date]= {"stock_count" => latestcount, "dispensed" => dispensed, "relocated" => relocated}
+          @stocks[drg][n.to_date]= {"stock_count" => latestcount, "dispensed" => dispensed, "relocated" => relocated}
         end
 
         n = n + 1.day
@@ -371,6 +381,9 @@ class ReportController < ApplicationController
     }
 =end
     puts "#{params[:drug_name]}"
+
+    @stocks[drug]["relocation_dates"] = relocation_flags
+    @stocks[drug]["delivery_dates"] = delivery_flags
 
     render :text => @stocks[drug].to_json
   end
