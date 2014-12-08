@@ -332,8 +332,13 @@ class ReportController < ApplicationController
     data = Observation.where("value_drug = ? and site_id = ?  and definition_id = ? and value_date BETWEEN ? AND ?",
                              drug,site_id,definition_id, controlled_bound,end_date).select("value_drug, value_numeric, value_date").order("value_date")
 
+    supervision_flags =  Observation.where("value_drug = ? and site_id = ?  and definition_id IN (?) and value_date BETWEEN ? AND ? AND value_numeric > 0",
+                                        drug, site_id, Definition.where(:name => "Supervision Verification").first.id,
+                                        controlled_bound,end_date).select("value_date").order("value_date"
+    ).map(&:value_date)
+
     delivery_flags =  Observation.where("value_drug = ? and site_id = ?  and definition_id IN (?) and value_date BETWEEN ? AND ? AND value_numeric > 0",
-                                        drug, site_id, Definition.where(:name => "New Delivery").first.id,
+                                        drug, site_id, Definition.where(:name => "New delivery").first.id,
                                         controlled_bound,end_date).select("value_date").order("value_date"
     ).map(&:value_date)
 
@@ -384,6 +389,7 @@ class ReportController < ApplicationController
 
     @stocks[drug]["relocation_dates"] = relocation_flags
     @stocks[drug]["delivery_dates"] = delivery_flags
+    @stocks[drug]["supervision_dates"] = supervision_flags
 
     render :text => @stocks[drug].to_json
   end

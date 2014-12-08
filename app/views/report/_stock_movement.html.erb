@@ -35,7 +35,7 @@
                     text: 'Stock Movement Report For ' +drug
                 },
                 yAxis: {
-                    min: 0,
+
                     title: { text: labl }
                 },
                 tooltip: {
@@ -87,6 +87,16 @@
                     {
                         type: 'flags',
                         name: 'Stock fluctuations2',
+                        data: supervisionFlags(),
+                        onSeries: drug,
+                        shape: 'flag',
+                        y: -40,
+                        fillColor : Highcharts.getOptions().colors[0]
+                    },
+
+                    {
+                        type: 'flags',
+                        name: 'Stock fluctuations3',
                         data: relocationFlags(),
                         onSeries: drug,
                         shape: 'flag',
@@ -103,27 +113,47 @@
 
     function deliveryFlags(){
         var data = [];
-        results = document.getElementById('results').value;
-        results = JSON.parse(results);
-        results = results["delivery_dates"];
-        for (var i in results){
+        var r  = document.getElementById('results').value;
+        r = JSON.parse(r);
+
+        var dates = r["delivery_dates"];
+
+        for (var i in dates){
             var date = new Date(dates[i])
-            data.push({x: Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()), title: "D"})
+
+            data.push({x: Date.UTC(date.getFullYear(), (date.getMonth()), date.getDate()), title: "D"})
         }
+
         return data;
     }
 
-    function relocationFlags(){
-        var data = [];
-        results = document.getElementById('results').value;
-        results = JSON.parse(results);
-        results = results["relocation_dates"];
-        for (var i in results){
-            var date = new Date(dates[i])
-            data.push({x: Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()), title: "L"})
+    function supervisionFlags(){
+        var data3 = [];
+        var r  = document.getElementById('results').value;
+        r = JSON.parse(r);
+
+        var dates3 = r["supervision_dates"];
+
+        for (var i in dates3){
+            var date = new Date(dates3[i])
+
+            data3.push({x: Date.UTC(date.getFullYear(), (date.getMonth()), date.getDate()), title: "S"})
         }
-        console.log(data)
-        return data;
+
+        return data3;
+    }
+
+    function relocationFlags(){
+        var data2 = [];
+        var r2 = document.getElementById('results').value;
+        r2 = JSON.parse(r2);
+        var dates2 = r2["relocation_dates"];
+        for (var i in dates2){
+            var date = new Date(dates2[i]);
+            data2.push({x: Date.UTC(date.getFullYear(), (date.getMonth()), (date.getDate()) + 1), title: "L"})
+        }
+
+        return data2;
     }
 
     function dataG() {
