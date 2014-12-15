@@ -115,11 +115,14 @@
                             ((parseInt(this.y) == 0) ? '' :  parseInt(this.y) + (parseInt(this.y) == 1 ? ' month ': ' months ')) +
                             parseInt((this.y*30 % 30)) + ( parseInt((this.y*30 % 30)) == 1 ? " day" :  " days");
 
+                    var qty = "<%= @unitQty%>";
+                    var unit = (parseInt(qty) == 1) ? "Pills" : ("Tins of " + parseInt(qty));
+
                     return '<span  style= "font-weight: bold; font-size : 10px;">' +
                             'Drug Name:  &nbsp&nbsp&nbsp&nbsp<span style="color: #097054; " >' + this.x + '</span> <br />' +
                             'Months of stock:  &nbsp&nbsp&nbsp<span style="color: #097054; " >' + stock_level_string + '</span> <br />' +
-                            'Stock level:  &nbsp&nbsp&nbsp<span style="color: #097054; ">' + data_list[this.x]['stock_level'] + ' tins</span><br />' +
-                            'Consumption rate:  &nbsp&nbsp&nbsp<span style="color: #097054; ">' + data_list[this.x]['consumption_rate'] + ' tins/month</span> </span>';
+                            'Stock level:  &nbsp&nbsp&nbsp<span style="color: #097054; ">' + data_list[this.x]['stock_level'] + " " + unit + ' </span><br />' +
+                            'Consumption rate:  &nbsp&nbsp&nbsp<span style="color: #097054; ">' + data_list[this.x]['consumption_rate'] + " " + unit +'/month</span> </span>';
                 }
             },
             plotOptions: {

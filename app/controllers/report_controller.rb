@@ -248,6 +248,9 @@ class ReportController < ApplicationController
 
     @site = Site.find_by_name(params[:site_name])
     @list = {}
+    @unitQty = (params[:qty] || preferred_units.scan(/\d+/)[0]).to_i rescue 60
+    @unitQty =  60 if @unitQty == 0
+    @unitQty = @unitQty.to_f
 
     unless @site.blank?
 
@@ -257,9 +260,9 @@ class ReportController < ApplicationController
       (hiv_unit_drugs || []).each do |drug|
 
         stock_level = Observation.calculate_stock_level(drug.drug_id,@site.id)
-        stock_level = stock_level / 60 # stock level comes in pills/day here we convert it to tins/month
+        stock_level = (stock_level / @unitQty).round # stock level comes in pills/day here we convert it to tins/month
         disp_rate = Observation.drug_dispensation_rates(drug.drug_id,@site.id)
-        disp_rate = (disp_rate.to_f * 0.5).round #rate is an avg of pills dispensed per day. here we convert it to tins per month
+        disp_rate = ((disp_rate.to_f * 0.5) * 60.0/@unitQty).round #rate is an avg of pills dispensed per day. here we convert it to tins per month
         month_of_stock = Observation.calculate_month_of_stock(drug.drug_id, @site.id).to_f
         stocked_out = (disp_rate.to_i != 0 && month_of_stock.to_f.round(3) == 0.00)
 
@@ -308,6 +311,10 @@ class ReportController < ApplicationController
 
   def stock_movement
 
+    @unitQty = (params[:qty] || preferred_units.scan(/\d+/)[0]).to_i rescue 60
+    @unitQty =  60 if @unitQty == 0
+    @unitQty = @unitQty.to_f
+
     start_date = params[:start_date].to_date
     end_date = params[:end_date].to_date
 
@@ -325,33 +332,48 @@ class ReportController < ApplicationController
     data = Observation.where("value_drug = ? and site_id = ?  and definition_id = ? and value_date BETWEEN ? AND ?",
                              drug,site_id,definition_id, controlled_bound,end_date).select("value_drug, value_numeric, value_date").order("value_date")
 
-    
+    supervision_flags =  Observation.where("value_drug = ? and site_id = ?  and definition_id IN (?) and value_date BETWEEN ? AND ? AND value_numeric > 0",
+                                        drug, site_id, Definition.where(:name => "Supervision Verification").first.id,
+                                        controlled_bound,end_date).select("value_date").order("value_date"
+    ).map(&:value_date)
+
+    delivery_flags =  Observation.where("value_drug = ? and site_id = ?  and definition_id IN (?) and value_date BETWEEN ? AND ? AND value_numeric > 0",
+                                        drug, site_id, Definition.where(:name => "New delivery").first.id,
+                                        controlled_bound,end_date).select("value_date").order("value_date"
+    ).map(&:value_date)
+
+    relocation_flags = Observation.where("value_drug = ? and site_id = ?  and definition_id IN (?) and value_date BETWEEN ? AND ? AND value_numeric > 0",
+                                       drug, site_id, Definition.where(:name => "Relocation").first.id,
+                                       controlled_bound,end_date).select("value_date").order("value_date"
+    ).map(&:value_date)
+
     @drugs = data.map(&:value_drug).uniq
     data.each do |data|
     
       stocks[data.value_drug] = {} unless stocks.keys.include?(data.value_drug)
-      value = data.value_numeric/60 rescue 0
+      value = (data.value_numeric/@unitQty).round rescue 0
       
       stocks[data.value_drug][data.value_date.to_date] = value
     end
 
-    n = controlled_bound
     @stocks = {}
-    stocks.each do |drug, data|
+    n = controlled_bound
 
-      @stocks[drug] = {} unless @stocks.keys.include?(drug)
+    stocks.each do |drg, data|
+     # next if drug.present? and drg != drug
+      @stocks[drg] = {} unless @stocks.keys.include?(drg)
 
       latestcount = 0
       while n <= params[:end_date].to_date
       
         if !data[n.to_date].blank? && data[n.to_date].to_i > 0
           latestcount = data[n.to_date]
-          @stocks[drug][n.to_date]= {"stock_count" => latestcount}
+          @stocks[drg][n.to_date]= {"stock_count" => latestcount}
         else
-          dispensed = Observation.dispensed(drug, (n.to_date - 1.days))
-          relocated = Observation.relocated(drug, (n.to_date - 1.days))
+          dispensed = Observation.dispensed(drg, (n.to_date - 1.days), @unitQty)
+          relocated = Observation.relocated(drg, (n.to_date - 1.days), @unitQty)
           latestcount = latestcount - (dispensed + relocated)
-          @stocks[drug][n.to_date]= {"stock_count" => latestcount, "dispensed" => dispensed, "relocated" => relocated}
+          @stocks[drg][n.to_date]= {"stock_count" => latestcount, "dispensed" => dispensed, "relocated" => relocated}
         end
 
         n = n + 1.day
@@ -364,6 +386,10 @@ class ReportController < ApplicationController
     }
 =end
     puts "#{params[:drug_name]}"
+
+    @stocks[drug]["relocation_dates"] = relocation_flags
+    @stocks[drug]["delivery_dates"] = delivery_flags
+    @stocks[drug]["supervision_dates"] = supervision_flags
 
     render :text => @stocks[drug].to_json
   end
@@ -384,6 +410,10 @@ class ReportController < ApplicationController
 
   def delivery_report
 
+    @unitQty = (params[:unitQty] || preferred_units.scan(/\d+/)[0]).to_i rescue 60
+    @unitQty =  60 if @unitQty == 0
+    @unitQty = @unitQty.to_f
+
     if request.get?
       @tree = {}
       @tree["Available Sites"] = Site.all.collect{|x| x.name}
@@ -393,13 +423,13 @@ class ReportController < ApplicationController
       site_id = @site.id
       if params[:type].blank?
         start_date = params[:start_date] || nil
-        @stocks = Observation.day_deliveries(site_id, start_date)
+        @stocks = Observation.day_deliveries(site_id, start_date, @unitQty)
         result = view_context.day_deliveries(@stocks, nil)
       elsif params[:type] == "duration"
-        @stocks = Observation.deliveries_in_range(site_id, params[:start_date],params[:end_date])
+        @stocks = Observation.deliveries_in_range(site_id, params[:start_date],params[:end_date], @unitQty)
         result = view_context.day_deliveries(@stocks, params[:type])
       elsif params[:type] == "delivery_code"
-        @stocks = Observation.deliveries_by_code(site_id, params[:d_code])
+        @stocks = Observation.deliveries_by_code(site_id, params[:d_code], @unitQty)
         result = view_context.code_deliveries(@stocks, params[:site_name])
       end
 
@@ -506,6 +536,10 @@ class ReportController < ApplicationController
 
   def physical_stock_summary
 
+    @unitQty = (params[:qty] || preferred_units.scan(/\d+/)[0]).to_i rescue 60
+    @unitQty =  60 if @unitQty == 0
+    @unitQty = @unitQty.to_f
+
     if request.get?
       @tree = {}
       @tree["Drug categories"] = {}
@@ -568,4 +602,10 @@ class ReportController < ApplicationController
     end
     render :text => true and return
   end
+
+  def update_display_units
+    preferred_units(params[:units])
+    render :text => "ok"
+  end
+
 end

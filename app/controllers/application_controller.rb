@@ -14,4 +14,14 @@ class ApplicationController < ActionController::Base
       User.current = User.find(session[:user_id])
     end
   end
+
+  def preferred_units(unit = nil)
+    return session[:display_units] if unit.blank?
+
+    if  [30, 60, 90, 120].include?(unit.to_i)
+      session[:display_units] = "Tins of #{unit}" if unit.present?
+    else
+      session[:display_units] = "pills" if unit.present?
+    end
+  end
 end

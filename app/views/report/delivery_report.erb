@@ -3,11 +3,12 @@
     .td-heading {
         width: 100px;
     }
-    span.spacing{
+
+    span.spacing {
         margin-left: 10px;
     }
 </style>
-<%=javascript_include_tag "bootstrap-tree/jquery-1.8.2"%>
+<%= javascript_include_tag "bootstrap-tree/jquery-1.8.2" %>
 <script type="text/javascript" src="/javascripts/zebra_datepicker.js"></script>
 <link rel="stylesheet" href="/stylesheets/default.css" type="text/css">
 
@@ -16,46 +17,53 @@
     <div class="span3">
       <div class="well">
         <ul class="tree">
-          <%(@tree || {}).sort_by{|k , v| k }.each do |cat, values|%>
+          <% (@tree || {}).sort_by { |k, v| k }.each do |cat, values| %>
               <li>
-                <%unless values.blank?%>
-                    <a href="#" role="branch" class="tree-toggle closed" data-toggle="branch" data-value="Bootstrap_Tree"><%=cat%></a>
-                <%else%>
-                    <li><a href="#" onclick="javascript:setSelectedValue('<%=cat%>');" class="tree-toggle" role="branch"><%=cat%></a></li>
-                <%end%>
+                <% unless values.blank? %>
+                    <a href="#" role="branch" class="tree-toggle closed" data-toggle="branch" data-value="Bootstrap_Tree"><%= cat %></a>
+                <% else %>
+                    <li>
+                      <a href="#" onclick="javascript:setSelectedValue('<%=cat%>');" class="tree-toggle" role="branch"><%= cat %></a>
+                    </li>
+                <% end %>
                 <ul class="branch">
-                  <%(values || {}).sort_by{|k , v| k }.each do |child_name, child_values|%>
-                      <%unless child_values.blank?%>
-                          <a href="#" role="branch" class="tree-toggle closed" data-toggle="branch" data-value="Bootstrap_Tree"><%=child_name%></a>
-                      <%else%>
-                          <li><a href="#" onclick="javascript:setSelectedValue('<%=child_name%>');" class="tree-toggle"><%=child_name%></a></li>
-                      <%end%>
-                      <%unless child_values.blank?%>
+                  <% (values || {}).sort_by { |k, v| k }.each do |child_name, child_values| %>
+                      <% unless child_values.blank? %>
+                          <a href="#" role="branch" class="tree-toggle closed" data-toggle="branch" data-value="Bootstrap_Tree"><%= child_name %></a>
+                      <% else %>
+                          <li>
+                            <a href="#" onclick="javascript:setSelectedValue('<%=child_name%>');" class="tree-toggle"><%= child_name %></a>
+                          </li>
+                      <% end %>
+                      <% unless child_values.blank? %>
                           <ul class="branch">
-                            <%(child_values || []).each do | c |%>
-                                <li><a href="#" role="leaf" onclick="javascript:setSelectedValue('<%= c %>');"><%= c %></a></li>
-                            <%end%>
+                            <% (child_values || []).each do |c| %>
+                                <li>
+                                  <a href="#" role="leaf" onclick="javascript:setSelectedValue('<%= c %>');"><%= c %></a>
+                                </li>
+                            <% end %>
                           </ul>
-                      <%end%>
-                  <%end%>
-          <%end%>
+                      <% end %>
+                  <% end %>
+          <% end %>
           </ul>
         </ul>
 
-      </div><!--/well-->
-    </div><!--/span-->
+      </div>
+      <!--/well-->
+    </div>
+    <!--/span-->
     <div class="span9" id="mainContent">
       <div class="row-fluid">
         <div class="well span13" id="editorArea">
           <!-- content -->
           <h3>Report:&nbsp;Delivery Report</h3>
-          <br />
-          <table style="width: 99%;">
+          <br/>
+          <table style="width: 99%;margin-top: -10px;">
+
             <tr>
               <td class="td-heading"><label>Site:</label></td>
-              <td><label id="selection-label" style="font-weight: bold;"></label></td>
-            </tr>
-            <tr>
+              <td><label id="selection-label" style="font-weight: bold;min-width: 60px;"></label></td>
               <td class="td-heading">Duration Type:</td>
               <td>
                 <input type="radio" name="duration" value="duration" onmousedown="manage_type(this.value)"
@@ -64,28 +72,46 @@
                     <input type="radio" name="duration" value="date" onmousedown="manage_type(this.value)"
                            id="date">Date
                 </span>
-                <span class="spacing">
+
+                <span id ="dcode" class="spacing">
                   <input type="radio" name="duration" value="delivery code"
                          onmousedown="manage_type(this.value)" id="d_code">Delivery Code
                 </span>
               </td>
+              <td class="td-heading">
+                <input type="submit" class="btn btn-success" value="Submit" onclick="display_report()" style="width: 100%;"/>
+              </td>
             </tr>
             <tr id="start_date_row">
-              <td class="td-heading"><label id="date">Select Date:</label></td>
-              <td><input id="selected_date" type="text" placeholder="Select Date" /></td>
+              <td class="td-heading">Display Units:</td>
+              <td style>
+                <span class="spacing">
+                    <select id = "qty" style="width: 95px;height:28px;border-radius: 2.5px; margin-top: 8px;" type="select"
+                            name="pack-size" value="text" onchange="switchUnits(this.value)">
+                      <option value="1">Pills</option>
+                      <option value="30">Tins of 30</option>
+                      <option value="60" selected="true">Tins of 60</option>
+                      <option value="90">Tins of 90</option>
+                      <option value="120">Tins of 120</option>
+                    </select>
+                </span>
+              </td>
+
+              <td id = "startL" class="td-heading"><label id="dateLabel">Select Date:</label></td>
+              <td id = "startI" ><input id="selected_date" type="text" placeholder="Select Date"/></td>
+
+              <td  style="display: none" id = "dcodeL" class="td-heading"><label>Delivery Code:</label></td>
+              <td style="display: none" id = "dcodeI" ><input id="delivery_code" type="text" placeholder="Enter delivery code"/></td>
+
             </tr>
-            <tr id="end_date_row" >
+            <tr id="end_date_row">
+              <td><label style="font-weight: bold;"></label></td>
+              <td><label style="font-weight: bold;"></label></td>
               <td class="td-heading"><label>End Date:</label></td>
               <td><input id="end_date" type="text" placeholder="Select Date"/></td>
             </tr>
-            <tr id="dcode_row" style="display:none">
-              <td class="td-heading"><label>Delivery Code:</label></td>
-              <td><input id="delivery_code" type="text" placeholder="Enter delivery code"/></td>
-            </tr>
             <tr>
-              <td class="td-heading">
-                <input type="submit" class="btn btn-success" value="Submit" onclick="display_report()" style="width: 100%;" />
-              </td>
+
             </tr>
           </table>
 
@@ -94,7 +120,7 @@
       </div>
       <div class="well span13" id="reporter" style="margin-left: 0% !important;margin-bottom: 5%;">
 
-            <table id="records"></table>
+        <table id="records"></table>
 
       </div>
     </div>
@@ -102,8 +128,8 @@
 </div>
 
 <%#=javascript_include_tag "bootstrap-tree/jquery-1.8.2"%>
-<%=javascript_include_tag "bootstrap-tree/bootstrap.min"%>
-<%=javascript_include_tag "bootstrap-tree/bootstrap-tree"%>
+<%= javascript_include_tag "bootstrap-tree/bootstrap.min" %>
+<%= javascript_include_tag "bootstrap-tree/bootstrap-tree" %>
 <%= stylesheet_link_tag "bootstrap-tree/bootstrap-tree" %>
 <%= stylesheet_link_tag "data_tables" %>
 <script type="text/javascript" language="javascript" src="/javascripts/DataTables/jquery.dataTables.js"></script>
@@ -111,10 +137,10 @@
 <script>
 
 
-    function display_picker(e){
+    function display_picker(e) {
 
-       $('#selected_date').Zebra_DatePicker({format: "d-M-Y", offset: [-220, (jQuery('#selected_date').position().top * 1.7)]});
-       $('#end_date').Zebra_DatePicker({format: "d-M-Y", offset: [-220, (jQuery('#end_date').position().top * 1.4)]});
+        $('#selected_date').Zebra_DatePicker({format: "d-M-Y", offset: [-220, (jQuery('#selected_date').position().top * 1.7)]});
+        $('#end_date').Zebra_DatePicker({format: "d-M-Y", offset: [-220, (jQuery('#end_date').position().top * 1.4)]});
     }
     setTimeout(display_picker, 2);
 
@@ -122,96 +148,143 @@
         label = document.getElementById('selection-label');
         label.innerHTML = value;
     }
-    function display_report(){
+    function display_report(ajaxified) {
 
-        var url = ""
-        var site = document.getElementById('selection-label').innerHTML
-        if (document.getElementById("duration").checked)
-        {
+        var url = "";
+        var site = document.getElementById('selection-label').innerHTML;
+        var qty = document.getElementById('qty').value;
+
+        if (!ajaxified && site.length  == 0){
+            document.getElementById('reporter').innerHTML =
+                    "<span style='color: red; font-size: 16px;'>No site selected</span>";
+            return;
+        }else{
+            //document.getElementById('reporter').innerHTML = "";
+        }
+
+        if (ajaxified && site.length > 0)
+            document.getElementById('reporter').innerHTML =
+                    "<span>Reloading ...</span>";
+
+        if (document.getElementById("duration").checked) {
             var start_date = document.getElementById("selected_date").value
             var end_date = document.getElementById("end_date").value
-            url = '/report/delivery_report?site_name=' + site + "&start_date="+ start_date +"&end_date="+end_date+
-                    "&type=duration"
+            url = '/report/delivery_report?site_name=' + site + "&start_date=" + start_date + "&end_date=" + end_date +
+                    "&type=duration&unitQty=" + qty;
         }
-        else if (document.getElementById("d_code").checked)
-        {
+        else if (document.getElementById("d_code").checked) {
             var d_code = document.getElementById("delivery_code").value
-            url = '/report/delivery_report?site_name=' + site +"&d_code="+ d_code +"&type=delivery_code"
+            url = '/report/delivery_report?site_name=' + site + "&d_code=" + d_code + "&type=delivery_code&unitQty=" + qty;
         }
-        else
-        {
-            var start_date = document.getElementById("selected_date").value
-            url = '/report/delivery_report?site_name=' + site + "&start_date="+ start_date
+        else {
+            var start_date = document.getElementById("selected_date").value;
+            url = '/report/delivery_report?site_name=' + site + "&start_date=" + start_date + "&unitQty=" + qty;
         }
 
 
         //document.getElementById('reporter').innerHTML = "Please wait ....";
         document.getElementById('reporter').innerHTML = "Loading.......";
         if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
-            xmlhttp=new XMLHttpRequest();
-        }else{// code for IE6, IE5
-            xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+            xmlhttp = new XMLHttpRequest();
+        } else {// code for IE6, IE5
+            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
         }
-        xmlhttp.onreadystatechange=function() {
-            if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+        xmlhttp.onreadystatechange = function () {
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
                 var results = xmlhttp.responseText;
-                if(results == 'undefined' || results == '' || results == '"not validate"') {
+                if (results == 'undefined' || results == '' || results == '"not validate"') {
                     document.getElementById('reporter').innerHTML = "....";
                     return;
-                }else if(results.length > 0){
+                } else if (results.length > 0) {
                     draw_table(results)
-                }else{
+                } else {
                     document.getElementById('reporter').innerHTML = "No Deliveries Were Made On This Day";
                     return;
                 }
             }
         }
-        xmlhttp.open("POST",url,true);
+        xmlhttp.open("POST", url, true);
         xmlhttp.send();
-
 
 
     }
 
-    function draw_table(results){
+    function draw_table(results) {
         document.getElementById('reporter').innerHTML = results;
 
-        if (results != "No Deliveries Were Made On This Day")
-        {
+        if (results != "No Deliveries Were Made On This Day") {
             $('#records').dataTable({
                 'iDisplayLength': 20,
                 "bLengthChange": false,
                 "bPaginate": false,
                 "bFilter": false,
                 "bSort": true,
-                "order": [[ 0, "desc" ]]
+                "order": [
+                    [ 0, "desc" ]
+                ]
             });
 
         }
     }
 
-    function manage_type(value){
+    function switchUnits(value) {
 
-        switch (value){
+        jQuery.ajax({
+            url: "update_display_units?units=" + value,
+            success: function(result){
+                var site = document.getElementById('selection-label').innerHTML;
+                var validInput = ["selected_date", "end_date", "delivery_code"];
+
+                var complete = true;
+                for (var i in validInput){
+                    var check = document.getElementById(validInput[i])
+                    if ((site.length == 0) || (jQuery(check).is(":visible") &&
+                            check.value.length == 0)){
+                        complete = false;
+                        break;
+                    }
+                }
+                if (complete) {
+                    display_report(true);
+                }
+            }
+        })
+    }
+    function manage_type(value) {
+
+        switch (value) {
             case "delivery code":
-                document.getElementById("start_date_row").style.display = "none";
+                document.getElementById("dcodeL").style.display = "table-cell";
+                document.getElementById("dcodeI").style.display = "table-cell";
+                document.getElementById("startL").style.display = "none";
+                document.getElementById("startI").style.display = "none";
                 document.getElementById("end_date_row").style.display = "none";
-                document.getElementById("dcode_row").style.display = "";
                 break;
             case "duration":
-                document.getElementById("start_date_row").style.display = "";
-                document.getElementById("end_date_row").style.display = "";
-                document.getElementById("dcode_row").style.display = "none";
-                document.getElementById("date").innerHTML = "Start Date"
+                document.getElementById("dcodeL").style.display = "none";
+                document.getElementById("dcodeI").style.display = "none";
+                document.getElementById("startL").style.display = "table-cell";
+                document.getElementById("startI").style.display = "table-cell";
+                document.getElementById("end_date_row").style.display = "table-row";
+                document.getElementById("dateLabel").innerHTML = "Start Date"
+                break;
+            case "date":
+                document.getElementById("dcodeL").style.display = "none";
+                document.getElementById("dcodeI").style.display = "none";
+                document.getElementById("startL").style.display = "table-cell";
+                document.getElementById("startI").style.display = "table-cell";
+                document.getElementById("dateLabel").innerHTML = "Select Date"
+                document.getElementById("end_date_row").style.display = "none";
                 break;
             default:
-                document.getElementById("start_date_row").style.display = "";
-                document.getElementById("end_date_row").style.display = "none";
-                document.getElementById("dcode_row").style.display = "none";
-                document.getElementById("date").innerHTML = "Select Date"
+                document.getElementById("dcodeL").style.display = "none";
+                document.getElementById("dcodeI").style.display = "none";
+                document.getElementById("startL").style.display = "table-cell";
+                document.getElementById("startI").style.display = "table-cell";
+                document.getElementById("date").innerHTML = "Start Date"
+                document.getElementById("end_date_row").style.display = "table-row";
+                break;
+            }
         }
-
-
-    }
 </script>
 

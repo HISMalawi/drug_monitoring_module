@@ -65,6 +65,7 @@ DrugMonitoringProgram::Application.routes.draw do
   get "report/months_of_stock_main"
   get "report/stock_movement"
   get "report/delivery_report"
+  get "report/update_display_units"
   post "report/delivery_report"
   get "report/physical_stock_summary"
   get "report/notices"
