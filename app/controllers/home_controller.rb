@@ -322,6 +322,11 @@ class HomeController < ApplicationController
     end
     render :layout => false
   end
+
+ def dashboard
+  @sites = Site.all
+  render :layout => false
+ end
 end
 
 

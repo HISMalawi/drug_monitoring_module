@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+  <base target="_parent"/>
+  <style>
+      body {
+          overflow: hidden;
+          margin: 0px;
+      }
+
+      .table {
+          display: table;
+      }
+
+      .row {
+          display: table-row;
+      }
+
+      .cell {
+          display: table-cell;
+      }
+
+      .contents {
+          margin: 5px 5px 30px 5px;
+          bottom: 0px;
+      }
+
+
+  </style>
+  <script type="text/javascript">
+      window.switch = function (site)
+      {
+
+          window.frames['main-display'].contentDocument.getElementById(sites[current_pos]).style.fill= "red"
+          window.frames['main-display'].contentDocument.getElementById(sites[sites.indexOf(site)]).style.fill= "green"
+          current_pos = sites.indexOf(site)
+          __$("report-display").setAttribute("src", "/report/months_of_stock_main?site="+ site);
+      }
+
+
+      function resizeIframe(id){
+
+          var frame = document.getElementById(id);
+          frame.height = frame.contentWindow.document.body.scrollHeight + "px";
+          frame.width = frame.contentWindow.document.body.scrollWidth + "px";
+      }
+  </script>
+</head>
+<body onresize="resizeTable()" onload="switchViews()">
+
+<div id="main" class="table" style="width: 99%; height: 83vh; border: 0px solid #000; top: 20px; position: absolute;">
+  <div class="row">
+    <div style="text-align: center;background-color: #f5f5f5;border: 1px solid rgba(0, 0, 0, 0.05);border-radius: 4px;padding-left: 50px;" >
+      <iframe id="main-display" onload="resizeIframe(this.id)" style=" height: 95vh;width: 100%; border: none; overflow: auto;" src="/home/map_main"></iframe>
+    </div>
+    <div class="cell" style="vertical-align: top;width: 65%;">
+      <iframe id="report-display" style="width: 100%;border: none; height: 95vh;overflow: auto;" ></iframe>
+    </div>
+  </div>
+</div>
+
+<script>
+    <!--
+
+    var sites = []
+    var current_pos = 0;
+    var timerHnd;
+
+    var timerSpacing = 40;
+
+
+    <% (@sites || []).each do |site| %>
+    sites.push('<%= site.name.downcase %>')
+    <% end %>
+
+    function __$(id){
+        return document.getElementById(id);
+    }
+
+
+    function switchViews(){
+        clearTimeout(timerHnd);
+
+        //window.frames['main-display'].contentDocument.getElementById(sites[current_pos].toLowerCase()).style.fill= "red"
+
+        if ((current_pos + 1) >= sites.length)
+        {
+            current_pos = 0;
+        }
+        else
+        {
+            current_pos += 1;
+        }
+
+        //window.frames['main-display'].contentDocument.getElementById(sites[current_pos].toLowerCase()).style.fill= "green"
+
+        __$("report-display").setAttribute("src", "/report/months_of_stock_main?site="+ sites[current_pos]);
+        timerHnd = setTimeout("switchViews()", timerSpacing * 1000);
+    }
+
+    function resizeTable(){
+        __$("main").style.height = "83vh";
+
+        __$("main-display").style.height = "85vh";
+
+        __$("report-display").style.height = "90vh";
+
+        __$("main-display").style.width = "100%";
+
+        __$("report-display").style.width = "100%";
+    }
+
+    timerHnd = setTimeout("switchViews()", timerSpacing * 1000);
+
+    //-->
+</script>
+
+</body>
+</html>

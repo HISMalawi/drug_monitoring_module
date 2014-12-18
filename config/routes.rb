@@ -73,11 +73,13 @@ DrugMonitoringProgram::Application.routes.draw do
   post "report/physical_stock_summary"
   post "report/update_notice"
   match 'report/:id' => 'report#menu', :as => :report
-
+  match '/months_of_stock_main' => "report#months_of_stock_main"
   ################### HOME ##############################
 
   match '/home' => "home#index"
+  match '/map_main' => "home#map_main"
   get "home/index"
+  get '/dashboard' => "home#dashboard"
   get "home/notices"
   get "home/map_main"
   get "home/overstock"
