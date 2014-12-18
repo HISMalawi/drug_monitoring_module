@@ -96,6 +96,7 @@
         //window.frames['main-display'].contentDocument.getElementById(sites[current_pos].toLowerCase()).style.fill= "green"
 
         __$("report-display").setAttribute("src", "/report/months_of_stock_main?site="+ sites[current_pos]);
+        resizeTable()
         timerHnd = setTimeout("switchViews()", timerSpacing * 1000);
     }
 
