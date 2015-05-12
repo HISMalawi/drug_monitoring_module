@@ -27,3 +27,13 @@ database.yml.example in the config folder.
 	rake db:create db:migrate db:seed
 
 
+Updating Site Data
+
+The National ART Stock Monitoring dashboard gets its data from the various 
+sites that it is connected to. To ensure that this data is colected on a 
+daily basis, a script must be run to pull the data. Set a cron-job to run 
+the script and pull the data.
+
+The cron-job should run the script as follows:
+
+	rails runner script/init_site_details.rb

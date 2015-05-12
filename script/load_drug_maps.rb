@@ -1,4 +1,4 @@
-
+require 'csv'
 def load_drug_map
 
   unknown = Definition.where(:name => "Unknown").first.id
@@ -17,8 +17,7 @@ def load_drug_map
 
   csv_url = "#{Rails.root}/db/drug_mapping.csv"
 
-  FasterCSV.foreach("#{csv_url}", :quote_char => '"',
-                    :col_sep =>',', :row_sep =>:auto, :headers=> :first_row) do |drug_map|
+  CSV.foreach("#{csv_url}", {:col_sep =>',', headers:true}) do |drug_map|
 
     drug_map = Drug.where(:full_name => drug_map[0], :short_name => drug_map[1], :category => type[drug_map[2]]).first_or_create
   end
