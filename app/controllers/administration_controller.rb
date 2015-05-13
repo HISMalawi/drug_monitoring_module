@@ -8,7 +8,7 @@ class AdministrationController < ApplicationController
     sites = YAML.load_file("#{Rails.root}/config/sites.yml")
     @sites = {}
     (sites || []).each do |name, value|
-       @sites[name] = {"address" => value.split(":")[0],"port" => value.split(":")[1]}  unless value.blank?
+      @sites[name] = {"address" => value.split(":")[0],"port" => value.split(":")[1]}  unless value.blank?
     end
   end
   def edit_site
@@ -24,20 +24,20 @@ class AdministrationController < ApplicationController
   end
 
   def save_site
-
     unless params.blank? || !request.post?
       if params[:old_site].blank?
-
-        site = Site.create({:name => params[:sitename], :x => params[:x],
-                            :y => params[:y], :region => params[:region],
-                            :ip_address => params[:ip_address], :port => params[:port]})
+        site = Site.find_by_name(params[:sitename])
+        site.update_attributes({
+            :name => params[:sitename],
+            :ip_address => params[:ip_address],
+            :port => params[:port],
+            :active => true
+          }
+        )
 
       elsif
         site = Site.find(:first, :conditions => ["name = ? ", params[:old_site]])
         site.name = params[:sitename]
-        site.x = params[:x]
-        site.y = params[:y]
-        site.region = params[:region]
         site.ip_address = params[:ip_address]
         site.port = params[:port]
         site.threshold = params[:threshold]
@@ -54,12 +54,12 @@ class AdministrationController < ApplicationController
     @region = "blank" if @region.blank?
 
     case @region.to_s.downcase
-      when "centre"
-        @label = "Central Region"
-      when "north"
-        @label = "Northern Region"
-      when "south"
-        @label = "Southern Region"
+    when "centre"
+      @label = "Central Region"
+    when "north"
+      @label = "Northern Region"
+    when "south"
+      @label = "Southern Region"
     end
 
     @x = nil

@@ -146,23 +146,61 @@
       var timerHnd;
 
 
-      var loader = d3.xml("/images/mw.svg", function(xml) {
-        document.getElementById("main").appendChild(xml.documentElement);
+      var refPoints = [-9.331537, -17.158189, 32.674051, 35.969950];
+      var offsets = [10, 295, 10, 710];
+      var limits = [305, 720];
+      var previous;
 
-        var svg = d3.select("#region")
-        .style("margin", "auto");
+      function __$(id) {
+        return document.getElementById(id);
+      }
 
-        loadSites();
+      function latLon2Coord(lat, lon) {
 
-        resizeSVG();
+        var x, y;
 
-        // loadProgress();
+        x = ((offsets[1] - offsets[0]) * ((Math.abs(lon) - Math.abs(refPoints[2])) / (Math.abs(refPoints[3]) - Math.abs(refPoints[2])))) // + offsets[0];
 
-        // loadSites();
-      });
+        y = ((offsets[3] - offsets[2]) * ((Math.abs(lat) - Math.abs(refPoints[0])) / (Math.abs(refPoints[1]) - Math.abs(refPoints[0])))) // + offsets[2];
 
+        return [x, y]
 
+      }
 
+      function loadSites() {
+        for (var s in sites){
+          x = sites[s].x;
+          y = sites[s].y;
+          var result = latLon2Coord(y, x)
+          var colors = ["rgba(255,0,0,0.9)", "rgba(0,200,0,0.9)", "rgba(0,0,200,0.9)"];
+
+          var pos = Math.round((Math.random() * 10)) % 3;
+
+          insertSite(result[0], result[1], colors[pos], 'site');
+        }
+      }
+  
+      function insertSite(x, y, color, id) {
+        var doc = __$("map").contentDocument;
+
+        var mw = doc.getElementById("malawi");
+
+        var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+
+        circle.setAttribute("cx", x);
+
+        circle.setAttribute("cy", y);
+
+        circle.setAttribute("r", 2);
+
+        circle.setAttribute("id", id);
+
+        circle.setAttribute("fill", color);
+
+        circle.setAttribute("stroke", "black");
+
+        mw.appendChild(circle);
+      }
       function resize() {
         c_map = document.getElementById('c_map')
         if (c_map) {
@@ -170,42 +208,43 @@
         }
       }
 
-      function insertSite() {
-        var doc = document.getElementById("map").contentDocument;
+      /*function insertSite() {
+    var doc = document.getElementById("map").contentDocument;
 
-        var mw = doc.getElementById("malawi");
+    var mw = doc.getElementById("malawi");
 
-        for(var i = 0; i < sites.length; i++){
-          if(sites[i]["x"] != null && sites[i]["y"] != null){
-            if(sites[i]["region"].toLowerCase() == "centre"){
-              x = Math.round(sites[i]["x"]);
-              y = Math.round(sites[i]["y"]) + 373;
-            }
-            if(sites[i]["region"].toLowerCase() == "north"){
-              x = Math.round(sites[i]["x"]) + 39
-              y = Math.round(sites[i]["y"])
-            }
-
-            if(sites[i]["region"].toLowerCase() == "south"){
-
-              xs = Math.round(sites[i]["x"]) + 212
-              ys = Math.round(sites[i]["y"]) + 552
-
-            }
-            id = 'test'
-            var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-            circle.setAttribute("cx", x);
-            circle.setAttribute("cy", y);
-            circle.setAttribute("r", 10);
-            circle.setAttribute("id", id);
-            circle.setAttribute("fill", "red");
-            circle.setAttribute("stroke", "black");
-            mw.appendChild(circle);
-          }
+    for(var i = 0; i < sites.length; i++){
+      if(sites[i]["x"] != null && sites[i]["y"] != null){
+        if(sites[i]["region"].toLowerCase() == "centre"){
+          x = Math.round(sites[i]["x"]);
+          y = Math.round(sites[i]["y"]) + 373;
         }
-      }
+        if(sites[i]["region"].toLowerCase() == "north"){
+          x = Math.round(sites[i]["x"]) + 39
+          y = Math.round(sites[i]["y"])
+        }
 
-      function loadSites(){
+        if(sites[i]["region"].toLowerCase() == "south"){
+
+          xs = Math.round(sites[i]["x"]) + 212
+          ys = Math.round(sites[i]["y"]) + 552
+
+        }
+        id = 'test'
+        var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle.setAttribute("cx", x);
+        circle.setAttribute("cy", y);
+        circle.setAttribute("r", 10);
+        circle.setAttribute("id", id);
+        circle.setAttribute("fill", "red");
+        circle.setAttribute("stroke", "black");
+        mw.appendChild(circle);
+      }
+    }
+  }*/
+
+
+      /*function loadSites(){
 
         d3.selectAll("rect.site").remove();
 
@@ -274,7 +313,7 @@
           //});
         }
 
-      }
+      }*/
 
 
 
@@ -343,6 +382,7 @@
          // meter.transition().delay(250).attr("transform", "scale(0)");
          });
        */
+      window.setTimeout("loadSites();", 350)
     </script>
   </body>
 </html>
