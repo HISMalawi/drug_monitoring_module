@@ -1,7 +1,7 @@
 module ApplicationHelper
   def app_name
     title=<<EOF
-    Drug Monitoring Dashboard
+    National ART Stock Monitoring Dashboard
 EOF
 
   end
