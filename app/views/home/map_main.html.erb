@@ -1,133 +1,156 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <title>Pharmacy Monitoring Dashboard</title>
-  <style>
+  <head>
+    <meta charset="utf-8">
+    <title>Pharmacy Monitoring Dashboard</title>
+    <script type="text/javascript" src="/javascripts/data/coords.js"></script>
+    <script type="text/javascript" src="/javascripts/data/districts.js"></script>
+    <script type="text/javascript" src="/javascripts/data/sites_by_zones.js"></script>
+    <script type="text/javascript" src="/javascripts/data/zones.js"></script>
+    <script type="text/javascript" src="/javascripts/data/district_offsets.js"></script> <script type="text/javascript" src="/assets/data/coords.js"></script>
+    <script type="text/javascript" src="/javascripts/data/districts.js"></script>
+    <script type="text/javascript" src="/javascripts/data/sites_by_zones.js"></script>
+    <script type="text/javascript" src="/javascripts/data/zones.js"></script>
+    <script type="text/javascript" src="/javascripts/data/district_offsets.js"></script>
+
+    <script>
+      var availableSites = []
+      for (var zone in sites_by_zones){
+        for ( var facility in sites_by_zones[zone]){
+          myFacility = sites_by_zones[zone][facility]["facility"];
+          myFacility = myFacility.replace(/\+/g, " "); //Replace every + with space
+          availableSites.push(myFacility);
+        }
+      }
+    </script>
+    <style>
 
       body {
-          overflow: hidden;
+        overflow: hidden;
       }
 
       .progress-meter .background-most {
-          fill: #fff;
+        fill: #fff;
       }
 
       .progress-meter .background {
-          fill: rgba(204,204,204,0.8);
+        fill: rgba(204,204,204,0.8);
       }
 
       .progress-meter .foreground {
-          fill: rgba(106,145,225,0.8);
+        fill: rgba(106,145,225,0.8);
       }
 
       .progress-meter .foreground-red {
-          fill: rgba(255,0,0,0.8);
+        fill: rgba(255,0,0,0.8);
       }
 
       .progress-meter .foreground-orange {
-          fill: rgba(236,143,33,0.8);
+        fill: rgba(236,143,33,0.8);
       }
 
       .progress-meter .foreground-green {
-          fill: rgba(59,154,68,0.8);
+        fill: rgba(59,154,68,0.8);
       }
 
       .progress-meter .foreground-blue {
-          fill: rgba(25,84,205,0.8);
+        fill: rgba(25,84,205,0.8);
       }
 
       .progress-meter .foreground-gray {
-          fill: rgba(102,102,102,0.8);
+        fill: rgba(102,102,102,0.8);
       }
 
       .progress-meter text {
-          font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-          font-size: 9px;
-          font-weight: bold;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 9px;
+        font-weight: bold;
       }
 
       .link {
-          fill: none;
-          stroke: #666;
-          stroke-width: 1.5px;
+        fill: none;
+        stroke: #666;
+        stroke-width: 1.5px;
       }
 
       path.link {
-          fill: none;
-          stroke: #666;
-          stroke-width: 1.5px;
+        fill: none;
+        stroke: #666;
+        stroke-width: 1.5px;
       }
       marker#licensing {
-          fill: green;
+        fill: green;
       }
       path.link.licensing {
-          stroke: green;
+        stroke: green;
       }
       path.link.resolved {
-          stroke-dasharray: 0, 2 1;
+        stroke-dasharray: 0, 2 1;
       }
       circle {
-          fill: #ccc;
-          stroke: #333;
-          stroke-width: 1.5px;
+        fill: #ccc;
+        stroke: #333;
+        stroke-width: 1.5px;
       }
       text {
-          font: 10px sans-serif;
-          pointer-events: none;
+        font: 10px sans-serif;
+        pointer-events: none;
       }
       text.shadow {
-          stroke: #fff;
-          stroke-width: 3px;
-          stroke-opacity: .8;
+        stroke: #fff;
+        stroke-width: 3px;
+        stroke-opacity: .8;
       }
 
-  </style>
-  <%#=javascript_include_tag "Charts/d3"%>
-  <%=javascript_include_tag "Charts/d3.min"%>
-</head>
-<body onresize="resizeSVG()">
-<div id="main" style="padding: 0px; text-align: center; overflow: hidden; width: 100%;"></div>
-<script>
+    </style>
+<%#=javascript_include_tag "Charts/d3"%>
+    <%=javascript_include_tag "Charts/d3.min"%>
+  </head>
+  <body onresize="resize();" onload="resize();">
+    <div id="c_map">
+      <object id="map" type="image/svg+xml" data="/images/Malawi.svg" style="height: 100%; width: 100%;"></object>
+    </div>
+    <div id="main" style="padding: 0px; text-align: center; overflow: hidden; width: 100%;"></div>
+    <script>
 
-    var zoomlevel = 1;
+      var zoomlevel = 1;
 
-    var red = "rgba(255,0,0,0.8)";
-    var green = "rgba(59,154,68,0.8)";
-    var blue = "rgba(25,84,205,0.8)";
-    var orange = "rgba(236,143,33,0.8)";
-    var gray = "rgba(102,102,102,0.8)";
+      var red = "rgba(255,0,0,0.8)";
+      var green = "rgba(59,154,68,0.8)";
+      var blue = "rgba(25,84,205,0.8)";
+      var orange = "rgba(236,143,33,0.8)";
+      var gray = "rgba(102,102,102,0.8)";
 
-    var lineData = [];
-    var lnData = [];
-    var lineGraph = {};
-    var foreground = {};
-    var text = {};
-    var meter = {};
+      var lineData = [];
+      var lnData = [];
+      var lineGraph = {};
+      var foreground = {};
+      var text = {};
+      var meter = {};
 
-    var oradius = 17;
-    var arc = d3.svg.arc()
-            .startAngle(0)
-            .innerRadius(12)
-            .outerRadius(oradius);
-    var twoPi = 2 * Math.PI,
-            progress = 0,
-            formatPercent = d3.format(".0%");
+      var oradius = 17;
+      var arc = d3.svg.arc()
+      .startAngle(0)
+      .innerRadius(12)
+      .outerRadius(oradius);
+      var twoPi = 2 * Math.PI,
+      progress = 0,
+      formatPercent = d3.format(".0%");
 
-    var connections = <%= @connections.to_json.html_safe %>;
-    var sites = <%= @sites.to_json.html_safe %>;
-    var total = 1;
+      var connections = <%= @connections.to_json.html_safe %>;
+      var sites = <%= @sites.to_json.html_safe %>;
+      var total = 1;
 
-    var spacing = 10;
-    var pollInterval = spacing * 1000;
-    var timerHnd;
+      var spacing = 10;
+      var pollInterval = spacing * 1000;
+      var timerHnd;
 
 
-    var loader = d3.xml("/images/mw.svg", function(xml) {
+      var loader = d3.xml("/images/mw.svg", function(xml) {
         document.getElementById("main").appendChild(xml.documentElement);
 
         var svg = d3.select("#region")
-                .style("margin", "auto");
+        .style("margin", "auto");
 
         loadSites();
 
@@ -136,146 +159,190 @@
         // loadProgress();
 
         // loadSites();
-    });
+      });
 
-    function loadSites(){
+
+
+      function resize() {
+        c_map = document.getElementById('c_map')
+        if (c_map) {
+          c_map.style.height = (window.innerHeight - 20) + "px";
+        }
+      }
+
+      function insertSite() {
+        var doc = document.getElementById("map").contentDocument;
+
+        var mw = doc.getElementById("malawi");
+
+        for(var i = 0; i < sites.length; i++){
+          if(sites[i]["x"] != null && sites[i]["y"] != null){
+            if(sites[i]["region"].toLowerCase() == "centre"){
+              x = Math.round(sites[i]["x"]);
+              y = Math.round(sites[i]["y"]) + 373;
+            }
+            if(sites[i]["region"].toLowerCase() == "north"){
+              x = Math.round(sites[i]["x"]) + 39
+              y = Math.round(sites[i]["y"])
+            }
+
+            if(sites[i]["region"].toLowerCase() == "south"){
+
+              xs = Math.round(sites[i]["x"]) + 212
+              ys = Math.round(sites[i]["y"]) + 552
+
+            }
+            id = 'test'
+            var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            circle.setAttribute("cx", x);
+            circle.setAttribute("cy", y);
+            circle.setAttribute("r", 10);
+            circle.setAttribute("id", id);
+            circle.setAttribute("fill", "red");
+            circle.setAttribute("stroke", "black");
+            mw.appendChild(circle);
+          }
+        }
+      }
+
+      function loadSites(){
 
         d3.selectAll("rect.site").remove();
 
         d3.selectAll("circle.site").remove();
 
         for(var i = 0; i < sites.length; i++){
-            var xs = -10;
-            var ys = -10;
+          var xs = -10;
+          var ys = -10;
 
-            var xt = -10;
-            var yt = -10;
+          var xt = -10;
+          var yt = -10;
 
-            if(sites[i]["x"] != null && sites[i]["y"] != null){
-                if(sites[i]["region"].toLowerCase() == "centre"){
+          if(sites[i]["x"] != null && sites[i]["y"] != null){
+            if(sites[i]["region"].toLowerCase() == "centre"){
 
-                    xs = Math.round(sites[i]["x"]);
-                    ys = Math.round(sites[i]["y"]) + 373;
+              xs = Math.round(sites[i]["x"]);
+              ys = Math.round(sites[i]["y"]) + 373;
 
-                } else if(sites[i]["region"].toLowerCase() == "north"){
+            } else if(sites[i]["region"].toLowerCase() == "north"){
 
-                    xs = Math.round(sites[i]["x"]) + 39
-                    ys = Math.round(sites[i]["y"])
+              xs = Math.round(sites[i]["x"]) + 39
+              ys = Math.round(sites[i]["y"])
 
-                } else if(sites[i]["region"].toLowerCase() == "south"){
+            } else if(sites[i]["region"].toLowerCase() == "south"){
 
-                    xs = Math.round(sites[i]["x"]) + 212
-                    ys = Math.round(sites[i]["y"]) + 552
+              xs = Math.round(sites[i]["x"]) + 212
+              ys = Math.round(sites[i]["y"]) + 552
 
-                }
             }
+          }
 
-            d3.select("#region").append("circle")
-                    .style("stroke", "white")
-                    .style("stroke-width", "1px")
-                    .style("fill", "red")
-                    .style("margin", "auto")
-                    .attr("class", "site")
-                    .attr("r", 6)
-                    .attr("cx", xs)
-                    .attr("cy", ys)
-                    .attr("id", sites[i]["name"].toLowerCase())
-                    .attr("new", sites[i]["new_notices"])
-                    .attr("investigating", sites[i]["not_investigating"])
-                    .attr("tag", sites[i]["name"])
-                    .on("mouseover", function(){
-                        d3.select("#" + this.id).attr("r", 6).style("z-index", "100")
-                                .style("fill", "#537ee0");
-                        return tooltip.style("visibility", "visible");
-                    })
-                    .on("mousemove", function(){
-                        site_name = this.getAttribute('id')
-                        new_notices = this.getAttribute('new')
-                        investigating = this.getAttribute('investigating')
-                        return tooltip.style("top", (d3.event.pageY-10)+"px")
-                                .style("left", (d3.event.pageX+20)+"px")
-                                .html("<center>" + site_name + '</center>New notices: ' + new_notices + " <br />Investigating: " + investigating);
-                    })
+          d3.select("#region").append("circle")
+          .style("stroke", "white")
+          .style("stroke-width", "1px")
+          .style("fill", "red")
+          .style("margin", "auto")
+          .attr("class", "site")
+          .attr("r", 6)
+          .attr("cx", xs)
+          .attr("cy", ys)
+          .attr("id", sites[i]["name"].toLowerCase())
+          .attr("new", sites[i]["new_notices"])
+          .attr("investigating", sites[i]["not_investigating"])
+          .attr("tag", sites[i]["name"])
+          .on("mouseover", function(){
+            d3.select("#" + this.id).attr("r", 6).style("z-index", "100")
+            .style("fill", "#537ee0");
+            return tooltip.style("visibility", "visible");
+          })
+          .on("mousemove", function(){
+            site_name = this.getAttribute('id')
+            new_notices = this.getAttribute('new')
+            investigating = this.getAttribute('investigating')
+            return tooltip.style("top", (d3.event.pageY-10)+"px")
+            .style("left", (d3.event.pageX+20)+"px")
+            .html("<center>" + site_name + '</center>New notices: ' + new_notices + " <br />Investigating: " + investigating);
+          })
 
-                    .on("mouseout", function(){
-                        d3.select("#" + this.id).attr("r", 6).style("z-index", "10")
-                                .style("fill", "red");
-                        return tooltip.style("visibility", "hidden");
-                    })
-                    //.on("click", function(){
-                      //  window.parent.switch(this.getAttribute('id'));
-                    //});
+          .on("mouseout", function(){
+            d3.select("#" + this.id).attr("r", 6).style("z-index", "10")
+            .style("fill", "red");
+            return tooltip.style("visibility", "hidden");
+          })
+          //.on("click", function(){
+          //  window.parent.switch(this.getAttribute('id'));
+          //});
         }
 
-    }
+      }
 
 
 
-    var tooltip = d3.select("body")
-            .append("div")
-            .style("position", "absolute")
-            .style("z-index", "10")
-            .style("visibility", "hidden")
-            .style("background", "#f6f3d7")
-            .style("padding", "5px")
-            .style("border", "1px solid #000")
-            .style("border-radius", "5px")
-            .text("Tooltip");
+      var tooltip = d3.select("body")
+      .append("div")
+      .style("position", "absolute")
+      .style("z-index", "10")
+      .style("visibility", "hidden")
+      .style("background", "#f6f3d7")
+      .style("padding", "5px")
+      .style("border", "1px solid #000")
+      .style("border-radius", "5px")
+      .text("Tooltip");
 
-    function getSiteInfo(id){
+      function getSiteInfo(id){
         var result = id;
 
         if(document.getElementById(id)){
-            result = document.getElementById(id).getAttribute("tag");
+          result = document.getElementById(id).getAttribute("tag");
         }
 
         return result;
-    }
+      }
 
-    function resizeMap(){
+      function resizeMap(){
         zoomlevel = 1;
 
         d3.select('#region').attr('transform','scale(' + zoomlevel + ')');
-    }
+      }
 
-    function toTaskDate(timestamp) {
+      function toTaskDate(timestamp) {
         var d = new Date(timestamp * 1000);
         var hours = d.getHours(), min = d.getMinutes(), secs = d.getSeconds();
         var year = d.getFullYear(), month = d.getMonth() + 1, day = d.getDate();
 
         return String(year) + "-" + (month < 10 ? "0" + month : month) + "-" +
-                day + " " + (hours < 10 ? "0" + hours : hours) + ":" +
-                (min < 10 ? "0" + min : min) + ":" + (secs < 10 ? "0" + secs : secs);
-    }
+          day + " " + (hours < 10 ? "0" + hours : hours) + ":" +
+          (min < 10 ? "0" + min : min) + ":" + (secs < 10 ? "0" + secs : secs);
+      }
 
-    function resizeSVG(){
+      function resizeSVG(){
         if(d3.select("#region").node() != null){
-            var height = d3.select("#region").node().height.baseVal.value;
+          var height = d3.select("#region").node().height.baseVal.value;
 
-            var scale = window.innerHeight / height;
+          var scale = window.innerHeight / height;
 
-            d3.select("#region").transition().delay(0).attr("transform", "scale(" + scale + ")");
+          d3.select("#region").transition().delay(0).attr("transform", "scale(" + scale + ")");
         }
-    }
+      }
 
-    // timerHnd = setTimeout("ajaxTasks()", pollInterval);
+      // timerHnd = setTimeout("ajaxTasks()", pollInterval);
 
-    /*
-     d3.json("data.json")
-     .on("progress", function() {
-     var i = d3.interpolate(progress, d3.event.loaded / total);
-     d3.transition().tween("progress", function() {
-     return function(t) {
-     progress = i(t);
-     foreground.attr("d", arc.endAngle(twoPi * progress));
-     text.text(formatPercent(progress));
-     };
-     });
-     })
-     .get(function(error, data) {
-     // meter.transition().delay(250).attr("transform", "scale(0)");
-     });
-     */
-</script>
-</body>
+      /*
+         d3.json("data.json")
+         .on("progress", function() {
+         var i = d3.interpolate(progress, d3.event.loaded / total);
+         d3.transition().tween("progress", function() {
+         return function(t) {
+         progress = i(t);
+         foreground.attr("d", arc.endAngle(twoPi * progress));
+         text.text(formatPercent(progress));
+         };
+         });
+         })
+         .get(function(error, data) {
+         // meter.transition().delay(250).attr("transform", "scale(0)");
+         });
+       */
+    </script>
+  </body>
 </html>

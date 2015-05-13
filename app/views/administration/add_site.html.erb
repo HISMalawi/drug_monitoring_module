@@ -1,170 +1,170 @@
 <link rel="stylesheet" type="text/css" href="/stylesheets/application.css" xmlns="http://www.w3.org/1999/html"/>
+<link href="/stylesheets/chosen.min.css" rel="stylesheet" media="screen">
 <script type="text/javascript" src="/javascripts/jquery.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.validate.min.js"></script>
+<script src="/javascripts/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+<script src="/javascripts/chosen.jquery.min.js"></script>
+<script type="text/javascript" src="/javascripts/data/sites_by_zones.js"></script>
+
+<script>
+  var availableSites = []
+  for (var zone in sites_by_zones){
+    for ( var facility in sites_by_zones[zone]){
+      myFacility = sites_by_zones[zone][facility]["facility"];
+      myFacility = unescape('<option>' + myFacility.replace(/\+/g, " ") + '</option>'); //Replace every + with space
+      availableSites.push(myFacility);
+    }
+  }
+</script>
 <style type="text/css">
-    td {
-        padding: 10px !important;
-    }
-    select,
-    textarea,
-    input {
-        width: 70% !important;
-        float: left !important;
-    }
-    button {
-        margin: 10px !important;
-    }
+  td {
+    padding: 10px !important;
+  }
+  select,
+  textarea,
+  input {
+    width: 70% !important;
+    float: left !important;
+  }
+  button {
+    margin: 10px !important;
+  }
+  .chzn-search input{
+    font-size: 8pt;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    box-sizing: inherit !important;
+    width: 50% !important;
+  }
 </style>
 
 
-  <div class="panel" style="">
-    <div class="panel-title">
-      <span>Add Site</span>
-    </div>
-    <div class="panel-content">
-
-      <%= form_tag('/administration/save_site', :method => 'post', :enctype => 'multipart/form-data',
-                   :id => 'site-form', :class => "form-horizontal", :autocomplete => "off",:role => "form", :novalidate=> "novalidate") do %>
-
-          <div class="form-control-group">
-            <table style="width: 100%;">
-              <tr>
-                <td align="right" style="width: 20%">
-                  <label class="control-label">Site Name:</label>&nbsp;&nbsp;&nbsp;
-                </td>
-                <td>
-                  <input name="sitename" class="form-control" placeholder="Site name" id="sitename" required="" value="" type="text" minlength=3 />
-                </td>
-              </tr>
-            </table>
-          </div>
-          <div class="form-control-group">
-            <table style="width: 100%;">
-              <tr>
-                <td align="right" style="width: 20%">
-                  <label class="control-label">IP Address:</label>&nbsp;&nbsp;&nbsp;
-                </td>
-                <td>
-                  <input name="ip_address" class="form-control" placeholder="Site IP Address" id="ip_address" required="" value="" type="text" minlength=7 ipaddress=true />
-                </td>
-              </tr>
-            </table>
-          </div>
-          <div class="form-control-group">
-            <table style="width: 100%;">
-              <tr>
-                <td align="right" style="width: 20%">
-                  <label class="control-label">Application Port:</label>&nbsp;&nbsp;&nbsp;
-                </td>
-                <td>
-                  <input name="port" class="form-control" placeholder="Site Application Port" id="port" required="" value="" type="text" />
-                </td>
-              </tr>
-            </table>
-          </div>
-          <div class="form-control-group">
-            <table style="width: 100%;">
-              <tr>
-                <td align="right" style="width: 20%">
-                  <label class="control-label">Region:</label>&nbsp;&nbsp;&nbsp;
-                </td>
-                <td>
-                  <select id="region" name="region" class="form-control" placeholder="Region" required="" onchange="switchRegion(this.value)" >
-                    <option value="">[ - Select site region in Malawi - ]</option>
-                    <option value="Centre">Central Region</option>
-                    <option value="North">Northern Region</option>
-                    <option value="South">Southern Region</option>
-                  </select>
-                </td>
-              </tr>
-            </table>
-          </div>
-          <div class="form-control-group">
-            <table style="width: 100%;">
-              <tr>
-                <td align="right" style="width: 20%; vertical-align: top;">
-                  <label class="control-label">Site location:</label>&nbsp;&nbsp;&nbsp;
-                </td>
-                <td>
-                  <iframe id="map" style="border: 1px dotted #999; padding: 0px; text-align: center; width: 70%; overflow: hidden !important; height: 600px;" src="/map?region"></iframe>
-                  <input name="x" class="form-control" id="x" required="" value="" type="hidden" />
-                  <input name="y" class="form-control" id="y" required="" value="" type="hidden" />
-                </td>
-              </tr>
-            </table>
-          </div>
-
-          <table style="width: 100%;">
-            <tr>
-              <td style="width: 20%;">
-                <button type="button" class="btn btn-danger" style="font-size: 18px !important; float: left;" onclick="window.location = '/'">Cancel</button>
-              </td>
-              <td>
-                <button type="submit" class="btn btn-success btn-large" style="font-size: 18px !important; float: right;">Save Site</button>
-              </td>
-            </tr>
-          </table>
-
-      <% end %>
-
-    </div>
+<div class="panel" style="">
+  <div class="panel-title">
+    <span>Add Site</span>
   </div>
+  <div class="panel-content">
+
+    <%= form_tag('/administration/save_site', :method => 'post', :enctype => 'multipart/form-data',
+      :id => 'site-form', :class => "form-horizontal", :autocomplete => "off",:role => "form", :novalidate=> "novalidate") do %>
+
+      <div class="form-control-group">
+        <table style="width: 100%;">
+          <tr>
+            <td align="right" style="width: 20%">
+              <label class="control-label" for="select01">Select Site</label>
+            </td>
+            <td>
+              <select id="select01" name="sitename" class="chzn-select form-control" required=""></select>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="form-control-group">
+        <table style="width: 100%;">
+          <tr>
+            <td align="right" style="width: 20%">
+              <label class="control-label">IP Address:</label>&nbsp;&nbsp;&nbsp;
+            </td>
+            <td>
+              <input name="ip_address" class="form-control" placeholder="Site IP Address" id="ip_address" required="" value="" type="text" minlength=7 ipaddress=true />
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="form-control-group">
+        <table style="width: 100%;">
+          <tr>
+            <td align="right" style="width: 20%">
+              <label class="control-label">Application Port:</label>&nbsp;&nbsp;&nbsp;
+            </td>
+            <td>
+              <input name="port" class="form-control" placeholder="Site Application Port" id="port" required="" value="" type="text" />
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <table style="width: 100%;">
+        <tr>
+          <td style="width: 20%;">
+            <button type="button" class="btn btn-danger" style="font-size: 18px !important; float: left;" onclick="window.location = '/'">Cancel</button>
+          </td>
+          <td>
+            <button type="submit" class="btn btn-success btn-large" style="font-size: 18px !important; float: right;">Save Site</button>
+          </td>
+        </tr>
+      </table>
+
+    <% end %>
+
+  </div>
+</div>
 
 
 <script defer="true">
 
-    jQuery.validator.addMethod("ipaddress", function(value, element) {
-        return this.optional(element) || /^\d+\.\d+\.\d+\.\d+/.test(value);
-    }, "Not a valid IP address.");
+  jQuery.validator.addMethod("ipaddress", function(value, element) {
+    return this.optional(element) || /^\d+\.\d+\.\d+\.\d+/.test(value);
+  }, "Not a valid IP address.");
 
-    function switchRegion(region){
-        document.getElementById("map").setAttribute("src", "/map?region=" + region.toLowerCase().trim());
-    }
+  function switchRegion(region){
+    document.getElementById("map").setAttribute("src", "/map?region=" + region.toLowerCase().trim());
+  }
 
-    function prettyPrint(){
-        $(document).ready(function(){
-
-            $('#site-form').validate({
-                rules: {},
-                highlight: function(element) {
-                    $(element).closest('.control-group').removeClass('success').addClass('error');
-                },
-                success: function(element) {
-                    element
-                            .text('OK').addClass('success')
-                }
-            });
-
-        }); // end document.ready
-    }
-
+  function prettyPrint(){
     $(document).ready(function(){
 
-        $('#site-form').validate({
-            rules: {
-                sitename: {required: true},
-                ip_address: {required: true},
-                port: {required:true}
-            },
-            messages: {
-                sitename: {required: "Please provide a name for the site"},
-                ip_address: {required: "Please provide an IP Address for the site"},
-                port: {required: "Please provide the port for the application"},
-                region: {required: "Please select the region for the site"}
-            },
-            highlight: function(element) {
-                $(element).closest('.control-group').removeClass('success').addClass('error');
-            },
-            success: function(element) {
-                element
-                        .text('OK').addClass('success')
-            }
-        });
+      $('#site-form').validate({
+        rules: {},
+        highlight: function(element) {
+          $(element).closest('.control-group').removeClass('success').addClass('error');
+        },
+        success: function(element) {
+          element
+          .text('OK').addClass('success')
+        }
+      });
 
     }); // end document.ready
+  }
 
-    addEventListener('load', prettyPrint, false);
-    $(document).ready(function(){
-        $('pre').addClass('prettyprint linenums');
+  $(document).ready(function(){
+
+    $('#site-form').validate({
+      rules: {
+        sitename: {required: true},
+        ip_address: {required: true},
+        port: {required:true}
+      },
+      messages: {
+        sitename: {required: "Please provide a name for the site"},
+        ip_address: {required: "Please provide an IP Address for the site"},
+        port: {required: "Please provide the port for the application"},
+        region: {required: "Please select the region for the site"}
+      },
+      highlight: function(element) {
+        $(element).closest('.control-group').removeClass('success').addClass('error');
+      },
+      success: function(element) {
+        element
+        .text('OK').addClass('success')
+      }
     });
+
+  }); // end document.ready
+
+  addEventListener('load', prettyPrint, false);
+  $(document).ready(function(){
+    $('pre').addClass('prettyprint linenums');
+  });
+
+  $(function() {
+    $(".chzn-select").chosen();
+  });
+  selectTag = document.getElementById('select01');
+  selectTag.innerHTML = availableSites;
 </script>
+
