@@ -35,4 +35,11 @@ class Site < ActiveRecord::Base
     sites = Site.all.collect{|x| x.name}
   end
 
+  def self.longitude
+    self.x
+  end
+
+  def self.latitude
+    self.y
+  end
 end

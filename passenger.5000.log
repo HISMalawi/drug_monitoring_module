@@ -1,0 +1,70 @@
+[ 2015-05-12 09:37:18.7166 24846/7f88d181a780 age/Wat/Main.cpp:1264 ]: Starting PassengerAgent watchdog...
+[ 2015-05-12 09:37:18.7197 24849/7f62e5a58780 age/Hel/Main.cpp:891 ]: Starting PassengerAgent server...
+[ 2015-05-12 09:37:18.7198 24849/7f62e5a58780 age/Hel/Main.cpp:234 ]: PassengerAgent server running in multi-application mode.
+[ 2015-05-12 09:37:18.7220 24849/7f62e5a58780 age/Hel/Main.cpp:645 ]: PassengerAgent server online, PID 24849
+[ 2015-05-12 09:37:18.7259 24856/7f667d16d780 age/Log/Main.cpp:442 ]: Starting PassengerAgent logger...
+[ 2015-05-12 09:37:18.7261 24856/7f667d16d780 age/Log/Main.cpp:323 ]: PassengerAgent logger online, PID 24856
+App 24896 stdout: 
+App 24896 stdout: 
+[ 2015-05-12 09:37:21.6854 24849/7f62e42cd700 App/Implementation.cpp:287 ]: Could not spawn process for application /var/www/drug_monitoring_module: An error occured while starting up the preloader.
+  Error ID: 691ca078
+  Error details saved to: /tmp/passenger-error-RtPRRb.html
+  Message from application: No such file or directory @ rb_sysopen - /var/www/drug_monitoring_module/config/database.yml (Errno::ENOENT)
+  /home/timmtonga/.rvm/gems/ruby-2.1.2@drug_monitoring/gems/railties-3.2.16/lib/rails/application/configuration.rb:115:in `read'
+  /home/timmtonga/.rvm/gems/ruby-2.1.2@drug_monitoring/gems/railties-3.2.16/lib/rails/application/configuration.rb:115:in `database_configuration'
+  /home/timmtonga/.rvm/gems/ruby-2.1.2@drug_monitoring/gems/activerecord-3.2.16/lib/active_record/railtie.rb:84:in `block (2 levels) in <class:Railtie>'
+  /home/timmtonga/.rvm/gems/ruby-2.1.2@drug_monitoring/gems/activesupport-3.2.16/lib/active_support/lazy_load_hooks.rb:36:in `instance_eval'
+  /home/timmtonga/.rvm/gems/ruby-2.1.2@drug_monitoring/gems/activesupport-3.2.16/lib/active_support/lazy_load_hooks.rb:36:in `execute_hook'
+  /home/timmtonga/.rvm/gems/ruby-2.1.2@drug_monitoring/gems/activesupport-3.2.16/lib/active_support/lazy_load_hooks.rb:43:in `block in run_load_hooks'
+  /home/timmtonga/.rvm/gems/ruby-2.1.2@drug_monitoring/gems/activesupport-3.2.16/lib/active_support/lazy_load_hooks.rb:42:in `each'
+  /home/timmtonga/.rvm/gems/ruby-2.1.2@drug_monitoring/gems/activesupport-3.2.16/lib/active_support/lazy_load_hooks.rb:42:in `run_load_hooks'
+  /home/timmtonga/.rvm/gems/ruby-2.1.2@drug_monitoring/gems/activerecord-3.2.16/lib/active_record/base.rb:720:in `<top (required)>'
+  /home/timmtonga/.rvm/gems/ruby-2.1.2@drug_monitoring/gems/activerecord-3.2.16/lib/active_record/session_store.rb:79:in `<class:SessionStore>'
+  /home/timmtonga/.rvm/gems/ruby-2.1.2@drug_monitoring/gems/activerecord-3.2.16/lib/active_record/session_store.rb:53:in `<module:ActiveRecord>'
+  /home/timmtonga/.rvm/gems/ruby-2.1.2@drug_monitoring/gems/activerecord-3.2.16/lib/active_record/session_store.rb:3:in `<top (required)>'
+  /home/timmtonga/.rvm/gems/ruby-2.1.2@drug_monitoring/gems/railties-3.2.16/lib/rails/application/configuration.rb:138:in `session_store'
+  /home/timmtonga/.rvm/gems/ruby-2.1.2@drug_monitoring/gems/railties-3.2.16/lib/rails/application.rb:281:in `block in default_middleware_stack'
+  /home/timmtonga/.rvm/gems/ruby-2.1.2@drug_monitoring/gems/railties-3.2.16/lib/rails/application.rb:245:in `tap'
+  /home/timmtonga/.rvm/gems/ruby-2.1.2@drug_monitoring/gems/railties-3.2.16/lib/rails/application.rb:245:in `default_middleware_stack'
+  /home/timmtonga/.rvm/gems/ruby-2.1.2@drug_monitoring/gems/railties-3.2.16/lib/rails/engine.rb:474:in `app'
+  /home/timmtonga/.rvm/gems/ruby-2.1.2@drug_monitoring/gems/railties-3.2.16/lib/rails/application/finisher.rb:31:in `block in <module:Finisher>'
+  /home/timmtonga/.rvm/gems/ruby-2.1.2@drug_monitoring/gems/railties-3.2.16/lib/rails/initializable.rb:30:in `instance_exec'
+  /home/timmtonga/.rvm/gems/ruby-2.1.2@drug_monitoring/gems/railties-3.2.16/lib/rails/initializable.rb:30:in `run'
+  /home/timmtonga/.rvm/gems/ruby-2.1.2@drug_monitoring/gems/railties-3.2.16/lib/rails/initializable.rb:55:in `block in run_initializers'
+  /home/timmtonga/.rvm/gems/ruby-2.1.2@drug_monitoring/gems/railties-3.2.16/lib/rails/initializable.rb:54:in `each'
+  /home/timmtonga/.rvm/gems/ruby-2.1.2@drug_monitoring/gems/railties-3.2.16/lib/rails/initializable.rb:54:in `run_initializers'
+  /home/timmtonga/.rvm/gems/ruby-2.1.2@drug_monitoring/gems/railties-3.2.16/lib/rails/application.rb:136:in `initialize!'
+  /home/timmtonga/.rvm/gems/ruby-2.1.2@drug_monitoring/gems/railties-3.2.16/lib/rails/railtie/configurable.rb:30:in `method_missing'
+  /var/www/drug_monitoring_module/config/environment.rb:5:in `<top (required)>'
+  config.ru:3:in `require'
+  config.ru:3:in `block in <main>'
+  /home/timmtonga/.rvm/gems/ruby-2.1.2@drug_monitoring/gems/rack-1.4.5/lib/rack/builder.rb:51:in `instance_eval'
+  /home/timmtonga/.rvm/gems/ruby-2.1.2@drug_monitoring/gems/rack-1.4.5/lib/rack/builder.rb:51:in `initialize'
+  config.ru:1:in `new'
+  config.ru:1:in `<main>'
+  /home/timmtonga/.rvm/gems/ruby-2.1.2@drug_monitoring/gems/passenger-5.0.7/helper-scripts/rack-preloader.rb:107:in `eval'
+  /home/timmtonga/.rvm/gems/ruby-2.1.2@drug_monitoring/gems/passenger-5.0.7/helper-scripts/rack-preloader.rb:107:in `preload_app'
+  /home/timmtonga/.rvm/gems/ruby-2.1.2@drug_monitoring/gems/passenger-5.0.7/helper-scripts/rack-preloader.rb:153:in `<module:App>'
+  /home/timmtonga/.rvm/gems/ruby-2.1.2@drug_monitoring/gems/passenger-5.0.7/helper-scripts/rack-preloader.rb:29:in `<module:PhusionPassenger>'
+  /home/timmtonga/.rvm/gems/ruby-2.1.2@drug_monitoring/gems/passenger-5.0.7/helper-scripts/rack-preloader.rb:28:in `<main>'
+
+
+[ 2015-05-12 09:37:21.6922 24849/7f62df7fe700 age/Hel/Req/CheckoutSession.cpp:252 ]: [Client 1-1] Cannot checkout session because a spawning error occurred. The identifier of the error is 691ca078. Please see earlier logs for details about the error.
+
+
+[ 2015-05-12 09:37:31.2709 24856/7f667b30b700 age/Log/Main.cpp:349 ]: Signal received. Gracefully shutting down... (send signal 2 more time(s) to force shutdown)
+[ 2015-05-12 09:37:31.2709 24849/7f62df7fe700 age/Hel/Main.cpp:455 ]: Signal received. Gracefully shutting down... (send signal 2 more time(s) to force shutdown)
+[ 2015-05-12 09:37:31.2709 24856/7f667d16d780 age/Log/Main.cpp:411 ]: Received command to shutdown gracefully. Waiting until all clients have disconnected...
+[ 2015-05-12 09:37:31.2709 24849/7f62e5a58780 age/Hel/Main.cpp:814 ]: Received command to shutdown gracefully. Waiting until all clients have disconnected...
+[ 2015-05-12 09:37:31.2710 24849/7f62df7fe700 Ser/Server.h:455 ]: [ServerThr.1] Shutdown finished
+[ 2015-05-12 09:37:31.2710 24856/7f667b30b700 Ser/Server.h:455 ]: [LoggerAdminServer] Shutdown finished
+[ 2015-05-12 09:37:31.2710 24849/7f62de7fc700 Ser/Server.h:455 ]: [ServerThr.3] Shutdown finished
+[ 2015-05-12 09:37:31.2710 24849/7f62deffd700 Ser/Server.h:455 ]: [ServerThr.2] Shutdown finished
+[ 2015-05-12 09:37:31.2710 24849/7f62ddffb700 Ser/Server.h:455 ]: [ServerThr.4] Shutdown finished
+[ 2015-05-12 09:37:31.2710 24849/7f62dd7fa700 Ser/Server.h:455 ]: [ServerThr.5] Shutdown finished
+[ 2015-05-12 09:37:31.2710 24856/7f667d16d780 age/Log/Main.cpp:436 ]: PassengerAgent logger shutdown finished
+[ 2015-05-12 09:37:31.2710 24849/7f62dcff9700 Ser/Server.h:455 ]: [ServerThr.6] Shutdown finished
+[ 2015-05-12 09:37:31.2711 24849/7f62bbfff700 Ser/Server.h:455 ]: [ServerThr.7] Shutdown finished
+[ 2015-05-12 09:37:31.2711 24849/7f62bb7fe700 Ser/Server.h:455 ]: [ServerThr.8] Shutdown finished
+[ 2015-05-12 09:37:31.2711 24849/7f62baffd700 Ser/Server.h:455 ]: [AdminServer] Shutdown finished
+[ 2015-05-12 09:37:31.2820 24849/7f62e5a58780 age/Hel/Main.cpp:876 ]: PassengerAgent server shutdown finished

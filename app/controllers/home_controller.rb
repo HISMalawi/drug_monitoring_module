@@ -306,10 +306,10 @@ class HomeController < ApplicationController
 
   def map_main
     @sites = []
-    (Site.all || []).each do |source|
+    sites = Site.find(:all, :conditions => ["active =?", true])
+    (sites || []).each do |source|
       notices = ReportTool.get_notices_summary(source.id)
       site = {
-          'region' => source["region"],
           'x' => source["x"],
           'y' =>source["y"],
           'name' => source["name"],
@@ -320,6 +320,7 @@ class HomeController < ApplicationController
 
       @sites << site
     end
+   # raise @sites.inspect
     render :layout => false
   end
 
