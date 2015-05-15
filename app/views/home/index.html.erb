@@ -45,6 +45,20 @@
           frame.height = frame.contentWindow.document.body.scrollHeight + "px";
           frame.width = frame.contentWindow.document.body.scrollWidth + "px";
       }
+
+      function setAttibutes(){
+        mainDisplay = document.getElementById('main-display').contentDocument
+        facilities = mainDisplay.getElementById("map").contentDocument.getElementsByTagName("circle");
+        for (var i=0; i<= facilities.length - 1; i++){
+          facilities[i].onmouseover = function(){
+            this.style.cursor = 'pointer';
+          }
+          facilities[i].onclick = function(){
+            site = this.id
+           __$("report-display").setAttribute("src", "/report/months_of_stock_main?site="+ site);
+          }
+        }
+      }
   </script>
 </head>
 <body onresize="resizeTable()" onload="switchViews()">
@@ -114,6 +128,7 @@
     timerHnd = setTimeout("switchViews()", timerSpacing * 1000);
 
     //-->
+  window.setInterval("setAttibutes()", 350);
 </script>
 
 </body>
