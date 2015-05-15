@@ -171,12 +171,13 @@
         for (var s in sites){
           x = sites[s].x;
           y = sites[s].y;
+          var name = sites[s].name
           var result = latLon2Coord(y, x)
           var colors = ["rgba(255,0,0,0.9)", "rgba(0,200,0,0.9)", "rgba(0,0,200,0.9)"];
 
           var pos = Math.round((Math.random() * 10)) % 3;
 
-          insertSite(result[0], result[1], colors[pos], 'site');
+          insertSite(result[0], result[1], colors[pos], name);
         }
       }
   
@@ -199,6 +200,7 @@
 
         circle.setAttribute("stroke", "black");
 
+
         mw.appendChild(circle);
       }
       function resize() {
@@ -208,40 +210,7 @@
         }
       }
 
-      /*function insertSite() {
-    var doc = document.getElementById("map").contentDocument;
-
-    var mw = doc.getElementById("malawi");
-
-    for(var i = 0; i < sites.length; i++){
-      if(sites[i]["x"] != null && sites[i]["y"] != null){
-        if(sites[i]["region"].toLowerCase() == "centre"){
-          x = Math.round(sites[i]["x"]);
-          y = Math.round(sites[i]["y"]) + 373;
-        }
-        if(sites[i]["region"].toLowerCase() == "north"){
-          x = Math.round(sites[i]["x"]) + 39
-          y = Math.round(sites[i]["y"])
-        }
-
-        if(sites[i]["region"].toLowerCase() == "south"){
-
-          xs = Math.round(sites[i]["x"]) + 212
-          ys = Math.round(sites[i]["y"]) + 552
-
-        }
-        id = 'test'
-        var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-        circle.setAttribute("cx", x);
-        circle.setAttribute("cy", y);
-        circle.setAttribute("r", 10);
-        circle.setAttribute("id", id);
-        circle.setAttribute("fill", "red");
-        circle.setAttribute("stroke", "black");
-        mw.appendChild(circle);
-      }
-    }
-  }*/
+    
 
 
       /*function loadSites(){

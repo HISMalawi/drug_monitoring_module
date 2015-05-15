@@ -4126,6 +4126,17 @@ sites_by_zones = {"chitipa"=> [
         "zone"=> "Central West"
     },
     {
+        "facility"=> "Martin Preuss Centre",
+        "facility_type"=> "ARV Center",
+        "mga"=> "Government/public",
+        "ftype"=> "Urban",
+        "latitude"=> -13.99164,
+        "longitude"=> 33.77561,
+        "facility_id"=> "10375",
+        "region"=> "Central",
+        "zone"=> "Central West"
+    },
+    {
         "facility"=> "City Assembly Health",
         "facility_type"=> "Clinic",
         "mga"=> "Government/public",
@@ -8138,7 +8149,7 @@ sites_by_zones = {"chitipa"=> [
     }
 ], "blantyre"=> [
     {
-        "facility"=> "Queen Elizabeth Central Hospit",
+        "facility"=> "Queen Elizabeth Central Hospital",
         "facility_type"=> "Central Hospital",
         "mga"=> "Government/public",
         "ftype"=> "Urban",

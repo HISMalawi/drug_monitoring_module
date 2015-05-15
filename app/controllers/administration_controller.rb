@@ -5,14 +5,14 @@ class AdministrationController < ApplicationController
     @nojquery = true
   end
   def list_sites
-    sites = YAML.load_file("#{Rails.root}/config/sites.yml")
+    sites = Site.where(:active => true)
     @sites = {}
-    (sites || []).each do |name, value|
-      @sites[name] = {"address" => value.split(":")[0],"port" => value.split(":")[1]}  unless value.blank?
+    (sites || []).each do |site|
+      @sites[site.name] = {"address" => site.ip_address,"port" => site.port}  unless @sites[site.name].blank?
     end
   end
   def edit_site
-    @sites = Site.all
+    @sites = Site.where(:active => true)
     @nojquery = true
   end
 
@@ -24,6 +24,7 @@ class AdministrationController < ApplicationController
   end
 
   def save_site
+
     unless params.blank? || !request.post?
       if params[:old_site].blank?
         site = Site.find_by_name(params[:sitename])
@@ -41,6 +42,7 @@ class AdministrationController < ApplicationController
         site.ip_address = params[:ip_address]
         site.port = params[:port]
         site.threshold = params[:threshold]
+        site.active = params[:status]
         site.save
       end
     end

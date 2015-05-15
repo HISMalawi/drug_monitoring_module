@@ -15,6 +15,9 @@
     button {
         margin: 10px !important;
     }
+    span.spacing {
+        margin-left: 10px;
+    }
 </style>
 
 <div class="panel">
@@ -83,39 +86,21 @@
             </tr>
           </table>
         </div>
-
         <div class="form-control-group">
           <table style="width: 100%;">
             <tr>
               <td align="right" style="width: 20%">
-                <label class="control-label">Region:</label>&nbsp;&nbsp;&nbsp;
+                <label class="control-label">Status:</label>&nbsp;&nbsp;&nbsp;
+              </td>
+              <td style="width: 20%">
+                <span class="spacing"><input type="radio" name="status" id="active" value=true style="width: 2px !important;">Activated</span>
               </td>
               <td>
-                <select id="region" name="region" class="form-control" placeholder="Region" required="" onchange="switchRegion(this.value)" >
-                  <option value="">[ - Select site region in Malawi - ]</option>
-                  <option value="Centre">Central Region</option>
-                  <option value="North">Northern Region</option>
-                  <option value="South">Southern Region</option>
-                </select>
+                <span class="spacing"><input type="radio" name="status" value=false style="width: 2px !important;">Deactivate</span>
               </td>
             </tr>
           </table>
         </div>
-        <div class="form-control-group">
-          <table style="width: 100%;">
-            <tr>
-              <td align="right" style="width: 20%; vertical-align: top;">
-                <label class="control-label">Site location:</label>&nbsp;&nbsp;&nbsp;
-              </td>
-              <td>
-                <iframe id="map" style="border: 1px dotted #999; padding: 0px; text-align: center; width: 70%; overflow: hidden !important; height: 600px;" src="/map?region"></iframe>
-                <input name="x" class="form-control" id="x" required="" value="" type="hidden" />
-                <input name="y" class="form-control" id="y" required="" value="" type="hidden" />
-              </td>
-            </tr>
-          </table>
-        </div>
-
         <table style="width: 100%;">
           <tr>
             <td style="width: 20%;">
@@ -153,20 +138,15 @@
         return this.optional(element) || /^\d+\.\d+\.\d+\.\d+$/.test(value);
     }, "Not a valid IP address.");
 
-    function switchRegion(region){
-        document.getElementById("map").setAttribute("src", "/map?region=" + region.toLowerCase().trim());
-    }
+
 
     function switchSite(sitename){
         document.getElementById("sitename").value = sites[sitename]["name"];
         document.getElementById("old_site").value = sites[sitename]["name"];
         document.getElementById("ip_address").value = sites[sitename]["ip_address"];
         document.getElementById("port").value = sites[sitename]["port"];
-        document.getElementById("map").setAttribute("src", "/map?region=" + sites[sitename]["region"] + "&x=" + sites[sitename]["x"] + "&y=" + sites[sitename]["y"]);
-        document.getElementById("x").value = sites[sitename]["x"];
-        document.getElementById("y").value = sites[sitename]["y"];
-        document.getElementById("region").value = sites[sitename]["region"];
         document.getElementById("threshold").value = sites[sitename]["threshold"];
+        document.getElementById("active").checked = true
     }
 
 
@@ -178,14 +158,13 @@
                     sitename: {required: true},
                     ip_address:{required: true},
                     port: {required: true},
-                    threshold:{required: true},
-                    region:{required: true}
+                    threshold:{required: true}
+
                 },
                 messages: {
                     sitename: {required: "Please provide a name for the site"},
                     ip_address: {required: "Please provide an IP Address for the site"},
-                    port: {required: "Please provide the port for the application"},
-                    region: {required: "Please select the region for the site"}
+                    port: {required: "Please provide the port for the application"}
                 },
                 highlight: function(element) {
                     $(element).closest('.control-group').removeClass('success').addClass('error');
