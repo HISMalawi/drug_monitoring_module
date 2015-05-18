@@ -45,7 +45,9 @@
         frame.height = frame.contentWindow.document.body.scrollHeight + "px";
         frame.width = frame.contentWindow.document.body.scrollWidth + "px";
       }
-      var circle = ''
+      var circle = '';
+      var previousCircle = '';
+      var previousColor = '';
       function setAttibutes(){
         mainDisplay = document.getElementById('main-display').contentDocument
         facilities = mainDisplay.getElementById("map").contentDocument.getElementsByTagName("circle");
@@ -54,28 +56,28 @@
             this.style.cursor = 'pointer';
           }
           facilities[i].onclick = function(){
+            if (previousCircle != ''){
+              previousCircle.setAttribute("fill", previousColor);
+              clearInterval(blinkInterval);
+            }
             site = this.id;
-            circle = this
-            //window.setInterval(BlinkIt(this), 50);
-            __$("report-display").setAttribute("src", "/report/months_of_stock_main?site="+ site);
-            "butt.css('visibility') === 'hidden' ? '' : 'hidden')"
-            
+            circle = this;
+            previousCircle = circle;
+            previousColor = this.getAttribute("fill");
+            blinkInterval = window.setInterval("BlinkIt()", 300);
+            __$("report-display").setAttribute("src", "/report/months_of_stock_main?site="+ site);            
           }
-          //console.log(this.style.visibility)
         }
       }
 
       var color = "#ffffff";
       function BlinkIt() {
         if (circle != ''){
-          console.log(circle)
           color = (color == "#ffffff")? "#000000" : "#ffffff";
           circle.setAttribute("fill", color);
-          console.log("ddddd")
         }
 
       }
-      window.setInterval("BlinkIt()", 300)
     </script>
   </head>
   <body onresize="resizeTable()" onload="switchViews()">
