@@ -111,10 +111,10 @@
     return document.getElementById(id);
   }
 
-
+  var previousCircle = '';
   function switchViews(){
     clearTimeout(timerHnd);
-
+     if (typeof(blinkInterval) != 'undefined')clearInterval(blinkInterval);
     //window.frames['main-display'].contentDocument.getElementById(sites[current_pos].toLowerCase()).style.fill= "red"
 
     if ((current_pos + 1) >= sites.length)
@@ -129,6 +129,21 @@
     //window.frames['main-display'].contentDocument.getElementById(sites[current_pos].toLowerCase()).style.fill= "green"
 
     __$("report-display").setAttribute("src", "/report/months_of_stock_main?site="+ sites[current_pos]);
+    mainDisplay = document.getElementById('main-display').contentDocument
+    facility = mainDisplay.getElementById("map").contentDocument.getElementById(sites[current_pos]);
+
+    console.log(previousCircle)
+    if (previousCircle != ''){
+      previousCircle.setAttribute("fill", previousColor);
+      clearInterval(blinkInterval);
+    }
+    if (facility){
+      circle = facility;
+      previousCircle = circle;
+      previousColor = previousCircle.getAttribute("fill");
+    }
+    blinkInterval = window.setInterval("BlinkIt()", 300);
+
     timerHnd = setTimeout("switchViews()", timerSpacing * 1000);
   }
 
