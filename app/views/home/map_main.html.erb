@@ -12,7 +12,7 @@
     <script type="text/javascript" src="/javascripts/data/sites_by_zones.js"></script>
     <script type="text/javascript" src="/javascripts/data/zones.js"></script>
     <script type="text/javascript" src="/javascripts/data/district_offsets.js"></script>
-
+    <script type="text/javascript" src="/javascripts/jquery.js"></script>
     <script>
       var availableSites = []
       for (var zone in sites_by_zones){
@@ -140,7 +140,6 @@
       var connections = <%= @connections.to_json.html_safe %>;
       var sites = <%= @sites.to_json.html_safe %>;
       var total = 1;
-
       var spacing = 10;
       var pollInterval = spacing * 1000;
       var timerHnd;
@@ -171,30 +170,38 @@
         for (var s in sites){
           x = sites[s].x;
           y = sites[s].y;
-          var name = sites[s].name
+          var name = sites[s].name;
+          var newNotices = sites[s].new_notices;
+          var notInvestigating = sites[s].not_investigating;
+          var proportion = sites[s].proportion;
           var result = latLon2Coord(y, x)
           var colors = ["rgba(255,0,0,0.9)", "rgba(0,200,0,0.9)", "rgba(0,0,200,0.9)"];
 
           var pos = Math.round((Math.random() * 10)) % 3;
 
-          insertSite(result[0], result[1], colors[pos], name);
+          insertSite(result[0], result[1], colors[pos], name, newNotices, notInvestigating, proportion);
         }
       }
   
-      function insertSite(x, y, color, id) {
+      function insertSite(x, y, color, id, new_notice, not_invest, prop) {
         var doc = __$("map").contentDocument;
 
         var mw = doc.getElementById("malawi");
 
         var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-        id = id.toLowerCase();
+        //id = id.toLowerCase();
+        var tooltip = id;
+        tooltip+='\nNew notices: ' + new_notice;
+        tooltip+='\nNot Investigating: ' + not_invest;
+        tooltip+='\nProportion: ' + prop;
         circle.setAttribute("cx", x);
 
         circle.setAttribute("cy", y);
 
         circle.setAttribute("r", 5);
 
-        circle.setAttribute("id", id);
+        circle.setAttribute("id", id.toLowerCase());
+        circle.setAttribute("title", tooltip);
 
         circle.setAttribute("fill", color);
 
