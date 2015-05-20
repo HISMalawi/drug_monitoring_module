@@ -3,6 +3,7 @@ class AdministrationController < ApplicationController
   end
   def add_site
     @nojquery = true
+    @sites = Site.where(:active => false)
   end
   def list_sites
     sites = Site.where(:active => true)

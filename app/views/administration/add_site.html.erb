@@ -4,18 +4,7 @@
 <script type="text/javascript" src="/javascripts/jquery.validate.min.js"></script>
 <script src="/javascripts/modernizr-2.6.2-respond-1.1.0.min.js"></script>
 <script src="/javascripts/chosen.jquery.min.js"></script>
-<script type="text/javascript" src="/javascripts/data/sites_by_zones.js"></script>
 
-<script>
-  var availableSites = []
-  for (var zone in sites_by_zones){
-    for ( var facility in sites_by_zones[zone]){
-      myFacility = sites_by_zones[zone][facility]["facility"];
-      myFacility = unescape('<option>' + myFacility.replace(/\+/g, " ") + '</option>'); //Replace every + with space
-      availableSites.push(myFacility);
-    }
-  }
-</script>
 <style type="text/css">
   td {
     padding: 10px !important;
@@ -55,7 +44,13 @@
               <label class="control-label" for="select01">Select Site</label>
             </td>
             <td>
-              <select id="select01" name="sitename" class="chzn-select form-control" required=""></select>
+
+              <%= select_tag("select01", options_for_select(@sites.map(&:name)),
+                {:class =>'chzn-select form-control',
+                  :required => '',
+                  :name => 'sitename'
+                })
+            %>
             </td>
           </tr>
         </table>
@@ -164,7 +159,6 @@
   $(function() {
     $(".chzn-select").chosen();
   });
-  selectTag = document.getElementById('select01');
-  selectTag.innerHTML = availableSites;
+
 </script>
 
