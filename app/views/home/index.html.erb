@@ -1,24 +1,24 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title></title>
-  <base target="_parent"/>
-  <style>
+  <head>
+    <title></title>
+    <base target="_parent"/>
+    <style>
       body {
-          overflow: hidden;
-          margin: 0px;
+        overflow: hidden;
+        margin: 0px;
       }
 
       .table {
-          display: table;
+        display: table;
       }
 
       .row {
-          display: table-row;
+        display: table-row;
       }
 
       .cell {
-          display: table-cell;
+        display: table-cell;
       }
 
       .contents {
@@ -27,94 +27,143 @@
       }
 
 
-  </style>
-<script type="text/javascript">
-  window.switch = function (site)
-  {
+    </style>
+    <script type="text/javascript">
+      window.switch = function (site)
+      {
 
-      window.frames['main-display'].contentDocument.getElementById(sites[current_pos]).style.fill= "red"
-      window.frames['main-display'].contentDocument.getElementById(sites[sites.indexOf(site)]).style.fill= "green"
-      current_pos = sites.indexOf(site)
-      __$("report-display").setAttribute("src", "/report/months_of_stock_main?site="+ site);
-  }
+        window.frames['main-display'].contentDocument.getElementById(sites[current_pos]).style.fill= "red"
+        window.frames['main-display'].contentDocument.getElementById(sites[sites.indexOf(site)]).style.fill= "green"
+        current_pos = sites.indexOf(site)
+        __$("report-display").setAttribute("src", "/report/months_of_stock_main?site="+ site);
+      }
 
 
       function resizeIframe(id){
 
-          var frame = document.getElementById(id);
-          frame.height = frame.contentWindow.document.body.scrollHeight + "px";
-          frame.width = frame.contentWindow.document.body.scrollWidth + "px";
+        var frame = document.getElementById(id);
+        frame.height = frame.contentWindow.document.body.scrollHeight + "px";
+        frame.width = frame.contentWindow.document.body.scrollWidth + "px";
       }
-  </script>
-</head>
-<body onresize="resizeTable()" onload="switchViews()">
-
-<div id="main" class="table" style="width: 99%; height: 83vh; border: 0px solid #000; top: 50px; position: absolute;">
-  <div class="row">
-    <div style="text-align: center;background-color: #f5f5f5;border: 1px solid rgba(0, 0, 0, 0.05);border-radius: 4px;padding-left: 50px;" >
-      <iframe id="main-display" onload="resizeIframe(this.id)" style=" height: 85vh;width: 100%; border: none; overflow: auto;" src="/home/map_main"></iframe>
-    </div>
-    <div class="cell" style="vertical-align: top;width: 65%;">
-      <iframe id="report-display" style="width: 100%;border: none; height: 90vh;overflow: auto;" ></iframe>
-    </div>
-  </div>
-</div>
-
-<script>
-    <!--
-
-    var sites = []
-    var current_pos = 0;
-    var timerHnd;
-
-    var timerSpacing = 40;
-
-
-    <% (@sites || []).each do |site| %>
-        sites.push('<%= site.name.downcase %>')
-    <% end %>
-
-    function __$(id){
-        return document.getElementById(id);
-    }
-
-
-    function switchViews(){
-        clearTimeout(timerHnd);
-
-        //window.frames['main-display'].contentDocument.getElementById(sites[current_pos].toLowerCase()).style.fill= "red"
-
-        if ((current_pos + 1) >= sites.length)
-        {
-           current_pos = 0;
+      var circle = '';
+      var previousCircle = '';
+      var previousColor = '';
+      function setAttibutes(){
+        mainDisplay = document.getElementById('main-display').contentDocument
+        facilities = mainDisplay.getElementById("map").contentDocument.getElementsByTagName("circle");
+        for (var i=0; i<= facilities.length - 1; i++){
+          facilities[i].onmouseover = function(){
+            this.style.cursor = 'pointer';
+          }
+          facilities[i].onclick = function(){
+            if (previousCircle != ''){
+              previousCircle.setAttribute("fill", previousColor);
+              clearInterval(blinkInterval);
+            }
+            site = this.id;
+            circle = this;
+            previousCircle = circle;
+            previousColor = this.getAttribute("fill");
+            blinkInterval = window.setInterval("BlinkIt()", 300);
+            __$("report-display").setAttribute("src", "/report/months_of_stock_main?site="+ site);            
+          }
         }
-        else
-        {
-            current_pos += 1;
+      }
+
+      var color = "white";
+      function BlinkIt() {
+        if (circle != ''){
+          color = (color == "white")? "red" : "white";
+          circle.setAttribute("fill", color);
         }
 
-        //window.frames['main-display'].contentDocument.getElementById(sites[current_pos].toLowerCase()).style.fill= "green"
+      }
+    </script>
+  </head>
+  <body onresize="resizeTable()" onload="switchViews()">
 
-        __$("report-display").setAttribute("src", "/report/months_of_stock_main?site="+ sites[current_pos]);
-        timerHnd = setTimeout("switchViews()", timerSpacing * 1000);
+    <div id="main" class="table" style="width: 99%; height: 83vh; border: 0px solid #000; top: 50px; position: absolute;">
+      <div class="row">
+        <div style="text-align: center;background-color: #f5f5f5;border: 1px solid rgba(0, 0, 0, 0.05);border-radius: 4px;padding-left: 50px;" >
+          <iframe id="main-display" onload="resizeIframe(this.id)" style=" height: 85vh;width: 100%; border: none; overflow: auto;" src="/home/map_main"></iframe>
+        </div>
+        <div class="cell" style="vertical-align: top;width: 65%;">
+          <iframe id="report-display" style="width: 100%;border: none; height: 90vh;overflow: auto;" ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      <!--
+
+      var sites = []
+      var current_pos = 0;
+      var timerHnd;
+
+      var timerSpacing = 40;
+
+
+<% (@sites || []).each do |site| %>
+    sites.push('<%= site.name.downcase %>')
+<% end %>
+
+  function __$(id){
+    return document.getElementById(id);
+  }
+
+  var previousCircle = '';
+  function switchViews(){
+    clearTimeout(timerHnd);
+    if (typeof(blinkInterval) != 'undefined')clearInterval(blinkInterval);
+    //window.frames['main-display'].contentDocument.getElementById(sites[current_pos].toLowerCase()).style.fill= "red"
+
+    if ((current_pos + 1) >= sites.length)
+    {
+      current_pos = 0;
+    }
+    else
+    {
+      current_pos += 1;
     }
 
-    function resizeTable(){
-        __$("main").style.height = "83vh";
+    //window.frames['main-display'].contentDocument.getElementById(sites[current_pos].toLowerCase()).style.fill= "green"
 
-        __$("main-display").style.height = "85vh";
-
-        __$("report-display").style.height = "90vh";
-
-        __$("main-display").style.width = "100%";
-
-        __$("report-display").style.width = "100%";
+    __$("report-display").setAttribute("src", "/report/months_of_stock_main?site="+ sites[current_pos]);
+    mainDisplay = document.getElementById('main-display').contentDocument;
+    facility = mainDisplay.getElementById("map").contentDocument.getElementById(sites[current_pos]);
+    if (previousCircle != ''){
+      previousCircle.setAttribute("fill", previousColor);
+      clearInterval(blinkInterval);
     }
 
-    timerHnd = setTimeout("switchViews()", timerSpacing * 1000);
+    if (facility){
+      circle = facility;
+      previousCircle = circle;
+      previousColor = previousCircle.getAttribute("fill");
+    }
 
-    //-->
-</script>
+    blinkInterval = window.setInterval("BlinkIt()", 300);
 
-</body>
+    timerHnd = setTimeout("switchViews()", timerSpacing * 500);
+  }
+ 
+  function resizeTable(){
+    __$("main").style.height = "83vh";
+
+    __$("main-display").style.height = "85vh";
+
+    __$("report-display").style.height = "90vh";
+
+    __$("main-display").style.width = "100%";
+
+    __$("report-display").style.width = "100%";
+  }
+
+  timerHnd = setTimeout("switchViews()", timerSpacing * 1000);
+
+  //-->
+  window.setInterval("setAttibutes()", 350);
+    </script>
+
+  </body>
 </html>

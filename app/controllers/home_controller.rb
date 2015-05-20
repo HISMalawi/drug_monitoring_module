@@ -1,6 +1,6 @@
 class HomeController < ApplicationController
   def index
-    @sites = Site.all
+    @sites = Site.where(:active => true)
   end
 
   def graph

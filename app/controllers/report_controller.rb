@@ -24,11 +24,11 @@ class ReportController < ApplicationController
   end
 
   def site_list
-    @sites = Site.all
+    @sites = Site.where(:active => true)
   end
 
   def report_menu
-    @sites = Site.all_sites
+    @sites = Site.where(:active => true).collect { |x| x.name }
     @drugs = drugs
 
   end
@@ -230,7 +230,7 @@ class ReportController < ApplicationController
       @stocks = Observation.drug_stock_out_predictions(params[:type])
     end
 
-    @sites = Site.all.map(&:name)
+    @sites = Site.where(:active => true).map(&:name)
     @drugs = []
     if params[:name] == "stock_movement"
       definition_id = Definition.where(:name => "Supervision verification").first.id
@@ -416,7 +416,7 @@ class ReportController < ApplicationController
 
     if request.get?
       @tree = {}
-      @tree["Available Sites"] = Site.all.collect{|x| x.name}
+      @tree["Available Sites"] = Site.where(:active => true).collect{|x| x.name}
       @nojquery = true
     else
       @site = Site.find_by_name(params[:site_name])
@@ -561,7 +561,7 @@ class ReportController < ApplicationController
   def notices
     if request.get?
       @tree = {}
-      @tree["Available Sites"] = Site.all.collect{|x| x.name}
+      @tree["Available Sites"] = Site.where(:active => true).collect{|x| x.name}
       @nojquery = true
     else
 

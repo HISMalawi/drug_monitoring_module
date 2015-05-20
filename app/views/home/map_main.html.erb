@@ -12,7 +12,7 @@
     <script type="text/javascript" src="/javascripts/data/sites_by_zones.js"></script>
     <script type="text/javascript" src="/javascripts/data/zones.js"></script>
     <script type="text/javascript" src="/javascripts/data/district_offsets.js"></script>
-
+    <script type="text/javascript" src="/javascripts/jquery.js"></script>
     <script>
       var availableSites = []
       for (var zone in sites_by_zones){
@@ -140,7 +140,6 @@
       var connections = <%= @connections.to_json.html_safe %>;
       var sites = <%= @sites.to_json.html_safe %>;
       var total = 1;
-
       var spacing = 10;
       var pollInterval = spacing * 1000;
       var timerHnd;
@@ -171,33 +170,43 @@
         for (var s in sites){
           x = sites[s].x;
           y = sites[s].y;
+          var name = sites[s].name;
+          var newNotices = sites[s].new_notices;
+          var notInvestigating = sites[s].not_investigating;
+          var proportion = sites[s].proportion;
           var result = latLon2Coord(y, x)
           var colors = ["rgba(255,0,0,0.9)", "rgba(0,200,0,0.9)", "rgba(0,0,200,0.9)"];
 
           var pos = Math.round((Math.random() * 10)) % 3;
 
-          insertSite(result[0], result[1], colors[pos], 'site');
+          insertSite(result[0], result[1], colors[pos], name, newNotices, notInvestigating, proportion);
         }
       }
   
-      function insertSite(x, y, color, id) {
+      function insertSite(x, y, color, id, new_notice, not_invest, prop) {
         var doc = __$("map").contentDocument;
 
         var mw = doc.getElementById("malawi");
 
         var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-
+        //id = id.toLowerCase();
+        var tooltip = id;
+        tooltip+='\nNew notices: ' + new_notice;
+        tooltip+='\nNot Investigating: ' + not_invest;
+        tooltip+='\nProportion: ' + prop;
         circle.setAttribute("cx", x);
 
         circle.setAttribute("cy", y);
 
-        circle.setAttribute("r", 2);
+        circle.setAttribute("r", 5);
 
-        circle.setAttribute("id", id);
+        circle.setAttribute("id", id.toLowerCase());
+        circle.setAttribute("title", tooltip);
 
         circle.setAttribute("fill", color);
 
         circle.setAttribute("stroke", "black");
+
 
         mw.appendChild(circle);
       }
@@ -208,40 +217,7 @@
         }
       }
 
-      /*function insertSite() {
-    var doc = document.getElementById("map").contentDocument;
-
-    var mw = doc.getElementById("malawi");
-
-    for(var i = 0; i < sites.length; i++){
-      if(sites[i]["x"] != null && sites[i]["y"] != null){
-        if(sites[i]["region"].toLowerCase() == "centre"){
-          x = Math.round(sites[i]["x"]);
-          y = Math.round(sites[i]["y"]) + 373;
-        }
-        if(sites[i]["region"].toLowerCase() == "north"){
-          x = Math.round(sites[i]["x"]) + 39
-          y = Math.round(sites[i]["y"])
-        }
-
-        if(sites[i]["region"].toLowerCase() == "south"){
-
-          xs = Math.round(sites[i]["x"]) + 212
-          ys = Math.round(sites[i]["y"]) + 552
-
-        }
-        id = 'test'
-        var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-        circle.setAttribute("cx", x);
-        circle.setAttribute("cy", y);
-        circle.setAttribute("r", 10);
-        circle.setAttribute("id", id);
-        circle.setAttribute("fill", "red");
-        circle.setAttribute("stroke", "black");
-        mw.appendChild(circle);
-      }
-    }
-  }*/
+    
 
 
       /*function loadSites(){
@@ -382,7 +358,7 @@
          // meter.transition().delay(250).attr("transform", "scale(0)");
          });
        */
-      window.setTimeout("loadSites();", 350)
+      window.setTimeout("loadSites();", 10);
     </script>
   </body>
 </html>
