@@ -357,6 +357,7 @@ class ReportController < ApplicationController
     end
 
     @stocks = {}
+    @stocks[drug] = {}
     n = controlled_bound
 
     stocks.each do |drg, data|
