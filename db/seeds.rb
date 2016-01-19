@@ -66,35 +66,9 @@ puts 'loading drugs'
 `rails runner #{Rails.root}/script/load_drug_maps.rb`
 
 
-definition = Definition.find_by_name("HIV Unit Drugs").id
 
 puts "Load drug set"
-drugs = [ ["ABC/3TC (Abacavir and Lamivudine 60/30mg tablet)",1],
-         ["AZT/3TC (Zidovudine and Lamivudine 60/30 tablet)",2],
-         ["AZT/3TC (Zidovudine and Lamivudine 300/150mg)",3],
-         ["AZT/3TC/NVP (60/30/50mg tablet)",4],
-         ["AZT/3TC/NVP (300/150/200mg tablet)",5],
-         ["d4T/3TC (Stavudine Lamivudine 6/30mg tablet)",6],
-         ["d4T/3TC (Stavudine Lamivudine 30/150 tablet)",7],
-         ["Triomune baby (d4T/3TC/NVP 6/30/50mg tablet)",8],
-         ["d4T/3TC/NVP (30/150/200mg tablet)",9],
-         ["EFV (Efavirenz 200mg tablet)",10],
-         ["EFV (Efavirenz 600mg tablet)",11],
-         ["LPV/r (Lopinavir and Ritonavir 100/25mg tablet)",12],
-         ["LPV/r (Lopinavir and Ritonavir 200/50mg tablet)",13],
-         # "LPV/r (Lopinavir and Ritonavir syrup)",
-         ["ATV/r (Atazanavir 300mg/Ritonavir 100mg)",14],
-         ["NVP (Nevirapine 200 mg tablet)",15],
-         ["TDF/3TC (Tenofavir and Lamivudine 300/300mg tablet",16],
-         ["TDF/3TC/EFV (300/300/600mg tablet)",17],
-         ["NVP (Nevirapine syrup 1mL/dose in 25mL bottle)",18],
-         ["Cotrimoxazole (480mg tablet)",19],
-         ["Cotrimoxazole (960mg)",20]]
 
-(drugs || []).each do |drug|
-  drug_id = Drug.where("full_name = ? OR short_name = ?", "#{drug[0]}", "#{drug[0]}").first.id
-  DrugSet.where({:definition_id => definition, :drug_id => drug_id, :weight => drug[1]}).first_or_create
-end
 
 puts "Loading sites"
 
@@ -11730,4 +11704,45 @@ sites_by_zones = {"chitipa"=> [
                 :active => false}).first_or_create
   end
 
+end
+
+puts "Create Drug CMS "
+def load_cms_drugs
+  cms_drugs = Spreadsheet.open "#{Rails.root}/script/cms.xls"
+  sheet1 = cms_drugs.worksheet 0
+
+  ActiveRecord::Base.transaction do
+    sheet1.each 1 do |row|
+      drug_name = row[0]
+      drug_code = row[1]
+      drug_inventory_id = row[2]
+      drug_short_name = row[3]
+      drug_tabs = row[4]
+      weight = row[5]
+      strength = row[6]
+      puts "#{drug_name} ......... #{drug_inventory_id}"
+      pack_size = drug_name.split(/[^\d]/).last rescue nil
+      next if drug_inventory_id.blank?
+      next if pack_size.blank?
+      drug_cms = DrugCms.find(drug_inventory_id) rescue nil
+      drug_cms = DrugCms.new if drug_cms.blank?
+      drug_cms.drug_inventory_id = drug_inventory_id
+      drug_cms.name = drug_name
+      drug_cms.short_name = drug_short_name
+      drug_cms.tabs = drug_tabs
+      drug_cms.code = drug_code
+      drug_cms.pack_size = pack_size
+      drug_cms.weight = weight
+      drug_cms.strength = strength
+      drug_cms.save
+    end
+  end
+end
+
+load_cms_drugs
+
+definition = Definition.find_by_name("HIV Unit Drugs").id
+(DrugCms.all || []).each do |drug|
+  drug_id = drug.drug_inventory_id
+  DrugSet.where({:definition_id => definition, :drug_id => drug_id, :weight => drug.weight}).first_or_create
 end
