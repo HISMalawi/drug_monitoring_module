@@ -323,7 +323,14 @@ class ReportController < ApplicationController
 
     definition_id = Definition.where(:name => "Supervision verification").first.id
     site_id = params[:site_id]
-    drug = Drug.check(params[:drug])
+    drug = nil
+    map = {}
+    DrugCms.all.each do |drug_cms|
+      short_name = "#{drug_cms.short_name} #{drug_cms.strength} #{drug_cms.tabs}"
+      map[short_name] = drug_cms.drug_inventory_id
+    end
+    drug = map[params[:drug]]
+    #drug = Drug.check(params[:drug])
 
     stocks = {}
    
@@ -360,42 +367,17 @@ class ReportController < ApplicationController
     end
 
     @stocks = {}
-    @stocks[drug] = {}
     n = controlled_bound
 
-    stocks.each do |drg, data|
-     # next if drug.present? and drg != drug
-      @stocks[drg] = {} unless @stocks.keys.include?(drg)
-
-      latestcount = 0
-      while n <= params[:end_date].to_date
-      
-        if !data[n.to_date].blank? && data[n.to_date].to_i > 0
-          latestcount = data[n.to_date]
-          @stocks[drg][n.to_date]= {"stock_count" => latestcount}
-        else
-          dispensed = Observation.dispensed(drg, (n.to_date - 1.days), @unitQty)
-          relocated = Observation.relocated(drg, (n.to_date - 1.days), @unitQty)
-          latestcount = latestcount - (dispensed + relocated)
-          @stocks[drg][n.to_date]= {"stock_count" => latestcount, "dispensed" => dispensed, "relocated" => relocated}
-        end
-
-        n = n + 1.day
-      end
-      n = controlled_bound
+    while n <= params[:end_date].to_date
+      stock_level = (Observation.calculate_stock_level(drug, site_id, n)/@unitQty).round rescue 0
+      @stocks[n.to_date]= {"stock_count" => stock_level}
+      n = n + 1.day
     end
-=begin
-    @stocks.each{|k, arr|
-      @stocks[k] = arr.sort{|a,b|a[0].to_date <=> b[0].to_date}
-    }
-=end
-    puts "#{params[:drug_name]}"
-
-    @stocks[drug]["relocation_dates"] = relocation_flags
-    @stocks[drug]["delivery_dates"] = delivery_flags
-    @stocks[drug]["supervision_dates"] = supervision_flags
-
-    render :text => @stocks[drug].to_json
+   # @stocks["relocation_dates"] = relocation_flags
+    #@stocks["delivery_dates"] = delivery_flags
+    #@stocks["supervision_dates"] = supervision_flags
+    render :text => @stocks.to_json
   end
   
   def drugs
@@ -452,11 +434,11 @@ class ReportController < ApplicationController
     if site_id.blank? || site_id < 1
       @stocks = {}
     else
-      @site = Site.find(site_id).name
       start_date = params[:start_date] || nil
       end_date = params[:end_date] || nil
-      delivery_code = params[:delivery_code] || nil    
-      @stocks = Observation.deliveries(site_id, start_date, end_date, delivery_code)
+      delivery_code = params[:delivery_code] || nil
+      @stocks = Observation.
+      @site = Site.find(site_id).namedeliveries(site_id, start_date, end_date, delivery_code)
     end
 
     raise @stocks.inspect

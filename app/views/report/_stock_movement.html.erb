@@ -47,21 +47,9 @@
 
                         var labl = (unit == 1) ? " pills " : (" tins of " + unit);
 
-                        main_text = '<span  style= "font-weight: bold; font-size : 10px;">' +
+                        return '<span  style= "font-weight: bold; font-size : 10px;">' +
                                 'Date:  &nbsp&nbsp&nbsp&nbsp<span style="color: #097054; " >' + Highcharts.dateFormat('%A, %e %B %Y', this.x) + '</span> <br />' +
-                                'Stock Level:  &nbsp&nbsp&nbsp<span style="color: #097054; " >' + this.y + labl + '</span> <br />'
-                        if (results[Highcharts.dateFormat('%Y-%m-%d', this.x)]["dispensed"] == null)
-                        {
-                            return '<span style="color: #ff0000;" >Supervision Visit </span><br/>' +main_text
-                        }
-                        else
-                        {
-                            return main_text + 'Dispensed:  &nbsp&nbsp&nbsp&nbsp<span style="color: #097054; " >' +
-                                    results[Highcharts.dateFormat('%Y-%m-%d', this.x)]["dispensed"] + labl + '</span> <br />' +
-                                    'Relocated:  &nbsp&nbsp&nbsp&nbsp<span style="color: #097054; " >' +
-                                    results[Highcharts.dateFormat('%Y-%m-%d', this.x)]["relocated"] + labl + '</span> <br />'
-                        }
-
+                                'Stock Level:  &nbsp&nbsp&nbsp<span style="color: #097054; " >' + this.y + labl + '</span>'
 
                     }
                 },

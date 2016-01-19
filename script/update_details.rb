@@ -8,6 +8,9 @@ $drug_given_to_id = Definition.where(:name => "People who received drugs").first
 $drug_prescribed_id = Definition.where(:name => "People prescribed drug").first.id
 $drug_stock_level_id = Definition.where(:name => "Stock level").first.id
 $drug_rate_id = Definition.where(:name => "Drug rate").first.id
+$receipts_id = Definition.where(:name => "New Delivery").first.id
+$clinic_id = Definition.where(:name => "Clinic verification").first.id
+$supervision_id = Definition.where(:name => "Supervision verification").first.id
 
 def start
 
@@ -125,6 +128,27 @@ def record(site, date,data)
     else
       relocation_obs.value_numeric = value
       relocation_obs.save
+    end
+
+  end
+
+  (data['receipts'] || []).each do |key,value|
+    next if value == 0
+    receipts_ob = Observation.where(:site_id => site.id,
+                                       :definition_id => $receipts_id,
+                                       :value_drug => key,
+                                       :value_date => date
+    ).first
+
+    if receipts_ob.blank?
+      Observation.create({:site_id => site.id,
+                          :definition_id => $receipts_id,
+                          :value_numeric => value,
+                          :value_drug => key,
+                          :value_date => date})
+    else
+      receipts_ob.value_numeric = value
+      receipts_ob.save
     end
 
   end
