@@ -481,7 +481,8 @@ class ReportController < ApplicationController
         stocked_out = (disp_rate.to_i != 0 && month_of_stock.to_f.round(3) == 0.00)
 
         active = (disp_rate.to_i == 0 && stock_level.to_i != 0)? false : true
-        @list[Drug.find(drug.drug_id).short_name] = {"month_of_stock" => month_of_stock,"weight" => drug.weight,
+        drug = DrugCms.find(drug.drug_id)
+        @list["#{drug.short_name} #{drug.strength} #{drug.tabs}"] = {"month_of_stock" => month_of_stock,"weight" => drug.weight,
                                                      "stock_level" => stock_level, "consumption_rate" => disp_rate,
                                                      "stocked_out" => stocked_out, "active" => active
                                                     }
