@@ -15,9 +15,11 @@ class ReportController < ApplicationController
     @tree["Drug categories"]['Antiviral'] = []
     @tree["Drug categories"]['Antifungal'] = []
     @tree["Drug categories"]['Antimalarial'] = []
+    @tree["Drug categories"]['Unknown'] = []
 
-    DrugSet.where(:definition_id =>hiv_unit_drugs ).order("weight asc").each do |drug|
-      @tree["Drug categories"][drug.drug.get_category] << drug.drug.short_name
+    DrugSet.where(:definition_id =>hiv_unit_drugs ).order("weight asc").each do |drug_set|
+      drug_cms = drug_set.drug_cms
+      @tree["Drug categories"][drug_cms.get_category] << "#{drug_cms.short_name} #{drug_cms.strength} #{drug_cms.tabs}"
     end
     #@sheets["Sheets"] = {}
 
