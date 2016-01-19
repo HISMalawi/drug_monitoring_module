@@ -11709,7 +11709,7 @@ end
 
 puts "Create Drug CMS "
 def load_cms_drugs
-  cms_drugs = Spreadsheet.open "#{Rails.root}/script/cms.xls"
+  cms_drugs = Spreadsheet.open "#{Rails.root}/db/cms.xls"
   sheet1 = cms_drugs.worksheet 0
 
   ActiveRecord::Base.transaction do
@@ -11721,6 +11721,7 @@ def load_cms_drugs
       drug_tabs = row[4]
       weight = row[5]
       strength = row[6]
+      category = row[7]
       puts "#{drug_name} ......... #{drug_inventory_id}"
       pack_size = drug_name.split(/[^\d]/).last rescue nil
       next if drug_inventory_id.blank?
@@ -11735,6 +11736,7 @@ def load_cms_drugs
       drug_cms.pack_size = pack_size
       drug_cms.weight = weight
       drug_cms.strength = strength
+      drug_cms.category = Definition.find_by_name(category).id
       drug_cms.save
     end
   end
