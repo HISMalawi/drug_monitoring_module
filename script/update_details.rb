@@ -6,6 +6,7 @@ $dispensation_id = Definition.where(:name => "dispensation").first.id
 $relocation_id = Definition.where(:name => "relocation").first.id
 $drug_given_to_id = Definition.where(:name => "People who received drugs").first.id
 $drug_prescribed_id = Definition.where(:name => "People prescribed drug").first.id
+$drug_stock_level_id = Definition.where(:name => "Stock level").first.id
 
 def start
 
@@ -21,6 +22,7 @@ def start
           puts "**** Error when pulling data from site #{site.name}"
           next
         )
+        puts "............. #{site.name}: #{date}"
         record(site,date ,data)
         date += 1.day
       end
@@ -126,76 +128,25 @@ def record(site, date,data)
 
   end
 
-  (data['stock_level'].keys || []).each do |drug|
+  (data['stock_level'] || []).each do |drug_id, value|
+    next if value == 0
+    relocation_obs = Observation.where(:site_id => site.id,
+      :definition_id => $drug_stock_level_id,
+      :value_drug => drug_id,
+      :value_date => date
+    ).first
 
-    data['stock_level'][drug].each do |key, value|
-      $definition_id = Definition.where(:name => key).first.id
-      if value.class.to_s == "Array"
-        
-        if value.first.class.to_s == "Array"
-
-          value.each do |val|
-            
-            pills = val[0]
-            date_of_count = val[1]
-            value_text = val[2] if val[2].present?
-            next if date_of_count.blank?
-            stock_obs = Observation.where(:site_id => site.id,
-              :definition_id => $definition_id,
-              :value_drug => Drug.check(drug),
-              :value_date => date_of_count
-            ).first
-            if stock_obs.blank?
-              Observation.create({:site_id => site.id,
-                  :definition_id => $definition_id,
-                  :value_numeric => pills,
-                  :value_drug => Drug.check(drug),
-                  :value_text => value_text,
-                  :value_date => date_of_count})
-            else
-              stock_obs.value_numeric = pills
-              stock_obs.save
-            end
-          end
-        else
-          pills = value[0]
-          date_of_count = value[1]
-          next if date_of_count.blank?
-          stock_obs = Observation.where(:site_id => site.id,
-            :definition_id => $definition_id,
-            :value_drug => Drug.check(drug),
-            :value_date => date_of_count
-          ).first
-          if stock_obs.blank?
-            Observation.create({:site_id => site.id,
-                :definition_id => $definition_id,
-                :value_numeric => pills,
-                :value_drug => Drug.check(drug),
-                :value_date => date_of_count})
-          else
-            stock_obs.value_numeric = pills
-            stock_obs.save
-          end
-        end
-      else
-
-        stock_single_obs = Observation.where(:site_id => site.id,
-          :definition_id => $definition_id,
-          :value_drug => Drug.check(drug),
-          :value_date => date
-        ).first
-        if stock_single_obs.blank?
-          Observation.create({:site_id => site.id,
-              :definition_id => $definition_id,
-              :value_numeric => value,
-              :value_drug => Drug.check(drug),
-              :value_date => date})
-        else
-          stock_single_obs.value_numeric = value
-          stock_single_obs.save
-        end
-      end
+    if relocation_obs.blank?
+      Observation.create({:site_id => site.id,
+          :definition_id => $drug_stock_level_id,
+          :value_numeric => value,
+          :value_drug => drug_id,
+          :value_date => date})
+    else
+      relocation_obs.value_numeric = value
+      relocation_obs.save
     end
+
   end
 
 end

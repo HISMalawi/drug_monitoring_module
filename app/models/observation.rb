@@ -8,7 +8,7 @@ class Observation < ActiveRecord::Base
   validates_presence_of :definition_id
 
   def get_short_form
-    DrugMap.where(:full_name => self.value_drug).first.short_name rescue self.value_drug
+    DrugCms.where(:drug_inventory_id => self.value_drug).first.short_name rescue self.value_drug
   end
 
   def definition_name
@@ -388,7 +388,7 @@ class Observation < ActiveRecord::Base
   end
 
   def self.calculate_stock_level(drug, site_id, date = Date.today )
-
+=begin
     total_delivered_defn = Definition.find_by_name("supervision verification").id
 
     obs = Observation.find_by_sql("SELECT value_numeric, MAX(value_date) as date FROM observations WHERE voided = 0
@@ -404,13 +404,22 @@ class Observation < ActiveRecord::Base
     stock_level = total_delivered.to_i - (dispensed_total.to_i + removed_total.to_i)
 
     if stock_level < 0
-      d = Drug.find(drug).short_name
+      d = DrugCms.find(drug).short_name
       notice = "negative stock for #{d}"
       Observation.create_notification(site_id,obs.date, notice, drug)
     end
 
     return stock_level < 0 ? 0 : stock_level
+=end
+    stock_level_defn = Definition.find_by_name("Stock level").id
+    obs = Observation.find_by_sql("SELECT value_numeric FROM observations WHERE voided = 0
+          AND definition_id = #{stock_level_defn} AND value_drug = #{drug}
+          AND site_id = #{site_id} AND value_date <= '#{date}'
+          AND value_date = (SELECT MAX(value_date) FROM observations WHERE voided = 0
+          AND definition_id = #{stock_level_defn} AND value_drug = #{drug}
+          AND site_id = #{site_id} AND value_date <= '#{date}')")
 
+    return obs.first.value_numeric rescue 0
   end
 
   def self.calculate_month_of_stock(drug, site_id, unitQty = 60)
@@ -430,10 +439,10 @@ class Observation < ActiveRecord::Base
       month_of_stock = (expected/ consumption_rate)
 
       if month_of_stock <= 2.0
-        notice = "#{Drug.find(drug).short_name} stock running low"
+        notice = "#{DrugCms.find(drug).short_name} stock running low"
         Observation.create_notification(site_id,Date.today,notice,drug)
       elsif month_of_stock >= 7.0
-        notice = "#{Site.find(site_id).name} has excess #{Drug.find(drug).short_name} stock"
+        notice = "#{Site.find(site_id).name} has excess #{DrugCms.find(drug).short_name} stock"
         Observation.create_notification(site_id,Date.today,notice,drug)
       end
 
@@ -477,8 +486,8 @@ class Observation < ActiveRecord::Base
 
       (result || []).each do |record|
 
-        results[Drug.find(record.value_drug).short_name] = [] if results[Drug.find(record.value_drug).short_name].blank?
-        results[Drug.find(record.value_drug).short_name] <<  {"value" => (record.value.to_i/unitQty.to_f).round, "code" => record.code}
+        results[DrugCms.find(record.value_drug).short_name] = [] if results[DrugCms.find(record.value_drug).short_name].blank?
+        results[DrugCms.find(record.value_drug).short_name] <<  {"value" => (record.value.to_i/unitQty.to_f).round, "code" => record.code}
       end
 
     return results
@@ -495,7 +504,7 @@ class Observation < ActiveRecord::Base
                                     GROUP BY value_drug, value_date")
 
     (result || []).each do |record|
-      results <<  {"value" => (record.value.to_i/unitQty.to_f).round, "date" => record.date, "drug" => Drug.find(record.value_drug).short_name}
+      results <<  {"value" => (record.value.to_i/unitQty.to_f).round, "date" => record.date, "drug" => DrugCms.find(record.value_drug).short_name}
     end
 
     return results
@@ -515,8 +524,8 @@ class Observation < ActiveRecord::Base
 
     (result || []).each do |record|
 
-      results[Drug.find(record.value_drug).short_name] = [] if results[Drug.find(record.value_drug).short_name].blank?
-      results[Drug.find(record.value_drug).short_name] <<  {"value" => (record.value.to_i/unitQty.to_f).round, "code" => record.code,
+      results[DrugCms.find(record.value_drug).short_name] = [] if results[DrugCms.find(record.value_drug).short_name].blank?
+      results[DrugCms.find(record.value_drug).short_name] <<  {"value" => (record.value.to_i/unitQty.to_f).round, "code" => record.code,
                                                             "date" => record.date}
     end
 
