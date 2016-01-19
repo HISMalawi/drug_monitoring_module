@@ -7,6 +7,7 @@ $relocation_id = Definition.where(:name => "relocation").first.id
 $drug_given_to_id = Definition.where(:name => "People who received drugs").first.id
 $drug_prescribed_id = Definition.where(:name => "People prescribed drug").first.id
 $drug_stock_level_id = Definition.where(:name => "Stock level").first.id
+$drug_rate_id = Definition.where(:name => "Drug rate").first.id
 
 def start
 
@@ -129,7 +130,6 @@ def record(site, date,data)
   end
 
   (data['stock_level'] || []).each do |drug_id, value|
-    next if value == 0
     relocation_obs = Observation.where(:site_id => site.id,
       :definition_id => $drug_stock_level_id,
       :value_drug => drug_id,
@@ -149,6 +149,25 @@ def record(site, date,data)
 
   end
 
+  (data['drug_rates'] || []).each do |drug_id, value|
+    relocation_obs = Observation.where(:site_id => site.id,
+      :definition_id => $drug_rate_id,
+      :value_drug => drug_id,
+      :value_date => date
+    ).first
+
+    if relocation_obs.blank?
+      Observation.create({:site_id => site.id,
+          :definition_id => $drug_rate_id,
+          :value_numeric => value,
+          :value_drug => drug_id,
+          :value_date => date})
+    else
+      relocation_obs.value_numeric = value
+      relocation_obs.save
+    end
+
+  end
 end
 
 start

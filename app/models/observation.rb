@@ -125,7 +125,7 @@ class Observation < ActiveRecord::Base
     # ** This method calculates average consumption/dispensation rate
     # ** Of drugs per each site
     # ** Developer   : KENNETH KAPUNDI
-
+=begin
     return  self.find_by_sql(
       "SELECT site_id, value_drug AS drug_name, ROUND(AVG(value_numeric)) AS rate FROM observations
         WHERE definition_id = (SELECT definition_id FROM definitions WHERE name = 'Dispensation' LIMIT 1)
@@ -133,32 +133,28 @@ class Observation < ActiveRecord::Base
     ).inject({}){|result, obs|
       result[obs.site_id] = {} if result[obs.site_id].blank?; result[obs.site_id][obs.drug_name] = obs.rate; result
     }
+=end
+    date = Date.today ; result = {}
+
+    stock_rate_defn = Definition.find_by_name("Drug rate").id
+    obs = Observation.find_by_sql("SELECT value_numeric,site_id,value_drug FROM observations WHERE voided = 0
+      AND definition_id = #{stock_rate_defn} AND value_date <= '#{date}'
+      AND value_date = (SELECT MAX(value_date) FROM observations WHERE voided = 0
+      AND definition_id = #{stock_rate_defn} AND value_date <= '#{date}')")
+
+    (obs || []).each do |ob|
+      result[ob.site_id] = {} if result[ob.site_id].blank?
+      result[ob.site_id][ob.value_drug] = ob.value_numeric 
+    end
+
+    return result
   end
 
   def self.drug_dispensation_rates(drug, site_id = nil)
     # ** This method calculates average consumption/dispensation rate
     # ** Of a specific drug per each site
 
-    dispensation_id = Definition.where(:name => "dispensation").first.id
-    start_date = (Date.today - 90.days).strftime("%Y-%m-%d")
-    end_date = Date.today.strftime("%Y-%m-%d")
-    if site_id.blank?
-      return  self.find_by_sql(
-          "SELECT site_id, ROUND(AVG(value_numeric)) AS rate FROM observations
-        WHERE definition_id = #{dispensation_id} AND value_drug = #{drug}
-        AND value_date BETWEEN '#{start_date}' AND '#{end_date}'
-        GROUP BY site_id"
-      ).inject({}){|result, obs|
-        result[obs.site_id] = {} if result[obs.site_id].blank?; result[obs.site_id] = obs.rate; result
-      }
-    else
-      return  self.find_by_sql(
-          "SELECT ROUND(AVG(value_numeric)) AS rate FROM observations
-        WHERE definition_id = #{dispensation_id} AND value_drug = #{drug}
-        AND site_id = #{site_id} AND value_date BETWEEN '#{start_date}' AND '#{end_date}'"
-      ).first.rate
-    end
-
+     return self.calculate_drug_rate(drug, site_id, Date.today)
   end
 
   def self.site_update_dates
@@ -539,4 +535,17 @@ class Observation < ActiveRecord::Base
   def creator_name
     self.user.username
   end
+    
+  def self.calculate_drug_rate(drug, site_id, date = Date.today )
+    stock_rate_defn = Definition.find_by_name("Drug rate").id
+    obs = Observation.find_by_sql("SELECT value_numeric FROM observations WHERE voided = 0
+          AND definition_id = #{stock_rate_defn} AND value_drug = #{drug}
+          AND site_id = #{site_id} AND value_date <= '#{date}'
+          AND value_date = (SELECT MAX(value_date) FROM observations WHERE voided = 0
+          AND definition_id = #{stock_rate_defn} AND value_drug = #{drug}
+          AND site_id = #{site_id} AND value_date <= '#{date}')")
+
+    return obs.first.value_numeric rescue 0
+  end
+
 end

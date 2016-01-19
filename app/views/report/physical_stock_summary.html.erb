@@ -64,7 +64,7 @@
               <td><label id="selection-label" style="font-weight: bold;"></label></td>
               <td class="td-heading">Select site</td>
               <%sites = []
-                Site.all.map do |s|
+                Site.where(:active => 1).map do |s|
                   sites << [s.name, s.id]
                 end
               %>
