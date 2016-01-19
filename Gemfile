@@ -10,3 +10,4 @@ gem 'rest-client', '1.6.7'
 gem "paperclip", "~> 2.0"
 gem 'rake', '10.1.1'
 gem 'passenger', '4.0.53'
+gem 'spreadsheet'

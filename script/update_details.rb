@@ -13,13 +13,15 @@ def start
   (sites || []).each do |site|
     puts "Getting Data For Site #{site.name}"
 
-      date = "2016-01-13".to_date
-      while date <= Date.today 
-        url = "http://#{site.ip_address}:#{site.port}/drug/art_summary_dispensation?date=#{date}"
+      date = "2016-01-14".to_date
+      while date <= Date.today
+
+        url = "http://#{site.ip_address}:#{site.port}/drug/art_stock_info?date=#{date}"
         data = JSON.parse(RestClient::Request.execute(:method => :post, :url => url, :timeout => 100000000)) rescue (
           puts "**** Error when pulling data from site #{site.name}"
           next
         )
+        raise data.inspect
         record(site,date ,data)
         date += 1.day
       end
