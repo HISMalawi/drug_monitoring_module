@@ -9,19 +9,20 @@ $drug_prescribed_id = Definition.where(:name => "People prescribed drug").first.
 
 def start
 
-  sites = Site.all
+  sites = Site.where(:active => 1)
   (sites || []).each do |site|
     puts "Getting Data For Site #{site.name}"
 
-      date = "12-07-2014".to_date
-
-      url = "http://#{site.ip_address}:#{site.port}/drug/art_summary_dispensation?date=#{date}"
-      data = JSON.parse(RestClient::Request.execute(:method => :post, :url => url, :timeout => 100000000)) rescue (
-        puts "**** Error when pulling data from site #{site.name}"
-        next
-      )
-      record(site,date ,data)
-
+      date = "2016-01-13".to_date
+      while date <= Date.today 
+        url = "http://#{site.ip_address}:#{site.port}/drug/art_summary_dispensation?date=#{date}"
+        data = JSON.parse(RestClient::Request.execute(:method => :post, :url => url, :timeout => 100000000)) rescue (
+          puts "**** Error when pulling data from site #{site.name}"
+          next
+        )
+        record(site,date ,data)
+        date += 1.day
+      end
   end
 
   puts "Calculating Stock Levels"
