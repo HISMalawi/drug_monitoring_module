@@ -18,7 +18,7 @@ def start
   (sites || []).each do |site|
     puts "Getting Data For Site #{site.name}"
 
-      date = "2016-01-14".to_date
+      date = "2016-01-13".to_date
       while date <= Date.today
 
         url = "http://#{site.ip_address}:#{site.port}/drug/art_stock_info?date=#{date}"
@@ -173,9 +173,30 @@ def record(site, date,data)
 
   end
 
-  (data['drug_rates'] || []).each do |drug_id, value|
+  (data['consumption_rate'] || []).each do |drug_id, value|
     relocation_obs = Observation.where(:site_id => site.id,
       :definition_id => $drug_rate_id,
+      :value_drug => drug_id,
+      :value_date => date
+    ).first
+
+    if relocation_obs.blank?
+      Observation.create({:site_id => site.id,
+          :definition_id => $drug_rate_id,
+          :value_numeric => value.round(2),
+          :value_drug => drug_id,
+          :value_date => date})
+    else
+      relocation_obs.value_numeric = value.round(2)
+      relocation_obs.save
+    end
+
+  end
+
+  #.............................................................................
+  (data['supervision_verification'] || []).each do |drug_id, value|
+    relocation_obs = Observation.where(:site_id => site.id,
+      :definition_id => $supervision_id,
       :value_drug => drug_id,
       :value_date => date
     ).first
@@ -192,6 +213,29 @@ def record(site, date,data)
     end
 
   end
+
+  (data['clinic_verification'] || []).each do |drug_id, value|
+    relocation_obs = Observation.where(:site_id => site.id,
+      :definition_id => $clinic_id,
+      :value_drug => drug_id,
+      :value_date => date
+    ).first
+
+    if relocation_obs.blank?
+      Observation.create({:site_id => site.id,
+          :definition_id => $drug_rate_id,
+          :value_numeric => value,
+          :value_drug => drug_id,
+          :value_date => date})
+    else
+      relocation_obs.value_numeric = value
+      relocation_obs.save
+    end
+
+  end
+
+  #.............................................................................
 end
+
 
 start
