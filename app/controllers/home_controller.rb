@@ -325,7 +325,7 @@ class HomeController < ApplicationController
   end
 
  def dashboard
-  @sites = Site.all
+  @sites = Site.where(:active => 1)
   render :layout => false
  end
 end
