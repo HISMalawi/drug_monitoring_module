@@ -528,16 +528,24 @@ class ReportController < ApplicationController
     @unitQty = @unitQty.to_f
 
     if request.get?
+      
       @tree = {}
       @tree["Drug categories"] = {}
       hiv_unit_drugs = Definition.find_by_name("HIV Unit Drugs").id
-      @tree["Drug categories"]["ARVs"] = DrugSet.where(:definition_id =>hiv_unit_drugs ).order("weight asc").collect{|x| x.get_short_name}
-      @tree["Drug categories"]['Opportunistic Infection  medicine'] = {}
-      @tree["Drug categories"]['Antibiotics'] = {}
-      @tree["Drug categories"]['Analgesic'] = {}
-      @tree["Drug categories"]['Antiviral'] = {}
-      @tree["Drug categories"]['Antifungal'] = {}
-      @tree["Drug categories"]['Antimalarial'] = {}
+      @tree["Drug categories"]["ARV"] = []
+      @tree["Drug categories"]['Opportunistic Infection  medicine'] = []
+      @tree["Drug categories"]['Antibiotics'] = []
+      @tree["Drug categories"]['Analgesic'] = []
+      @tree["Drug categories"]['Antiviral'] = []
+      @tree["Drug categories"]['Antifungal'] = []
+      @tree["Drug categories"]['Antimalarial'] = []
+      @tree["Drug categories"]['Unknown'] = []
+
+      DrugSet.where(:definition_id =>hiv_unit_drugs ).order("weight asc").each do |drug_set|
+        drug_cms = drug_set.drug_cms
+        @tree["Drug categories"][drug_cms.get_category] << "#{drug_cms.short_name} #{drug_cms.strength} #{drug_cms.tabs}"
+      end
+
       @nojquery = true
     else
 
@@ -593,6 +601,31 @@ class ReportController < ApplicationController
   def update_display_units
     preferred_units(params[:units])
     render :text => "ok"
+  end
+
+  def stock_report
+    @drugs_cms = DrugCms.order(:weight)
+  end
+
+  def get_stock_report
+    date = params[:date].to_date
+    site_id = Site.find(params[:site_id]).id
+    definition_id = Definition.where(:name => "Supervision verification in detail").first.id
+
+    data = {}
+    Observation.where(:definition_id => definition_id,:site_id => site_id, :value_date => date).each do |r|
+      value_numeric = 'N/A' 
+      value_numeric = r.value_numeric unless r.value_numeric.blank?
+      expiring_units = r.value_text.split(',')[2].sub('expiring_units:','').sub('}','').to_i rescue nil
+      expiring_units = 'N/A' if expiring_units.blank?
+
+      data[r.value_drug] = {:total_usable_tins => value_numeric,
+        :previous_verified_stock => r.value_text.split(',')[0].sub('{previous_verified_stock:','') || '',
+        :earliest_expiry_date => (r.value_text.split(',')[1].sub('earliest_expiry_date:','').to_date.strftime('%b/%Y') rescue 'N/A'),
+        :expiring_units => expiring_units
+      }
+    end
+    render :text => data.to_json and return
   end
 
 end

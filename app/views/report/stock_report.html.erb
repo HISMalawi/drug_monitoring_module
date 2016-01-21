@@ -1,0 +1,311 @@
+<script>
+
+var drugsCms = [];
+var drugsCmsWeightSorted = [];
+
+<%(@drugs_cms || []).each do |drug|%>
+  drugsCms.push({name: "<%=drug.name%>", code: "<%=drug.code%>",drug_id: <%=drug.id%>,
+    short_name: "<%=drug.short_name%>", tabs: "<%=drug.tabs%>", weight: <%=drug.weight%>,
+    pack_size: "<%=drug.pack_size%>", strength: "<%=drug.strength%>"
+  })
+<%end%>
+
+
+function showSummaryX() {
+
+  buildTable();
+
+}
+
+function buildTable() {
+  table = document.createElement('table');
+  table.setAttribute('class','summary-table');
+  thead = document.createElement('thead');
+  tr = document.createElement('tr');
+  thead.appendChild(tr);
+ 
+  ths = [
+    ["text-align:left;","Items counted as"],
+    ["text-align:right;","TINS"],
+    ["","&nbsp"],
+    ["text-align:right;","Previous stock"],
+    ["text-align:right;","Total usable tins"],
+    ["text-align:center;","Date&nbsp;MM/YY"],
+    ["text-align:right;","Units expiring that date"]
+  ] 
+  
+  for(var i = 0; i < ths.length; i++) {
+    th = document.createElement('th');
+    th.setAttribute('style',ths[i][0]);
+    th.innerHTML = ths[i][1];
+    tr.appendChild(th);
+  }
+  table.appendChild(thead);
+
+  tbody = document.createElement('tbody');
+  tbody.setAttribute('id','section_one');
+  section_one = 1;
+
+  for(var i = 0; i < drugsCms.length; i++) {
+    drug = drugsCms[i];
+
+    if(drug.weight > 17)
+      continue;
+
+      tbody.appendChild(buildRows(drug.drug_id, drug.short_name , drug.strength , drug.tabs, '', '', '',''));
+    }
+    table.appendChild(tbody);
+    table.appendChild(tBodySeparator());
+
+
+    tbody = document.createElement('tbody');
+    tbody.setAttribute('id','section_two');
+    tbody.appendChild(rowHeading('BOTTLES', 'BOTTLES'));
+    amount = '';
+    total_usable_tins = '';
+    section_two = 1;
+
+    for(var i = 0; i < drugsCms.length; i++) {
+      drug = drugsCms[i];
+
+      if(drug.weight < 18 || drug.weight > 19) 
+        continue;
+
+      tbody.appendChild(buildRows(drug.drug_id, drug.short_name , drug.strength , drug.tabs, '', '', '',''));
+    }
+    table.appendChild(tbody);
+    table.appendChild(tBodySeparator());
+  
+
+    tbody = document.createElement('tbody');
+    tbody.setAttribute('id','section_three');
+    tbody.appendChild(rowHeading('TABS', 'TABS'));
+    section_three = 1;
+
+    for(var i = 0; i < drugsCms.length; i++) {
+      drug = drugsCms[i];
+
+      if(drug.weight < 20)
+        continue;
+
+      tbody.appendChild(buildRows(drug.drug_id, drug.short_name , drug.strength , drug.tabs, '', '', '',''));
+    }
+    table.appendChild(tbody);
+
+
+    inputFrame = document.getElementById('inputFrame');
+    inputFrame.setAttribute('style','overflow: auto')
+    inputFrame.appendChild(table);
+  }
+
+  function buildRows(drug_id, item, item_desc, unit, previous_stock, total_usable_tins, expiry_date, units_expiring) {
+    if(expiry_date != "N/A"){
+        expiry_date = expiry_date.slice(3, 11);
+    }
+    t = document.createElement('tr');
+    tds = [
+      ['text-align:left',item],
+      ['text-align:right',item_desc],
+      ['text-align:center',unit],
+      ['text-align:right',previous_stock],
+      ['text-align:right',total_usable_tins],
+      ['text-align:center',expiry_date],
+      ['text-align:right',units_expiring]
+    ]
+
+    for(var z = 0; z < tds.length; z++) {
+      std = document.createElement('td');
+      std.setAttribute('style', tds[z][0]);
+      std.innerHTML = tds[z][1];
+      if (z >= 4) {
+        std.setAttribute('class', 'borders');
+      }
+
+      if (z == 3) {
+        std.setAttribute('id', 'previous_stock_' + drug_id);
+      }else if(z == 4) {
+        std.setAttribute('id', 'total_usable_' + drug_id);
+      }else if(z == 5) {
+        std.setAttribute('id', 'expiry_date_' + drug_id);
+      }else if(z == 6) {
+        std.setAttribute('id', 'units_expiring_' + drug_id);
+      }
+
+
+      t.appendChild(std);
+    }
+
+    return t;
+  }
+
+  function tBodySeparator() {
+    t = document.createElement('tr');
+    sd = document.createElement('td');
+    sd.setAttribute('colspan','7');
+    sd.innerHTML = '&nbsp;';
+    return t.appendChild(sd);
+  }
+
+
+  function rowHeading(heading, second_heading) {
+    t = document.createElement('tr');
+    ths = [
+      ["text-align:left;","Items counted as"],
+      ["text-align:right;", heading],
+      ["","&nbsp"],
+      ["text-align:right;","Previous stock"],
+      ["text-align:right;","Total usable " + second_heading.toLowerCase()],
+      ["text-align:center;","Date&nbsp;MM/YY"],
+      ["text-align:right;","Units expiring that date"]
+    ] 
+    
+    for(var i = 0; i < ths.length; i++) {
+      th = document.createElement('th');
+      th.setAttribute('style',ths[i][0]);
+      th.innerHTML = ths[i][1];
+      t.appendChild(th);
+    }
+    return t;
+  }
+
+
+</script>
+
+
+<style>
+.summary-table {
+  width: 100%;
+  padding-right: 5px;
+}
+
+.borders {
+  border-style: solid;
+  border-width: 1px;
+  width: 130px;
+  padding-right: 5px;
+}
+
+#input-header {
+  font-size: 17px;
+}
+
+#inputFrame {
+  border-style: solid;
+  border-width: 1px;
+  padding: 15px;
+  margin: 10px 0px 50px 0px;
+  overflow: auto;
+}
+
+.table-controllers {
+  margin-top: 50px;
+}
+
+</style>
+
+
+
+
+<table style="width: 99%;" class="table-controllers">
+  <tr>
+    <td class="td-heading">Select site</td>
+    <%sites = []
+      Site.where(:active => true).map do |s|
+        sites << [s.name, s.id]
+      end
+    %>
+    <td>
+      <select id="sitename" name="sitename" class="form-control" placeholder="Region" required=""  >
+        <option value="">[ - Select site - ]</option>
+        <% (sites || []).each do |site, id| %>
+            <option value="<%= id%>"><%= site %></option>
+        <% end %>
+      </select>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="td-heading">Verification date</td><td><input type="text" id="end_date" required="" /></td>
+    <td><input type="submit" class="btn btn-success" value="Submit" onclick="fetchData()" style="width: 100%;" /></td>
+  </tr>
+
+</table>
+
+
+
+
+
+
+
+<div id="inputFrame"></div>
+<%=javascript_include_tag "bootstrap-tree/jquery-1.8.2"%>
+<script type="text/javascript" src="/javascripts/zebra_datepicker.js"></script>
+<link rel="stylesheet" href="/stylesheets/default.css" type="text/css">
+
+<script>
+
+function display_picker(e){
+  $('#end_date').Zebra_DatePicker({format: "d-M-Y", offset: [-220, ($('#end_date').position().top * 1.2)]});
+}
+setTimeout(display_picker, 2);
+
+
+
+
+buildTable();
+
+function fetchData() {                                                       
+  var report_date = document.getElementById('end_date').value;               
+  var site_id = document.getElementById('sitename').value;               
+                                                                              
+  if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari  
+      xmlhttp=new XMLHttpRequest();                                             
+    }else{// code for IE6, IE5                                                  
+      xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");                           
+    }                                                                           
+    xmlhttp.onreadystatechange=function() {                                     
+      if (xmlhttp.readyState==4 && xmlhttp.status==200) {                       
+        var results = xmlhttp.responseText;                                     
+        if(results == 'undefined' || results == '' || results == '"not validate"') {                           
+          return;                                                               
+        }else{                                                                  
+          clearTable();
+          addRows(results);                                                           
+        }                                                                       
+      }                                                                         
+    }                                                                           
+    xmlhttp.open("GET","/get_stock_report?date="+report_date+"&site_id="+site_id,true);           
+    xmlhttp.send();                                                             
+  } 
+
+  function addRows(data) {
+    products = JSON.parse(data);
+    counter = 0;
+    for (drug_id in products) {
+      document.getElementById('previous_stock_'+drug_id).innerHTML = (products[drug_id]['previous_verified_stock'])
+      document.getElementById('total_usable_'+drug_id).innerHTML = (products[drug_id]['total_usable_tins'])
+      document.getElementById('expiry_date_'+drug_id).innerHTML = (products[drug_id]['earliest_expiry_date'])
+      document.getElementById('units_expiring_'+drug_id).innerHTML = (products[drug_id]['expiring_units'])
+    }
+  }
+
+/*
+        std.setAttribute('id', 'previous_stock_' + drug_id);
+      }else if(z == 4) {
+        std.setAttribute('id', 'total_usable_' + drug_id);
+      }else if(z == 5) {
+        std.setAttribute('id', 'expiry_date_' + drug_id);
+      }else if(z == 6) {
+        std.setAttribute('id', 'units_expiring_' + drug_id);
+      }
+  */
+  function clearTable() {
+    <%(@drugs_cms || []).each do |drug|%>
+      drug_id = <%=drug.id%>
+      document.getElementById('previous_stock_'+drug_id).innerHTML = '';
+      document.getElementById('total_usable_'+drug_id).innerHTML = '';
+      document.getElementById('expiry_date_'+drug_id).innerHTML = '';
+      document.getElementById('units_expiring_'+drug_id).innerHTML = '';
+    <%end%>
+  }
+</script>

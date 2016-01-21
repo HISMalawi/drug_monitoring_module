@@ -74,6 +74,8 @@ DrugMonitoringProgram::Application.routes.draw do
   post "report/update_notice"
   match 'report/:id' => 'report#menu', :as => :report
   match '/months_of_stock_main' => "report#months_of_stock_main"
+  match '/stock_report' => "report#stock_report"
+  match '/get_stock_report' => "report#get_stock_report"
   ################### HOME ##############################
 
   match '/home' => "home#index"

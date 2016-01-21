@@ -56,7 +56,8 @@ definitions = [["Prescription", "Describes the number of precriptions"],
 	["Opportunistic infection medicine", "medicine for all other infections and diseases"],
   ["Unknown", "unknown" ],
   ["Comment", "descriptions added to observations"],
-  ["Drug Rate", "Average drug dispensation rate per day"]
+  ["Drug Rate", "Average drug dispensation rate per day"],
+  ["Supervision verification in detail","Physically counted at supervision level (in detail)" ]
 ]
 
 (definitions || []).each do |definition|

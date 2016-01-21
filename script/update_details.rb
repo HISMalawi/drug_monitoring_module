@@ -11,6 +11,7 @@ $drug_rate_id = Definition.where(:name => "Drug rate").first.id
 $receipts_id = Definition.where(:name => "New Delivery").first.id
 $clinic_id = Definition.where(:name => "Clinic verification").first.id
 $supervision_id = Definition.where(:name => "Supervision verification").first.id
+$supervision_in_detail_id = Definition.where(:name => "Supervision verification in detail").first.id
 
 def start
 
@@ -234,6 +235,35 @@ def record(site, date,data)
 
   end
 
+  (data['supervision_verification_in_details'] || []).each do |drug_id, values|
+    next if values.blank?
+    relocation_obs = Observation.where(:site_id => site.id,
+      :definition_id => $supervision_in_detail_id,
+      :value_drug => drug_id,
+      :value_date => date
+    ).first
+
+    if relocation_obs.blank?
+      value_text_str = "{previous_verified_stock:#{values['previous_verified_stock']},"
+      value_text_str += "earliest_expiry_date:#{values['earliest_expiry_date']},"
+      value_text_str += "expiring_units:#{values['expiring_units']}}"
+      Observation.create({:site_id => site.id,
+          :definition_id => $supervision_in_detail_id,
+          :value_numeric => values['verified_stock'],
+          :value_drug => drug_id,
+          :value_text => value_text_str,
+          :value_date => date})
+    else
+      value_text_str = "{previous_verified_stock:#{values['previous_verified_stock']},"
+      value_text_str += "earliest_expiry_date:#{values['earliest_expiry_date']},"
+      value_text_str += "expiring_units:#{values['expiring_units']}}"
+
+      relocation_obs.value_numeric =  values['verified_stock']
+      relocation_obs.value_text = value_text_str
+      relocation_obs.save
+    end
+
+  end
   #.............................................................................
 end
 
