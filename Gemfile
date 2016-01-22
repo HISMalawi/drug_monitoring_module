@@ -11,3 +11,7 @@ gem "paperclip", "~> 2.0"
 gem 'rake', '10.1.1'
 gem 'passenger', '4.0.53'
 gem 'spreadsheet'
+gem 'rb-readline'
+gem 'chronic', '0.10.2'
+gem 'whenever',  :require => false 
+
