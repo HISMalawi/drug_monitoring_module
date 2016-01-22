@@ -19,7 +19,7 @@ def start
   (sites || []).each do |site|
     puts "Getting Data For Site #{site.name}"
 
-      date = "2016-01-13".to_date
+      date = Date.today
       while date <= Date.today
 
         url = "http://#{site.ip_address}:#{site.port}/drug/art_stock_info?date=#{date}"
