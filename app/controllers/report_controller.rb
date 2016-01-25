@@ -313,7 +313,7 @@ class ReportController < ApplicationController
   end
 
   def stock_movement
-
+=begin
     @unitQty = (params[:qty] || preferred_units.scan(/\d+/)[0]).to_i rescue 60
     @unitQty =  60 if @unitQty == 0
     @unitQty = @unitQty.to_f
@@ -378,6 +378,37 @@ class ReportController < ApplicationController
     #@stocks["delivery_dates"] = delivery_flags
     #@stocks["supervision_dates"] = supervision_flags
     render :text => @stocks.to_json
+=end
+    @unitQty = (params[:qty] || preferred_units.scan(/\d+/)[0]).to_i rescue 60
+    @unitQty =  60 if @unitQty == 0
+    @unitQty = @unitQty.to_f
+
+    start_date = params[:start_date].to_date
+    end_date = params[:end_date].to_date
+    definition_id = Definition.where(:name => "Stock level").first.id
+
+    #............................. a hack to get drug .........................
+    drug = nil
+    DrugCms.all.each do |drug_cms|
+      short_name = "#{drug_cms.short_name} #{drug_cms.strength} #{drug_cms.tabs}"
+      if short_name == params[:drug]
+        drug = drug_cms
+        break
+      end
+    end
+    #............................. end hack .........................
+
+    @stocks = {}
+    stock_levels = Observation.where("definition_id = ? AND site_id = ? AND 
+      (value_date BETWEEN ? AND ?) AND value_drug = ?",definition_id,
+      params[:site_id],start_date,end_date, drug.id)
+  
+    (stock_levels || []).each do |s|
+      stock_level = (s.value_numeric/@unitQty).round rescue 0
+      @stocks[s.value_date.to_date]= {"stock_count" => stock_level}
+    end
+    render :text => @stocks.to_json
+
   end
   
   def drugs
