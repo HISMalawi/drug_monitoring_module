@@ -649,8 +649,9 @@ class ReportController < ApplicationController
       value_numeric = r.value_numeric unless r.value_numeric.blank?
       expiring_units = r.value_text.split(',')[2].sub('expiring_units:','').sub('}','').to_i rescue nil
       expiring_units = 'N/A' if expiring_units.blank?
+      pack_size = r.drug_cms.pack_size 
 
-      data[r.value_drug] = {:total_usable_tins => value_numeric,
+      data[r.value_drug] = {:total_usable_tins => (value_numeric/pack_size),
         :previous_verified_stock => r.value_text.split(',')[0].sub('{previous_verified_stock:','') || '',
         :earliest_expiry_date => (r.value_text.split(',')[1].sub('earliest_expiry_date:','').to_date.strftime('%b/%Y') rescue 'N/A'),
         :expiring_units => expiring_units
