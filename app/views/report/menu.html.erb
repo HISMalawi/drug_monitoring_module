@@ -71,7 +71,7 @@
                           </tr>
 
                           <tr>
-                            <td class="td-heading">Display Units:</td>
+                            <!--td class="td-heading">Display Units:</td>
                                             <td style>
                                 <span class="spacing">
                                     <select id = "qty" style="width: 95px;height:28px;border-radius: 2.5px; margin-top: 8px;" type="select"
@@ -83,8 +83,9 @@
                                       <option value="120">Tins of 120</option>
                                     </select>
                                 </span>
-                            </td>
+                            </td-->
 
+                            <td class="td-heading" colspan="2">&nbsp;</td>
                             <td class="td-heading">Start date</td><td><input type="text" id="start_date" required="" /></td>
                           </tr>
                           <tr>
@@ -156,7 +157,7 @@ function display_report(){
     var start_date = document.getElementById("start_date").value
     var end_date = document.getElementById('end_date').value
     var drug = document.getElementById('selection-label').innerHTML
-    var qty = document.getElementById('qty').value
+    //var qty = document.getElementById('qty').value
 
     document.getElementById('wait').innerHTML = "Loading chart. Please wait ......";
     document.getElementById("container-chart").style.display = 'none';
@@ -186,7 +187,7 @@ function display_report(){
         }
     }
     xmlhttp.open("GET",'/report/stock_movement?site_id=' + site + "&start_date="+
-            start_date + "&end_date="+end_date + "&drug="+ drug + "&qty=" + qty ,true);
+            start_date + "&end_date="+end_date + "&drug="+ drug ,true);
     xmlhttp.send();
 }
 </script>

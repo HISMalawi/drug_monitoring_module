@@ -21,7 +21,13 @@
             results = JSON.parse(results);
 
             // Create the chart
-            var unit = document.getElementById("qty").value;
+            var unitQty = 60;
+            dates = Object.keys(results);
+            for (date_key in results){
+                unitQty = results[date_key]['pack_size'];
+                break;
+            }
+            unit = unitQty;
 
             var labl = (unit == 1) ? " pills " : (" tins of " + unit);
             $('#container-chart').highcharts('StockChart', {
@@ -43,7 +49,7 @@
                     useHTML: true,
                     valueSuffix: ' ',
                     formatter: function() {
-                        var unit = document.getElementById("qty").value;
+                        var unit = unitQty;
 
                         var labl = (unit == 1) ? " pills " : (" tins of " + unit);
 

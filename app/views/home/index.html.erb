@@ -50,7 +50,12 @@
       var previousColor = '';
       function setAttibutes(){
         mainDisplay = document.getElementById('main-display').contentDocument
-        facilities = mainDisplay.getElementById("map").contentDocument.getElementsByTagName("circle");
+        try {
+          facilities = mainDisplay.getElementById("map").contentDocument.getElementsByTagName("circle");
+        }catch(e) { 
+          return ; 
+        }
+
         for (var i=0; i<= facilities.length - 1; i++){
           facilities[i].onmouseover = function(){
             this.style.cursor = 'pointer';

@@ -250,29 +250,28 @@ class ReportController < ApplicationController
 
     @site = Site.find_by_name(params[:site_name])
     @list = {}
-    @unitQty = (params[:qty] || preferred_units.scan(/\d+/)[0]).to_i rescue 60
-    @unitQty =  60 if @unitQty == 0
-    @unitQty = @unitQty.to_f
+    @unitQty =  {}
 
     unless @site.blank?
 
-      hiv_unit_drugs = DrugSet.where(:definition_id => Definition.find_by_name("HIV Unit Drugs").id).order("weight asc")
+      #hiv_unit_drugs = DrugSet.where(:definition_id => Definition.find_by_name("HIV Unit Drugs").id).order("weight asc")
+      hiv_unit_drugs = DrugCms.order("weight asc")
 
       #raise hiv_unit_drugs.collect{|x| x.drug.short_name}.inspect
       (hiv_unit_drugs || []).each do |drug|
 
-        stock_level = Observation.calculate_stock_level(drug.drug_id,@site.id)
-        stock_level = (stock_level / @unitQty).round # stock level comes in pills/day here we convert it to tins/month
-        disp_rate = Observation.drug_dispensation_rates(drug.drug_id,@site.id)
-        disp_rate = ((disp_rate.to_f * 0.5) * 60.0/@unitQty).round #rate is an avg of pills dispensed per day. here we convert it to tins per month
-        month_of_stock = Observation.calculate_month_of_stock(drug.drug_id, @site.id).to_f
+        stock_level = Observation.calculate_stock_level(drug.id,@site.id)
+        stock_level = (stock_level / drug.pack_size).round # stock level comes in pills/day here we convert it to tins/month
+        disp_rate = Observation.drug_dispensation_rates(drug.id,@site.id)
+        disp_rate = ((disp_rate.to_f * 0.5) * 60.0/drug.pack_size).round #rate is an avg of pills dispensed per day. here we convert it to tins per month
+        month_of_stock = Observation.calculate_month_of_stock(drug.id, @site.id).to_f
         stocked_out = (disp_rate.to_i != 0 && month_of_stock.to_f.round(3) == 0.00)
 
         active = (disp_rate.to_i == 0 && stock_level.to_i != 0)? false : true
-        drug_cms = DrugCms.find(drug.drug_id)
-        @list["#{drug_cms.short_name} #{drug_cms.strength} #{drug_cms.tabs}"] = {"month_of_stock" => month_of_stock,"weight" => drug.weight,
+        #drug_cms = DrugCms.find(drug.drug_id)
+        @list["#{drug.short_name} #{drug.strength} #{drug.tabs}"] = {"month_of_stock" => month_of_stock,"weight" => drug.weight,
                                                      "stock_level" => stock_level, "consumption_rate" => disp_rate,
-                                                     "stocked_out" => stocked_out, "active" => active
+                                                     "stocked_out" => stocked_out, "active" => active, "pack_size" => drug.pack_size
                                                     }
       end
     end
@@ -379,10 +378,6 @@ class ReportController < ApplicationController
     #@stocks["supervision_dates"] = supervision_flags
     render :text => @stocks.to_json
 =end
-    @unitQty = (params[:qty] || preferred_units.scan(/\d+/)[0]).to_i rescue 60
-    @unitQty =  60 if @unitQty == 0
-    @unitQty = @unitQty.to_f
-
     start_date = params[:start_date].to_date
     end_date = params[:end_date].to_date
     definition_id = Definition.where(:name => "Stock level").first.id
@@ -396,6 +391,7 @@ class ReportController < ApplicationController
         break
       end
     end
+    @unitQty = (drug.pack_size).to_i rescue 60
     #............................. end hack .........................
 
     @stocks = {}
@@ -405,7 +401,7 @@ class ReportController < ApplicationController
   
     (stock_levels || []).each do |s|
       stock_level = (s.value_numeric/@unitQty).round rescue 0
-      @stocks[s.value_date.to_date]= {"stock_count" => stock_level}
+      @stocks[s.value_date.to_date]= {"stock_count" => stock_level,"pack_size" => @unitQty}
     end
     render :text => @stocks.to_json
 
@@ -483,24 +479,24 @@ class ReportController < ApplicationController
     unless @site.blank?
 
 
-      hiv_unit_drugs = DrugSet.where(:definition_id => Definition.find_by_name("HIV Unit Drugs").id).order("weight asc")
+      #hiv_unit_drugs = DrugSet.where(:definition_id => Definition.find_by_name("HIV Unit Drugs").id).order("weight asc")
+      hiv_unit_drugs = DrugCms.order("weight asc")
 
-      #raise hiv_unit_drugs.collect{|x| x.drug.short_name}.inspect
       (hiv_unit_drugs || []).each do |drug|
 
-        stock_level = Observation.calculate_stock_level(drug.drug_id,@site.id)
-        stock_level = stock_level / 60 # stock level comes in pills/day here we convert it to tins/month
-        disp_rate = Observation.drug_dispensation_rates(drug.drug_id,@site.id)
+        stock_level = Observation.calculate_stock_level(drug.id,@site.id)
+        stock_level = (stock_level / drug.pack_size).round # stock level comes in pills/day here we convert it to tins/month
+        disp_rate = Observation.drug_dispensation_rates(drug.id,@site.id)
         disp_rate = (disp_rate.to_f * 0.5).round #rate is an avg of pills dispensed per day. here we convert it to tins per month
-        month_of_stock = Observation.calculate_month_of_stock(drug.drug_id, @site.id).to_f
+        month_of_stock = Observation.calculate_month_of_stock(drug.id, @site.id).to_f
 
         stocked_out = (disp_rate.to_i != 0 && month_of_stock.to_f.round(3) == 0.00)
 
         active = (disp_rate.to_i == 0 && stock_level.to_i != 0)? false : true
-        drug = DrugCms.find(drug.drug_id)
+        #drug = DrugCms.find(drug.drug_id)
         @list["#{drug.short_name} #{drug.strength} #{drug.tabs}"] = {"month_of_stock" => month_of_stock,"weight" => drug.weight,
                                                      "stock_level" => stock_level, "consumption_rate" => disp_rate,
-                                                     "stocked_out" => stocked_out, "active" => active
+                                                     "stocked_out" => stocked_out, "active" => active,"pack_size" => drug.pack_size 
                                                     }
 
       end

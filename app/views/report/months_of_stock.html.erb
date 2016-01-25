@@ -13,7 +13,8 @@
         stock_level:<%= values['stock_level'] %> ,
         consumption_rate: <%= values['consumption_rate'] %>,
         stocked_out: <%= values['stocked_out'] %>,
-        active: <%= values['active'] %>
+        active: <%= values['active'] %>,
+        pack_size: <%= values['pack_size'] %>
     };
 
     <% end %>
@@ -115,7 +116,7 @@
                             ((parseInt(this.y) == 0) ? '' :  parseInt(this.y) + (parseInt(this.y) == 1 ? ' month ': ' months ')) +
                             parseInt((this.y*30 % 30)) + ( parseInt((this.y*30 % 30)) == 1 ? " day" :  " days");
 
-                    var qty = "<%= @unitQty%>";
+                    var qty = data_list[this.x]['pack_size'];
                     var unit = (parseInt(qty) == 1) ? "Pills" : ("Tins of " + parseInt(qty));
 
                     return '<span  style= "font-weight: bold; font-size : 10px;">' +

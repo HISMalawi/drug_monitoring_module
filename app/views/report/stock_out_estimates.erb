@@ -3,10 +3,9 @@
 <script type="text/javascript">
     function switch_site(site)
     {
-        var qty = document.getElementById("qty").value;
         if (site != "")
         {
-            document.getElementById("chart").setAttribute("src", "/report/months_of_stock?site_name="+ site + "&qty=" + qty);
+            document.getElementById("chart").setAttribute("src", "/report/months_of_stock?site_name="+ site);
         }
 
     }
@@ -40,14 +39,14 @@
           <option><%= site %></option>
       <% end %>
     </select>
-&nbsp;&nbsp;&nbsp; Display Units:  <select id="qty" style="margin-top:1%;  width: 95px;" name="qty"
+<!-- &nbsp;&nbsp;&nbsp; Display Units:  <select id="qty" style="margin-top:1%;  width: 95px;" name="qty"
                         onchange="switchUnits(this.value)">
   <option value="1">Pills</option>
   <option value="30">Tins of 30</option>
   <option value="60" selected="true">Tins of 60</option>
   <option value="90">Tins of 90</option>
   <option value="120">Tins of 120</option>
-</select>
+</select> -->
 
 <iframe id="chart" style="background-color:#f5f5f5;width: 98%;height:80vh;border: 1px solid #000000;border-radius: 15px;margin-left:1%;"></iframe>
 
