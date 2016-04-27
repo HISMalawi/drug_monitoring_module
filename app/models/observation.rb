@@ -429,11 +429,11 @@ class Observation < ActiveRecord::Base
       return "Unknown"
 
     else
-      consumption_rate = (dispensation_rate.to_f * 0.5) * (60.0/unitQty.to_f).round
-
+      #consumption_rate = (dispensation_rate.to_f * 0.5) * (60.0/unitQty.to_f).round
+      consumption_rate = ((30 * dispensation_rate)/unitQty)
       expected = (stock_level/ unitQty.to_f).round
 
-      month_of_stock = (expected/ consumption_rate)
+      month_of_stock = (expected/ consumption_rate) rescue 0
 
       if month_of_stock <= 2.0
         notice = "#{DrugCms.find(drug).short_name} stock running low"

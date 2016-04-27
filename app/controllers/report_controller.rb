@@ -486,15 +486,16 @@ class ReportController < ApplicationController
 
         stock_level = Observation.calculate_stock_level(drug.id,@site.id)
         stock_level = (stock_level / drug.pack_size).round # stock level comes in pills/day here we convert it to tins/month
-        disp_rate = Observation.drug_dispensation_rates(drug.id,@site.id)
-        disp_rate = (disp_rate.to_f * 0.5).round #rate is an avg of pills dispensed per day. here we convert it to tins per month
-        month_of_stock = Observation.calculate_month_of_stock(drug.id, @site.id).to_f
+        disp_rate = Observation.drug_dispensation_rates(drug.id, @site.id)
+        #disp_rate = (disp_rate.to_f * 0.5).round #rate is an avg of pills dispensed per day. here we convert it to tins per month
+        disp_rate = ((30 * disp_rate)/drug.pack_size)
+        month_of_stock = Observation.calculate_month_of_stock(drug.id, @site.id, drug.pack_size).to_f
 
         stocked_out = (disp_rate.to_i != 0 && month_of_stock.to_f.round(3) == 0.00)
 
         active = (disp_rate.to_i == 0 && stock_level.to_i != 0)? false : true
         #drug = DrugCms.find(drug.drug_id)
-        @list["#{drug.short_name} #{drug.strength} #{drug.tabs}"] = {"month_of_stock" => month_of_stock,"weight" => drug.weight,
+        @list["#{drug.name}"] = {"month_of_stock" => month_of_stock,"weight" => drug.weight,
                                                      "stock_level" => stock_level, "consumption_rate" => disp_rate,
                                                      "stocked_out" => stocked_out, "active" => active,"pack_size" => drug.pack_size 
                                                     }
@@ -502,7 +503,7 @@ class ReportController < ApplicationController
       end
     end
 
-    @list = @list.sort_by{|drug, values| values["weight"]}
+    @list = @list.sort_by{|drug, values| drug}
 
 
 =begin
