@@ -18,8 +18,8 @@ def start
   sites = Site.where(:active => 1)
   (sites || []).each do |site|
     puts "Getting Data For Site #{site.name}"
-
-      date = PullTracker.where(:'site_id' => site.id).first.pulled_datetime.to_date rescue Date.today
+    
+      date = PullTracker.where(:'site_id' => site.id).select('MAX(pulled_datetime) as pulled_datetime').first.pulled_datetime rescue Date.today
 
       while date <= Date.today
 
