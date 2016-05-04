@@ -19,16 +19,15 @@ def start
   (sites || []).each do |site|
     puts "Getting Data For Site #{site.name}"
 
-      date = Date.today
+      date = PullTracker.where(:'site_id' => site.id).first.pulled_datetime.to_date rescue Date.today
+
       while date <= Date.today
 
         url = "http://#{site.ip_address}:#{site.port}/drug/art_stock_info?date=#{date}"
-        data = JSON.parse(RestClient::Request.execute(:method => :post, :url => url, :timeout => 100000000)) rescue (
-          puts "**** Error when pulling data from site #{site.name}"
-          next
-        )
+        data = JSON.parse(RestClient::Request.execute(:method => :post, :url => url)) 
         puts "............. #{site.name}: #{date}"
         record(site,date ,data)
+        record_pulled_datetime(site, date)
         date += 1.day
       end
   end
@@ -267,5 +266,17 @@ def record(site, date,data)
   #.............................................................................
 end
 
+def record_pulled_datetime(site, date)
+
+  pulled_time = PullTracker.where(:'site_id' => site.id).first
+
+  if pulled_time.blank?
+    pulled_time = PullTracker.new()
+    pulled_time.site_id = site.id
+  end
+  pulled_time.pulled_datetime = ("#{date.to_date} #{Time.now().strftime('%H:%M:%S')}")
+  pulled_time.save
+  puts "Recorded for :#{site.name}, Date: #{pulled_time.pulled_datetime}"
+end
 
 start
