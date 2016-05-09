@@ -23,12 +23,17 @@ def start
 
       while date <= Date.today
 
-        url = "http://#{site.ip_address}:#{site.port}/drug/art_stock_info?date=#{date}"
-        data = JSON.parse(RestClient::Request.execute(:method => :post, :url => url)) 
-        puts "............. #{site.name}: #{date}"
-        record(site,date ,data)
-        record_pulled_datetime(site, date)
-        date += 1.day
+        url = "http://#{site.ip_address}:#{site.port}/drug/art_stock_info?date=#{date.to_date.to_s}"
+        begin
+          data = JSON.parse(RestClient::Request.execute(:method => :post, :url => url)) 
+          puts "............. #{site.name}: #{date}"
+          record(site,date ,data)
+          record_pulled_datetime(site, date)
+          date += 1.day
+        rescue 
+          puts "Failed to connect #{site.name}: #{date}"
+          break
+        end
       end
   end
 
