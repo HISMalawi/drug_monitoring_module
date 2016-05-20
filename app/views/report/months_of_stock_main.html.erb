@@ -6,7 +6,14 @@
 
     var drugs = []
     var data_list = {}
-    <%# raise @list.inspect%>
+    
+    <%
+    site_details = @site.name rescue ''
+    unless @latest_pull_date.blank?
+    	site_details = site_details + " as of  <span style='font-weight:bold; color:red; font-size: 12pt;'>#{@latest_pull_date.to_date.strftime('%d-%b-%Y')}</span>"
+    end
+    %>
+    
     <% (@list || []).each do |drug, values| %>
         drugs.push('<%= drug %>')
         data_list['<%= drug %>'] = { month_of_stock: <%= values['month_of_stock'] %>,
@@ -39,7 +46,8 @@
                     fontFamily: "'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif",
                     fontSize: '14px'
                 },
-                text: 'ARV Stock Levels At '+ '<%= @site.name rescue "" %>'
+                useHTML: true,
+                text: "ARV Stock Levels At <%= (site_details.html_safe) %>"
             },
             xAxis: {
                 categories: drugs,

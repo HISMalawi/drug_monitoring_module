@@ -18,9 +18,7 @@ def start
   sites = Site.where(:active => 1)
   (sites || []).each do |site|
     puts "Getting Data For Site #{site.name}"
-    
-      date = PullTracker.where(:'site_id' => site.id).select('MAX(pulled_datetime) as pulled_datetime').first.pulled_datetime rescue Date.today
-
+      date = PullTracker.where(:'site_id' => site.id).select('MAX(pulled_datetime) as pulled_datetime').first.pulled_datetime.to_date rescue Date.today
       while date <= Date.today
 
         url = "http://#{site.ip_address}:#{site.port}/drug/art_stock_info?date=#{date}"

@@ -9,3 +9,4 @@ tmp/
 test/*.json
 log/
 nbproject/
+.project

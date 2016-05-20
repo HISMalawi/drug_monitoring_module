@@ -474,6 +474,7 @@ class ReportController < ApplicationController
 
   def months_of_stock_main
     @site = Site.find_by_name(params[:site])
+    @latest_pull_date = PullTracker.where(:'site_id' => @site.id).select('MAX(pulled_datetime) as pulled_datetime').first.pulled_datetime.to_date rescue nil
     @list = {}
 
     unless @site.blank?
