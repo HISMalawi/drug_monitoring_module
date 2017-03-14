@@ -1,56 +1,61 @@
-require 'digest/sha1'
-require 'digest/sha2'
+require 'couchrest_model'
+class User < CouchRest::Model::Base
 
-class User < ActiveRecord::Base
-  require 'digest/sha1'
+  use_database "user"
+  def username
+    self['_id']
+  end
 
-  validates_presence_of :username, :password
-  validates_uniqueness_of :username
-  self.primary_key = :user_id
-  has_one :user_role
+  def username=(value)
+    self['_id'] = value
+  end
+
+  property :first_name, String
+  property :last_name, String
+  property :password_hash, String
+  property :email, String
+  property :active, TrueClass, :default => true
+  property :role, String
+  property :creator, String
+
+  timestamps!
+
+  cattr_accessor :current_user
   cattr_accessor :current
-  before_save :encrypt_password
-  self.default_scope :conditions => "#{self.table_name}.voided = 0"
 
-  def self.random_string(len)
-    #generat a random password consisting of strings and digits
-    chars = ("a".."z").to_a + ("A".."Z").to_a + ("0".."9").to_a
-    newpass = ""
-    1.upto(len) { |i| newpass << chars[rand(chars.size-1)] }
-    return newpass
+  def has_role?(role_name)
+    self.current.role == role_name ? true : false
   end
 
-  def encrypt_password
-    self.salt = User.random_string(10)
-    self.password = encrypt(self.password, self.salt)
+  design do
+    view :by_active
+    view :by_email
   end
 
-  def encrypt(password,salt)
-    Digest::SHA1.hexdigest(password+salt)
+  design do
+    view :by_username
   end
 
-  def self.authenticate(username, password)
+  before_save do |pass|
+    check_password = BCrypt::Password.new(self.password_hash) rescue 'invalid hash'
+    self.password_hash = BCrypt::Password.create(self.password_hash) if (check_password == 'invalid hash')
+    self.creator = 'admin' if self.creator.blank?
+  end
 
-    user = User.find_by_username(username) rescue nil
+  def password_matches?(plain_password)
+    not plain_password.nil? and self.password == plain_password
+  end
 
-    if !user.nil?
+  def password
+    @password ||= BCrypt::Password.new(password_hash)
+    rescue BCrypt::Errors::InvalidHash
+      Rails.logger.error "The password_hash attribute of User[#{self.username}] does not contain a valid BCrypt Hash."
+    return nil
+  end
 
-      salt = Digest::SHA1.hexdigest(password + user.salt)
-
-      if salt == user.password
-
-        return true
-      else
-        return false
-      end
-
-    else
-
-      return false
-
-    end
-
-
+  def password=(new_password)
+    @password = BCrypt::Password.create(new_password)
+    self.password_hash = @password
   end
 
 end

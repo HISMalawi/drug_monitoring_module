@@ -2,7 +2,7 @@
   .main-links { display: none !important; }
 
   .brand-name { display: inline; }                                              
-                                                                                
+
   #image-logo {                                                                 
     position: relative;                                                         
     float: left;                                                                
@@ -39,20 +39,20 @@
 </div>                                                                  
 
 <div id = "image-logo">                                                 
-<%= image_tag("keys.png" ,:id => "keys")%>                              
+  <%= image_tag("keys.png" ,:id => "keys")%>
 
-<%= form_tag :controller => 'user', :action => 'login', :method => :post do %> 
-<table>                                                                 
-  <tr>                                                                  
-    <td><%=text_field(:user, :username, :textCase => "lower",:placeholder => "username") %></td>
-  </tr>                                                                 
-  <tr>                                                                  
-    <td>                                                                
-      <%=password_field(:user, :password, :textCase => "lower",         
-      :placeholder => "password", :style => "width: 155px;") %>         
-      <%= submit_tag "Login" ,:class => "btn btn-primary" , :style => "position: relative;top: -5px;"%>
-    </td>                                                               
-  </tr>                                                                 
-</table>                                                                
-<%end%>
+  <%= form_tag :controller => 'user', :action => 'authenticate', :method => :post do %>
+    <table>
+      <tr>
+        <td><%=text_field(:user, :username, :textCase => "lower",:placeholder => "username") %></td>
+      </tr>
+      <tr>
+        <td>
+          <%=password_field(:user, :password, :textCase => "lower",
+            :placeholder => "password", :style => "width: 155px;") %>
+          <%= submit_tag "Login" ,:class => "btn btn-primary" , :style => "position: relative;top: -5px;"%>
+        </td>
+      </tr>
+    </table>
+  <%end%>
 </div>

@@ -1,4 +1,11 @@
-class Definition < ActiveRecord::Base
-  set_primary_key :definition_id
-  validates_uniqueness_of :name
+require 'couchrest_model'
+class Definition < CouchRest::Model::Base
+  property :name, String
+  property :description, String
+
+  design do
+    view :by_name
+  end
+
+  timestamps!
 end

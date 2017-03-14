@@ -48,7 +48,7 @@ DrugMonitoringProgram::Application.routes.draw do
 
   post "user/save_edit"
 
-
+  post 'user/authenticate'
   ################### OBSERVATION ######################
 
   ################### REPORT ############################

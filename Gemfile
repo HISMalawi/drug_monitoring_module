@@ -1,7 +1,6 @@
 source 'http://rubygems.org'
-
+ruby '2.0.0'
 gem 'rails', '3.2.16'
-gem 'mysql'
 gem 'json', '1.5.0'
 gem 'fastercsv'
 gem 'bundler'
@@ -14,4 +13,5 @@ gem 'spreadsheet'
 gem 'rb-readline'
 gem 'chronic', '0.10.2'
 gem 'whenever',  :require => false 
+gem 'couchrest_model'
 

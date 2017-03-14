@@ -1,8 +1,15 @@
-class Drug < ActiveRecord::Base
-  # attr_accessible :title, :body
-  set_primary_key :drug_id
-  belongs_to :definition, :foreign_key => :category_id
-  validates_uniqueness_of :full_name
+require 'couchrest_model'
+class Drug < CouchRest::Model::Base
+  property :full_name, String
+  property :short_name, String
+  property :category, String
+  property :voided, TrueClass, :default => false
+
+  design do
+    view :by_full_name
+    view :by_short_name
+    view :by_category
+  end
 
   def self.check(name)
     drug_id = Drug.where("full_name = ? OR short_name = ?", "#{name}", "#{name}").first.id rescue create_drug(name)

@@ -1,46 +1,45 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-    	<meta charset="utf-8">
-    	<title><%=app_name%></title>
-    	<meta name="description" content="">
-    	<meta name="author" content="">
-    	<!--[if lt IE 9]>
+    <meta charset="utf-8">
+    <title><%=app_name%></title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!--[if lt IE 9]>
     		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     	<![endif]-->
 
-      <%= stylesheet_link_tag "footer.sticky" %>
-      <%= stylesheet_link_tag "application" %>
-      <%= stylesheet_link_tag "IE/bootstrap" %>                                         
-   		<style>
-    		body{ padding-top: 60px; }
-		</style>
-    	<!--[if IE 6]>    
+    <%= stylesheet_link_tag "footer.sticky" %>
+    <%= stylesheet_link_tag "application" %>
+    <%= stylesheet_link_tag "IE/bootstrap" %>
+    <style>
+      body{ padding-top: 60px; }
+    </style>
+    <!--[if IE 6]>
     		<link href="ie6.min.css" rel="stylesheet">
     	<![endif]-->
-    </head>
-    <body>
-    	<div class="navbar navbar-fixed-top">
-    		<div class="navbar-inner">
-    			<div class="container" style="width: 99%;">
-            <a class="brand" href="/"><%= app_name %></a>
-    				<div class="nav-collapse">
-               <%if User.current%>
+  </head>
+  <body>
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container" style="width: 99%;">
+          <a class="brand" href="/"><%= app_name %></a>
+          <div class="nav-collapse">
+            <%if User.current %>
               <ul class="nav">
                 <li class="active"><a href="/">Home</a></li>
                 <li><a href="/report/index">Reports</a></li>
-                <%if admin?%>                                           
-                <li class="dropdown">
-                  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Settings <b class="caret"></b></a>
-                  <ul class="dropdown-menu">
+                <%if User.current.has_role?('admin')%>
+                  <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Settings <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
                       <li><a href="/administration/add_site">Add Site</a></li>
                       <li><a href="/administration/edit_site">Edit Site</a></li>
-                      <li class="divider"></li>                               
+                      <li class="divider"></li>
                       <li><a href="/user/create">Add User</a></li>
                       <li><a href="/user/edit">Edit user</a></li>
-                  </ul>
-                </li>
-                <%end%>                                                 
-
+                    </ul>
+                  </li>
+                <%end%>
               </ul>
 
               <ul class="nav" style="float: right;">
@@ -48,57 +47,57 @@
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown">Logged in as:&nbsp;<b><%= User.current.username[0..9] %></b> <b class="caret"></b></a>
                   <ul class="dropdown-menu">
                     <li><a href="#">Change Password</a></li>
-                    <li class="divider"></li>                               
+                    <li class="divider"></li>
                     <li><a href="/login">Signout</a></li>
                   </ul>
                 </li>
               </ul>
 
-              <%end%>
+            <%end%>
 
-    				</div>
-    			</div>
-    		</div>
-    	</div>
-
-        <div class="container" style="width: 99%;">
-        <section id="modals">
-          <%=yield%>
-        </section>
-        </div> <!-- /container -->
-
-        <div class="footer" style="height: 40px !important;bottom: 0;line-height: 0px !important; ">
-          <div class="container" style="text-align: center;">
-            <p class="text-muted credit"><%=app_name%> <a target="_blank" href="http://www.baobabhealth.org" style="color: #0088cc !important;">baobabhealth.org</a>.</p>
           </div>
         </div>
+      </div>
+    </div>
+
+    <div class="container" style="width: 99%;">
+      <section id="modals">
+        <%=yield%>
+      </section>
+    </div> <!-- /container -->
+
+    <div class="footer" style="height: 40px !important;bottom: 0;line-height: 0px !important; ">
+      <div class="container" style="text-align: center;">
+        <p class="text-muted credit"><%=app_name%> <a target="_blank" href="http://www.baobabhealth.org" style="color: #0088cc !important;">baobabhealth.org</a>.</p>
+      </div>
+    </div>
 
 
-        <%#=javascript_include_tag "IE/jquery-1.7.1.min"%>                                         
-        <%unless action_name == 'menu' || @nojquery %>
-          <%=javascript_include_tag "bootstrap-tree/jquery-1.8.2"%>
-        <%end%>
-        <%=javascript_include_tag "IE/bootstrap"%>                                         
-        <script type="text/javascript">
-			$(function(){if($.browser.msie&&parseInt($.browser.version,10)===6){$('.row div[class^="span"]:last-child').addClass("last-child");$('[class*="span"]').addClass("margin-left-20");$('[class*="span"][class*="offset"]').removeClass('margin-left-20');$(':button[class="btn"], :reset[class="btn"], :submit[class="btn"], input[type="button"]').addClass("button-reset");$(":checkbox").addClass("input-checkbox");$('[class^="icon-"], [class*=" icon-"]').addClass("icon-sprite");$(".pagination li:first-child a").addClass("pagination-first-child")}
+<%#=javascript_include_tag "IE/jquery-1.7.1.min"%>                                         
+    <%unless action_name == 'menu' || @nojquery %>
+      <%=javascript_include_tag "bootstrap-tree/jquery-1.8.2"%>
+    <%end%>
+    <%=javascript_include_tag "IE/bootstrap"%>
+    <script type="text/javascript">
+      $(function(){if($.browser.msie&&parseInt($.browser.version,10)===6){$('.row div[class^="span"]:last-child').addClass("last-child");$('[class*="span"]').addClass("margin-left-20");$('[class*="span"][class*="offset"]').removeClass('margin-left-20');$(':button[class="btn"], :reset[class="btn"], :submit[class="btn"], input[type="button"]').addClass("button-reset");$(":checkbox").addClass("input-checkbox");$('[class^="icon-"], [class*=" icon-"]').addClass("icon-sprite");$(".pagination li:first-child a").addClass("pagination-first-child")}
 				
-				// Tooltip demo
-				$('.tooltip-demo.well').tooltip({
-				  selector: "a[rel=tooltip]",
-				  placement: "top"
-				})
+        // Tooltip demo
+        $('.tooltip-demo.well').tooltip({
+          selector: "a[rel=tooltip]",
+          placement: "top"
+        })
 			
-				$('.tooltip-test').tooltip()
-				$('.popover-test').popover()
+        $('.tooltip-test').tooltip()
+        $('.popover-test').popover()
 			
-				// Popover demo
-				$("a[rel=popover]")
-				  .popover({
-					placement : "top"  
-				   })
-				  .click(function(e) {
-					e.preventDefault()
-				  })
-			});</script>
-	</body>
+        // Popover demo
+        $("a[rel=popover]")
+        .popover({
+          placement : "top"
+        })
+        .click(function(e) {
+          e.preventDefault()
+        })
+      });</script>
+  </body>
 </html>

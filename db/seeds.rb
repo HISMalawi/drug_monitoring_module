@@ -9,19 +9,19 @@
 
 puts "Loading defaults"
 
-puts "Creating User roles"
-roles =[["Administrator", "This is the system administrator who handles all system functions"],
-  ["Other", "Other system user"] ]
+#puts "Creating User roles"
+#roles =[["Administrator", "This is the system administrator who handles all system functions"],
+  #["Other", "Other system user"] ]
 
-(roles || []).each do |role|
-  new_role = Role.where({:role => role[0], :description => role[1]}).first_or_create
-end
+#(roles || []).each do |role|
+  #new_role = Role.where({:role => role[0], :description => role[1]}).first_or_create
+#end
 
-puts "Creating default user"
-if User.find_by_username("admin").blank?
-  user = User.create({:username => "admin", :password => "test"})
-  UserRole.create({:user_id => user.id, :role_id => 1})
-end
+#puts "Creating default user"
+#if User.find_by_username("admin").blank?
+  #user = User.create({:username => "admin", :password => "test"})
+  #UserRole.create({:user_id => user.id, :role_id => 1})
+#end
 
 
 puts "Creating default definitions"
@@ -61,7 +61,14 @@ definitions = [["Prescription", "Describes the number of precriptions"],
 ]
 
 (definitions || []).each do |definition|
-  new_definition = Definition.where({:name => definition[0], :description => definition[1]}).first_or_create
+  new_definition = Definition.by_name.key(definition[0]).last
+  if new_definition.blank?
+    new_definition = Definition.new
+    new_definition.name = definition[0]
+    new_definition.description = definition[1]
+    new_definition.save
+  end
+  #new_definition = Definition.where({:name => definition[0], :description => definition[1]}).first_or_create
 end
 
 puts 'loading drugs'
@@ -11701,9 +11708,20 @@ sites_by_zones = {"chitipa"=> [
 
 (sites_by_zones || []).each do |district,values|
   (values || []).each do |facility_details|
-    Site.where({:name => facility_details["facility"],:description => facility_details['facility_type'],
-                :x => facility_details['longitude'],:y => facility_details['latitude'],
-                :active => false}).first_or_create
+    site = Site.by_name.key(facility_details["facility"]).last
+    if site.blank?
+      site = Site.new
+      site.name = facility_details["facility"]
+      site.description = facility_details['facility_type']
+      site.x = facility_details['longitude']
+      site.y = facility_details['latitude']
+      site.active = false
+      site.save
+    end
+    #Site.where({:name => facility_details["facility"],:description => facility_details['facility_type'],
+                #:x => facility_details['longitude'],:y => facility_details['latitude'],
+                #:active => false}).first_or_create
+
   end
 
 end
@@ -11713,6 +11731,37 @@ def load_cms_drugs
   cms_drugs = Spreadsheet.open "#{Rails.root}/db/cms.xls"
   sheet1 = cms_drugs.worksheet 0
 
+  sheet1.each 1 do |row|
+      drug_name = row[0]
+      drug_code = row[1]
+      drug_inventory_id = row[2]
+      drug_short_name = row[3]
+      drug_tabs = row[4]
+      weight = row[5]
+      strength = row[6]
+      category = row[7]
+      puts "#{drug_name} ......... #{drug_inventory_id}"
+      pack_size = drug_name.split(/[^\d]/).last rescue nil
+      next if drug_inventory_id.blank?
+      next if pack_size.blank?
+
+      #drug_cms = DrugCms.find(drug_inventory_id) rescue nil
+      drug_cms = DrugCms.by_drug_inventory_id.key(drug_inventory_id).last
+      drug_cms = DrugCms.new if drug_cms.blank?
+      
+      drug_cms.drug_inventory_id = drug_inventory_id
+      drug_cms.name = drug_name
+      drug_cms.short_name = drug_short_name
+      drug_cms.tabs = drug_tabs
+      drug_cms.code = drug_code
+      drug_cms.pack_size = pack_size
+      drug_cms.weight = weight
+      drug_cms.strength = strength
+      drug_cms.category = Definition.by_name.key(category).last.id
+      drug_cms.save
+    end
+
+=begin
   ActiveRecord::Base.transaction do
     sheet1.each 1 do |row|
       drug_name = row[0]
@@ -11741,12 +11790,32 @@ def load_cms_drugs
       drug_cms.save
     end
   end
+=end
 end
 
 load_cms_drugs
 
 definition = Definition.find_by_name("HIV Unit Drugs").id
+definition = Definition.by_name.key("HIV Unit Drugs").last.id
+
 (DrugCms.all || []).each do |drug|
   drug_id = drug.drug_inventory_id
-  DrugSet.where({:definition_id => definition, :drug_id => drug_id, :weight => drug.weight}).first_or_create
+  drug_set = DrugSet.by_drug_id.key(drug_id).last
+  if drug_set.blank?
+    drug_set = DrugSet.new
+    drug_set.definition_id = definition
+    drug_set.drug_id = drug_id
+    drug_set.weight = drug.weight
+    drug_set.save
+  end
+  #DrugSet.where({:definition_id => definition, :drug_id => drug_id, :weight => drug.weight}).first_or_create
 end
+
+user = User.new
+user.username = 'admin'
+user.password_hash = 'test'
+user.first_name = 'Admin'
+user.last_name = 'Test'
+user.role = 'admin'
+user.email = 'admin@gmail.com'
+user.save
