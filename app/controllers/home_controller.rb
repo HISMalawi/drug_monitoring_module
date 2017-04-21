@@ -1,6 +1,6 @@
 class HomeController < ApplicationController
   def index
-    @sites = []#Site.where(:active => true)
+    @sites = Site.by_active.key(true).all#Site.where(:active => false)
   end
 
   def graph
@@ -306,9 +306,9 @@ class HomeController < ApplicationController
 
   def map_main
     @sites = []
-    sites = Site.find(:all, :conditions => ["active =?", true])
+    sites = Site.by_active.key(true).all
     (sites || []).each do |source|
-      notices = ReportTool.get_notices_summary(source.id)
+      notices = ReportTool.get_notices_summary(source.id) rescue {}
       site = {
           'x' => source["x"],
           'y' =>source["y"],

@@ -3,17 +3,19 @@ class AdministrationController < ApplicationController
   end
   def add_site
     @nojquery = true
-    @sites = Site.where(:active => false)
+    @sites = Site.by_active.key(false).all
   end
+
   def list_sites
-    sites = Site.where(:active => true)
+    sites = Site.by_active.key(true).all
     @sites = {}
     (sites || []).each do |site|
       @sites[site.name] = {"address" => site.ip_address,"port" => site.port}  unless @sites[site.name].blank?
     end
   end
+  
   def edit_site
-    @sites = Site.where(:active => true)
+    @sites = Site.by_active.key(true).all
     @nojquery = true
   end
 
@@ -25,10 +27,9 @@ class AdministrationController < ApplicationController
   end
 
   def save_site
-
     unless params.blank? || !request.post?
       if params[:old_site].blank?
-        site = Site.find_by_name(params[:sitename])
+        site = Site.by_name.key(params[:sitename]).last
         site.update_attributes({
             :name => params[:sitename],
             :ip_address => params[:ip_address],
@@ -38,7 +39,8 @@ class AdministrationController < ApplicationController
         )
 
       elsif
-        site = Site.find(:first, :conditions => ["name = ? ", params[:old_site]])
+        #site = Site.find(:first, :conditions => ["name = ? ", params[:old_site]])
+        site = Site.by_name.key(params[:old_site]).last
         site.name = params[:sitename]
         site.ip_address = params[:ip_address]
         site.port = params[:port]

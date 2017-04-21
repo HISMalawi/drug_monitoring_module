@@ -6,7 +6,10 @@ class ApplicationController < ActionController::Base
   protected
 
   def authenticate_user
-    return true if User.find(session[:current_user_id])
+    if User.find(session[:current_user_id])
+      User.current = User.find(session[:current_user_id])
+      return true
+    end
     access_denied
     return false
   end
