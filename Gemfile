@@ -1,6 +1,8 @@
 source 'http://rubygems.org'
-
+ruby '2.0.0'
 gem 'rails', '3.2.16'
+gem 'couchrest_model'
+gem 'couch_tap'
 gem 'mysql'
 gem 'json', '1.5.0'
 gem 'fastercsv'
