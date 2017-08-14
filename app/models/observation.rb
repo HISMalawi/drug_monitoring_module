@@ -1,12 +1,21 @@
-class Observation < ActiveRecord::Base
-  set_primary_key :observation_id
-  belongs_to :site, :foreign_key => :site_id
-  belongs_to :definition, :foreign_key => :definition_id
-  belongs_to :drug, :foreign_key => :value_drug
-  belongs_to :drug_cms, :foreign_key => :value_drug
-  belongs_to :user, :foreign_key => :creator
-  validates_presence_of :site_id
-  validates_presence_of :definition_id
+require 'couchrest_model'
+class Observation < CouchRest::Model::Base
+  #set_primary_key :observation_id
+  #belongs_to :site, :foreign_key => :site_id
+  #belongs_to :definition, :foreign_key => :definition_id
+  #belongs_to :drug, :foreign_key => :value_drug
+  #belongs_to :drug_cms, :foreign_key => :value_drug
+  #belongs_to :user, :foreign_key => :creator
+  #validates_presence_of :site_id
+  #validates_presence_of :definition_id
+
+  property :observation_id, Integer
+  property :site_id, Integer
+  property :definition_id, Integer #value_numeric
+  property :value_numeric, Float #value_date
+  property :value_date, Date #value_text
+  property :value_text, String #value_drug
+  property :value_drug, Integer #voided
 
   def get_short_form
     DrugCms.where(:drug_inventory_id => self.value_drug).first.short_name rescue self.value_drug
