@@ -354,16 +354,3 @@ changes "http://#{couch_username}:#{couch_password}@#{couch_host}:#{couch_port}/
   end
 
 end
-
-def record_pulled_datetime(site_code, date)
-
-  pulled_time = PullTracker.where(:'site_code' => site_code).first
-
-  if pulled_time.blank?
-    pulled_time = PullTracker.new()
-    pulled_time.site_code = site_code
-  end
-  pulled_time.pulled_datetime = ("#{date.to_date} #{Time.now().strftime('%H:%M:%S')}")
-  pulled_time.save
-  puts "Recorded for :#{site.name}, Date: #{pulled_time.pulled_datetime}"
-end
