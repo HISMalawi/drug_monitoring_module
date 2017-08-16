@@ -30,11 +30,11 @@ mysql_adapter = mysql_db_settings["adapter"]
 #db_map_path = DIR.to_s + "/config/db_mapping.yml"
 #db_maps = YAML.load_file(db_map_path)
 
-client = Mysql2::Client.new(:host => mysql_host,
-  :username => mysql_username,
-  :password => mysql_password,
-  :database => mysql_db
-)
+#client = Mysql2::Client.new(:host => mysql_host,
+  #:username => mysql_username,
+  #:password => mysql_password,
+  #:database => mysql_db
+#)
 
 changes "http://#{couch_username}:#{couch_password}@#{couch_host}:#{couch_port}/#{couch_db}" do
   # Which database should we connect to?
