@@ -65,6 +65,7 @@ changes "http://#{couch_username}:#{couch_password}@#{couch_host}:#{couch_port}/
     data["stock_level"] = stock_level
     data["supervision_verification"] = supervision_verification
     data["supervision_verification_in_details"] = supervision_verification_in_details
+    data["relocations"] = relocations
     
     #################### START###################################################
 
