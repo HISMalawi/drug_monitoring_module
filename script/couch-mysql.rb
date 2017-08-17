@@ -48,7 +48,7 @@ changes "http://#{couch_username}:#{couch_password}@#{couch_host}:#{couch_port}/
     consumption_rate = doc.document["consumption_rate"]
     date = doc.document["date"].to_date.strftime('%Y-%m-%d') rescue doc.document["date"]
     dispensations = doc.document["dispensations"]
-    location = doc.document["location"]
+    #location = doc.document["location"]
     prescriptions = doc.document["prescriptions"]
     receipts = doc.document["receipts"]
     site_code = doc.document["site_code"]
@@ -84,7 +84,7 @@ changes "http://#{couch_username}:#{couch_password}@#{couch_host}:#{couch_port}/
     site_id = Site.find_by_site_code(site_code).id  rescue nil
     
     (data['prescriptions'] || []).each do |prescription|
-      pres_obs = Observation.where(:site_code => site_code,
+      pres_obs = Observation.where(:site_id => site_id,
         :definition_id => prescription_id,
         :value_drug => prescription['drug_inventory_id'],
         :value_date => date
