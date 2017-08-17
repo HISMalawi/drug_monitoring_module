@@ -350,7 +350,7 @@ changes "http://#{couch_username}:#{couch_password}@#{couch_host}:#{couch_port}/
     pulled_time.save
     #################### END ####################################################
 
-    logger.info("Done upating MySQL db")
+    #logger.info("Done upating MySQL db")
   end
 
 end
