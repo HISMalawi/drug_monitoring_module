@@ -31,6 +31,7 @@ class AdministrationController < ApplicationController
         site = Site.find_by_name(params[:sitename])
         site.update_attributes({
             :name => params[:sitename],
+            :site_code => params[:site_code],
             :ip_address => params[:ip_address],
             :port => params[:port],
             :active => true
@@ -40,6 +41,7 @@ class AdministrationController < ApplicationController
       elsif
         site = Site.find(:first, :conditions => ["name = ? ", params[:old_site]])
         site.name = params[:sitename]
+        site.site_code = params[:site_code]
         site.ip_address = params[:ip_address]
         site.port = params[:port]
         site.threshold = params[:threshold]

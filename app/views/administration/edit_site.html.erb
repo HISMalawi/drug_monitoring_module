@@ -3,21 +3,21 @@
 <script type="text/javascript" src="/javascripts/jquery.validate.min.js"></script>
 
 <style type="text/css">
-    td {
-        padding: 10px !important;
-    }
-    select,
-    textarea,
-    input {
-        width: 70% !important;
-        float: left !important;
-    }
-    button {
-        margin: 10px !important;
-    }
-    span.spacing {
-        margin-left: 10px;
-    }
+  td {
+    padding: 10px !important;
+  }
+  select,
+  textarea,
+  input {
+    width: 70% !important;
+    float: left !important;
+  }
+  button {
+    margin: 10px !important;
+  }
+  span.spacing {
+    margin-left: 10px;
+  }
 </style>
 
 <div class="panel">
@@ -27,90 +27,105 @@
   <div class="panel-content">
 
     <%= form_tag('/administration/save_site', :method => 'post', :enctype => 'multipart/form-data',
-                 :id => 'site-form', :class => "form-horizontal", :autocomplete => "off",:role => "form", :novalidate=> "novalidate") do %>
+      :id => 'site-form', :class => "form-horizontal", :autocomplete => "off",:role => "form", :novalidate=> "novalidate") do %>
 
-        <div class="form-control-group">
-          <table style="width: 100%;">
-            <tr>
-              <td align="right" style="width: 20%">
-                <label class="control-label">Site Name:</label>&nbsp;&nbsp;&nbsp;
-              </td>
-              <td>
-                <select id="sitename" name="sitename" class="form-control" placeholder="Region" required="" onchange="switchSite(this.value)" >
-                  <option value="">[ - Select site - ]</option>
-
-                  <% @sites.each do |site| %>
-
-                      <option value="<%= site.name %>"><%= site.name %></option>
-
-                  <% end %>
-                  <input name="old_site" class="form-control" id="old_site" required="" value="" type="hidden" />
-                </select>
-              </td>
-            </tr>
-          </table>
-        </div>
-        <div class="form-control-group">
-          <table style="width: 100%;">
-            <tr>
-              <td align="right" style="width: 20%">
-                <label class="control-label">IP Address:</label>&nbsp;&nbsp;&nbsp;
-              </td>
-              <td>
-                <input name="ip_address" class="form-control" placeholder="Site IP Address" id="ip_address" required="" value="" type="text" minlength=7 ipaddress=true />
-              </td>
-            </tr>
-          </table>
-        </div>
-        <div class="form-control-group">
-          <table style="width: 100%;">
-            <tr>
-              <td align="right" style="width: 20%">
-                <label class="control-label">Port:</label>&nbsp;&nbsp;&nbsp;
-              </td>
-              <td>
-                <input name="port" class="form-control" placeholder="Port" id="port" required="" value="" type="text" />
-              </td>
-            </tr>
-          </table>
-        </div>
-        <div class="form-control-group">
-          <table style="width: 100%;">
-            <tr>
-              <td align="right" style="width: 20%">
-                <label class="control-label">Threshold:</label>&nbsp;&nbsp;&nbsp;
-              </td>
-              <td>
-                <input type="text" id="threshold" name="threshold" value="" class="form-control" placeholder="Enter discrepancy threshold" required="" digits=true />
-              </td>
-            </tr>
-          </table>
-        </div>
-        <div class="form-control-group">
-          <table style="width: 100%;">
-            <tr>
-              <td align="right" style="width: 20%">
-                <label class="control-label">Status:</label>&nbsp;&nbsp;&nbsp;
-              </td>
-              <td style="width: 20%">
-                <span class="spacing"><input type="radio" name="status" id="active" value=true style="width: 2px !important;">Activated</span>
-              </td>
-              <td>
-                <span class="spacing"><input type="radio" name="status" value=false style="width: 2px !important;">Deactivate</span>
-              </td>
-            </tr>
-          </table>
-        </div>
+      <div class="form-control-group">
         <table style="width: 100%;">
           <tr>
-            <td style="width: 20%;">
-              <button type="button" class="btn btn-danger" style="font-size: 18px !important; float: left;" onclick="window.location = '/'">Cancel</button>
+            <td align="right" style="width: 20%">
+              <label class="control-label">Site Name:</label>&nbsp;&nbsp;&nbsp;
             </td>
             <td>
-              <button type="submit" class="btn btn-success btn-large" style="font-size: 18px !important; float: right;">Save Site</button>
+              <select id="sitename" name="sitename" class="form-control" placeholder="Region" required="" onchange="switchSite(this.value)" >
+                <option value="">[ - Select site - ]</option>
+
+                <% @sites.each do |site| %>
+
+                  <option value="<%= site.name %>"><%= site.name %></option>
+
+                <% end %>
+                <input name="old_site" class="form-control" id="old_site" required="" value="" type="hidden" />
+              </select>
             </td>
           </tr>
         </table>
+      </div>
+
+      <div class="form-control-group">
+        <table style="width: 100%;">
+          <tr>
+            <td align="right" style="width: 20%">
+              <label class="control-label">Site code</label>&nbsp;&nbsp;&nbsp;
+            </td>
+            <td>
+              <input name="site_code" class="form-control" placeholder="Site code" id="site_code" required="" value="" type="text" />
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="form-control-group">
+        <table style="width: 100%;">
+          <tr>
+            <td align="right" style="width: 20%">
+              <label class="control-label">IP Address:</label>&nbsp;&nbsp;&nbsp;
+            </td>
+            <td>
+              <input name="ip_address" class="form-control" placeholder="Site IP Address" id="ip_address" required="" value="" type="text" minlength=7 ipaddress=true />
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="form-control-group">
+        <table style="width: 100%;">
+          <tr>
+            <td align="right" style="width: 20%">
+              <label class="control-label">Port:</label>&nbsp;&nbsp;&nbsp;
+            </td>
+            <td>
+              <input name="port" class="form-control" placeholder="Port" id="port" required="" value="" type="text" />
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="form-control-group">
+        <table style="width: 100%;">
+          <tr>
+            <td align="right" style="width: 20%">
+              <label class="control-label">Threshold:</label>&nbsp;&nbsp;&nbsp;
+            </td>
+            <td>
+              <input type="text" id="threshold" name="threshold" value="" class="form-control" placeholder="Enter discrepancy threshold" required="" digits=true />
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="form-control-group">
+        <table style="width: 100%;">
+          <tr>
+            <td align="right" style="width: 20%">
+              <label class="control-label">Status:</label>&nbsp;&nbsp;&nbsp;
+            </td>
+            <td style="width: 20%">
+              <span class="spacing"><input type="radio" name="status" id="active" value=true style="width: 2px !important;">Activated</span>
+            </td>
+            <td>
+              <span class="spacing"><input type="radio" name="status" value=false style="width: 2px !important;">Deactivate</span>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <table style="width: 100%;">
+        <tr>
+          <td style="width: 20%;">
+            <button type="button" class="btn btn-danger" style="font-size: 18px !important; float: left;" onclick="window.location = '/'">Cancel</button>
+          </td>
+          <td>
+            <button type="submit" class="btn btn-success btn-large" style="font-size: 18px !important; float: right;">Save Site</button>
+          </td>
+        </tr>
+      </table>
 
     <% end %>
 
@@ -119,81 +134,82 @@
 
 
 <script defer="true">
-    var sites = {};
+  var sites = {};
 
-    <% @sites.each do |site| %>
-        sites["<%= site.name %>"] = {"name": '<%= site.name %>', "ip_address": '<%= site.ip_address %>',
-                                     "port": '<%= site.port %>', "x": '<%= site.x %>', "y":'<%= site.y %>' ,
-                                    "threshold": <%= site.threshold %>,"region":'<%= site.region %>'}
+<% @sites.each do |site| %>
+    sites["<%= site.name %>"] = {"name": '<%= site.name %>', "ip_address": '<%= site.ip_address %>', "site_code": '<%= site.site_code %>',
+      "port": '<%= site.port %>', "x": '<%= site.x %>', "y":'<%= site.y %>' ,
+      "threshold": <%= site.threshold %>,"region":'<%= site.region %>'}
 
-    <% end %>
-
-
-
-    jQuery.validator.addMethod("sitecode", function(value, element) {
-        return this.optional(element) || /^[A-Z]{3}$/.test(value);
-    }, "Please 3 capital letters only.");
-
-    jQuery.validator.addMethod("ipaddress", function(value, element) {
-        return this.optional(element) || /^\d+\.\d+\.\d+\.\d+$/.test(value);
-    }, "Not a valid IP address.");
+<% end %>
 
 
 
-    function switchSite(sitename){
-        document.getElementById("sitename").value = sites[sitename]["name"];
-        document.getElementById("old_site").value = sites[sitename]["name"];
-        document.getElementById("ip_address").value = sites[sitename]["ip_address"];
-        document.getElementById("port").value = sites[sitename]["port"];
-        document.getElementById("threshold").value = sites[sitename]["threshold"];
-        document.getElementById("active").checked = true
-    }
+  jQuery.validator.addMethod("sitecode", function(value, element) {
+    return this.optional(element) || /^[A-Z]{3}$/.test(value);
+  }, "Please 3 capital letters only.");
+
+  jQuery.validator.addMethod("ipaddress", function(value, element) {
+    return this.optional(element) || /^\d+\.\d+\.\d+\.\d+$/.test(value);
+  }, "Not a valid IP address.");
 
 
-    function prettyPrint(){
-        $(document).ready(function(){
 
-            $('#site-form').validate({
-                rules: {
-                    sitename: {required: true},
-                    ip_address:{required: true},
-                    port: {required: true},
-                    threshold:{required: true}
+  function switchSite(sitename){
+    document.getElementById("sitename").value = sites[sitename]["name"];
+    document.getElementById("old_site").value = sites[sitename]["name"];
+    document.getElementById("site_code").value = sites[sitename]["site_code"];
+    document.getElementById("ip_address").value = sites[sitename]["ip_address"];
+    document.getElementById("port").value = sites[sitename]["port"];
+    document.getElementById("threshold").value = sites[sitename]["threshold"];
+    document.getElementById("active").checked = true
+  }
 
-                },
-                messages: {
-                    sitename: {required: "Please provide a name for the site"},
-                    ip_address: {required: "Please provide an IP Address for the site"},
-                    port: {required: "Please provide the port for the application"}
-                },
-                highlight: function(element) {
-                    $(element).closest('.control-group').removeClass('success').addClass('error');
-                },
-                success: function(element) {
-                    element
-                            .text('OK').addClass('success')
-                }
-            });
 
-        }); // end document.ready
-    }
-
+  function prettyPrint(){
     $(document).ready(function(){
 
-        $('#site-form').validate({
-            highlight: function(element) {
-                $(element).closest('.control-group').removeClass('success').addClass('error');
-            },
-            success: function(element) {
-                element
-                        .text('OK').addClass('success')
-            }
-        });
+      $('#site-form').validate({
+        rules: {
+          sitename: {required: true},
+          ip_address:{required: true},
+          port: {required: true},
+          threshold:{required: true}
+
+        },
+        messages: {
+          sitename: {required: "Please provide a name for the site"},
+          ip_address: {required: "Please provide an IP Address for the site"},
+          port: {required: "Please provide the port for the application"}
+        },
+        highlight: function(element) {
+          $(element).closest('.control-group').removeClass('success').addClass('error');
+        },
+        success: function(element) {
+          element
+          .text('OK').addClass('success')
+        }
+      });
 
     }); // end document.ready
+  }
 
-    addEventListener('load', prettyPrint, false);
-    $(document).ready(function(){
-        $('pre').addClass('prettyprint linenums');
+  $(document).ready(function(){
+
+    $('#site-form').validate({
+      highlight: function(element) {
+        $(element).closest('.control-group').removeClass('success').addClass('error');
+      },
+      success: function(element) {
+        element
+        .text('OK').addClass('success')
+      }
     });
+
+  }); // end document.ready
+
+  addEventListener('load', prettyPrint, false);
+  $(document).ready(function(){
+    $('pre').addClass('prettyprint linenums');
+  });
 </script>

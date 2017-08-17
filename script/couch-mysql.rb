@@ -91,7 +91,7 @@ changes "http://#{couch_username}:#{couch_password}@#{couch_host}:#{couch_port}/
       ).first
 
       if pres_obs.blank?
-        Observation.create({:site_code => site_code,
+        Observation.create({
             :site_id => site_id,
             :definition_id => prescription_id,
             :value_numeric => prescription['total'],
@@ -102,14 +102,14 @@ changes "http://#{couch_username}:#{couch_password}@#{couch_host}:#{couch_port}/
         pres_obs.save
       end
       
-      pres_to = Observation.where(:site_code => site_code,
+      pres_to = Observation.where(:site_id => site_id,
         :definition_id => drug_prescribed_id,
         :value_drug => prescription['drug_inventory_id'],
         :value_date => date
       ).first
 
       if pres_to.blank?
-        Observation.create({:site_code => site_code,
+        Observation.create({
             :site_id => site_id,
             :definition_id => drug_prescribed_id,
             :value_numeric => prescription['total_patients'],
@@ -122,14 +122,14 @@ changes "http://#{couch_username}:#{couch_password}@#{couch_host}:#{couch_port}/
     end
 
     (data['dispensations'] || []).each do |dispensation|
-      disp_obs = Observation.where(:site_code => site_code,
+      disp_obs = Observation.where(:site_id => site_id,
         :definition_id => dispensation_id,
         :value_drug => dispensation['drug_inventory_id'],
         :value_date => date
       ).first
 
       if disp_obs.blank?
-        Observation.create({:site_code => site_code,
+        Observation.create({
             :site_id => site_id,
             :definition_id => dispensation_id,
             :value_numeric => dispensation['total'],
@@ -140,14 +140,14 @@ changes "http://#{couch_username}:#{couch_password}@#{couch_host}:#{couch_port}/
         disp_obs.save
       end
 
-      disp_to = Observation.where(:site_code => site_code,
+      disp_to = Observation.where(:site_id => site_id,
         :definition_id => drug_given_to_id,
         :value_drug => dispensation['drug_inventory_id'],
         :value_date => date
       ).first
 
       if disp_to.blank?
-        Observation.create({:site_code => site_code,
+        Observation.create({
             :site_id => site_id,
             :definition_id => drug_given_to_id,
             :value_numeric => dispensation['total_patients'],
@@ -161,14 +161,14 @@ changes "http://#{couch_username}:#{couch_password}@#{couch_host}:#{couch_port}/
 
     (data['relocations'] || []).each do |key,value|
       next if value == 0
-      relocation_obs = Observation.where(:site_code => site_code,
+      relocation_obs = Observation.where(:site_id => site_id,
         :definition_id => relocation_id,
         :value_drug => key,
         :value_date => date
       ).first
 
       if relocation_obs.blank?
-        Observation.create({:site_code => site_code,
+        Observation.create({
             :site_id => site_id,
             :definition_id => relocation_id,
             :value_numeric => value,
@@ -183,14 +183,14 @@ changes "http://#{couch_username}:#{couch_password}@#{couch_host}:#{couch_port}/
 
     (data['receipts'] || []).each do |key,value|
       next if value == 0
-      receipts_ob = Observation.where(:site_code => site_code,
+      receipts_ob = Observation.where(:site_id => site_id,
         :definition_id => receipts_id,
         :value_drug => key,
         :value_date => date
       ).first
 
       if receipts_ob.blank?
-        Observation.create({:site_code => site_code,
+        Observation.create({
             :site_id => site_id,
             :definition_id => receipts_id,
             :value_numeric => value,
@@ -204,14 +204,14 @@ changes "http://#{couch_username}:#{couch_password}@#{couch_host}:#{couch_port}/
     end
 
     (data['stock_level'] || []).each do |drug_id, value|
-      relocation_obs = Observation.where(:site_code => site_code,
+      relocation_obs = Observation.where(:site_id => site_id,
         :definition_id => drug_stock_level_id,
         :value_drug => drug_id,
         :value_date => date
       ).first
 
       if relocation_obs.blank?
-        Observation.create({:site_code => site_code,
+        Observation.create({
             :site_id => site_id,
             :definition_id => drug_stock_level_id,
             :value_numeric => value,
@@ -225,14 +225,14 @@ changes "http://#{couch_username}:#{couch_password}@#{couch_host}:#{couch_port}/
     end
 
     (data['consumption_rate'] || []).each do |drug_id, value|
-      relocation_obs = Observation.where(:site_code => site_code,
+      relocation_obs = Observation.where(:site_id => site_id,
         :definition_id => drug_rate_id,
         :value_drug => drug_id,
         :value_date => date
       ).first
 
       if relocation_obs.blank?
-        Observation.create({:site_code => site_code,
+        Observation.create({
             :site_id => site_id,
             :definition_id => drug_rate_id,
             :value_numeric => value.round(2),
@@ -247,14 +247,14 @@ changes "http://#{couch_username}:#{couch_password}@#{couch_host}:#{couch_port}/
 
     #.............................................................................
     (data['supervision_verification'] || []).each do |drug_id, value|
-      relocation_obs = Observation.where(:site_code => site_code,
+      relocation_obs = Observation.where(:site_id => site_id,
         :definition_id => supervision_id,
         :value_drug => drug_id,
         :value_date => date
       ).first
 
       if relocation_obs.blank?
-        Observation.create({:site_code => site_code,
+        Observation.create({
             :site_id => site_id,
             :definition_id => drug_rate_id,
             :value_numeric => value,
@@ -268,14 +268,14 @@ changes "http://#{couch_username}:#{couch_password}@#{couch_host}:#{couch_port}/
     end
 
     (data['clinic_verification'] || []).each do |drug_id, value|
-      relocation_obs = Observation.where(:site_code => site_code,
+      relocation_obs = Observation.where(:site_id => site_id,
         :definition_id => clinic_id,
         :value_drug => drug_id,
         :value_date => date
       ).first
 
       if relocation_obs.blank?
-        Observation.create({:site_code => site_code,
+        Observation.create({
             :site_id => site_id,
             :definition_id => drug_rate_id,
             :value_numeric => value,
@@ -290,7 +290,7 @@ changes "http://#{couch_username}:#{couch_password}@#{couch_host}:#{couch_port}/
 
     (data['supervision_verification_in_details'] || []).each do |drug_id, values|
       next if values.blank?
-      relocation_obs = Observation.where(:site_code => site_code,
+      relocation_obs = Observation.where(:site_id => site_id,
         :definition_id => supervision_in_detail_id,
         :value_drug => drug_id,
         :value_date => date
@@ -300,7 +300,7 @@ changes "http://#{couch_username}:#{couch_password}@#{couch_host}:#{couch_port}/
         value_text_str = "{previous_verified_stock:#{values['previous_verified_stock']},"
         value_text_str += "earliest_expiry_date:#{values['earliest_expiry_date']},"
         value_text_str += "expiring_units:#{values['expiring_units']}}"
-        Observation.create({:site_code => site_code,
+        Observation.create({
             :site_id => site_id,
             :definition_id => supervision_in_detail_id,
             :value_numeric => values['verified_stock'],
@@ -333,7 +333,6 @@ changes "http://#{couch_username}:#{couch_password}@#{couch_host}:#{couch_port}/
               :definition_id => month_of_stock_defn,
               :value_numeric => month_of_stock.to_f.round(3),
               :value_drug => drug.value_drug,
-              :site_code => site.site_code,
               :value_date => Date.today})
 
         end
@@ -341,11 +340,11 @@ changes "http://#{couch_username}:#{couch_password}@#{couch_host}:#{couch_port}/
     end
     ##### calculating month of stock end#################
 
-    pulled_time = PullTracker.where(:'site_code' => site_code).first
+    pulled_time = PullTracker.where(:'site_id' => site_id).first
 
     if pulled_time.blank?
       pulled_time = PullTracker.new()
-      pulled_time.site_code = site_code
+      pulled_time.site_id = site_id
     end
     pulled_time.pulled_datetime = ("#{date.to_date} #{Time.now().strftime('%H:%M:%S')}")
     pulled_time.save
