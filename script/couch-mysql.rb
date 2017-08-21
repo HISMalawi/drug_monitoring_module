@@ -3,6 +3,8 @@ require "yaml"
 require 'mysql2'
 require "json"
 #require 'couch_tap'
+
+DIR = File.dirname(__FILE__)
 couch_mysql_path = DIR.to_s + "/config/couch_mysql.yml"
 db_settings = YAML.load_file(couch_mysql_path)
 couch_db_settings = db_settings["couchdb"]
@@ -20,6 +22,17 @@ mysql_db = mysql_db_settings["database"]
 mysql_port = mysql_db_settings["port"]
 mysql_adapter = mysql_db_settings["adapter"]
 
+#reading db_mapping
+#db_map_path = DIR.to_s + "/config/db_mapping.yml"
+#db_maps = YAML.load_file(db_map_path)
+
+client = Mysql2::Client.new(:host => mysql_host,
+  :username => mysql_username,
+  :password => mysql_password,
+  :database => mysql_db
+)
+#raise Definition.first.inspect
+#raise ActiveRecord::Base.inspect
 changes "http://#{couch_username}:#{couch_password}@#{couch_host}:#{couch_port}/#{couch_db}" do
   # Which database should we connect to?
   logger.info("Successfully connected to couchdb: #{couch_db} available at #{couch_host}")
