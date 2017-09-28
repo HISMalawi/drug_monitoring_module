@@ -91,6 +91,7 @@ DrugMonitoringProgram::Application.routes.draw do
   get '/ajax_low_stock' => "home#ajax_low_stock"
   get '/ajax_high_stock' => "home#ajax_high_stock"
   get "home/manage_notices"
+  get '/get_couch_changes' => "home#get_couch_changes"
   # The priority is based upon order of creation:
   # first created -> highest priority.
 

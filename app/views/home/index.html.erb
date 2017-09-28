@@ -2,6 +2,7 @@
 <html>
   <head>
     <title></title>
+    <%=javascript_include_tag "bootstrap-tree/jquery-1.8.2"%>
     <base target="_parent"/>
     <style>
       body {
@@ -168,7 +169,32 @@
 
   //-->
   window.setInterval("setAttibutes()", 350);
+
+ 
     </script>
 
+    <script type="text/javascript">
+      function listenToCouchChangesFeed() {
+        jQuery.ajax({
+          type: "GET",
+          url: "/get_couch_changes",
+          success: function(results){
+
+          }
+
+        });
+
+      }
+
+      listenToCouchChangesFeed();
+
+
+      window.setInterval(function(){
+        listenToCouchChangesFeed();
+      }, 1000 * 60 * 60); //Run it every hour 1000 * 60 * 60
+
+
+
+    </script>
   </body>
 </html>
