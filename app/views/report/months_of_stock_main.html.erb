@@ -61,7 +61,9 @@
                 labels: {
                     style: {
                         color: '#000000',
-                        font: "12px Arial, 'Helvetica Neue', Helvetica, sans-serif;"
+                        font: "12px Arial, 'Helvetica Neue', Helvetica, sans-serif;",
+                        width: 'auto',
+                        'min-width': 'auto'
                     },
 
                         formatter: function () {
@@ -136,6 +138,9 @@
                 bar: {
                     dataLabels: {
                         enabled: false
+                    },
+                    series: {
+                      pointWidth: 400//width of the column bars irrespective of the chart size
                     }
                 }
             },
