@@ -5,18 +5,29 @@ def get_couch_changes
   couch_host = couch_db_settings["host"]
   couch_db = couch_db_settings["database"]
   couch_port = couch_db_settings["port"]
+  
+  file_path = Rails.root.to_s + "/log/last_sequence.txt"
+  last_sequence_number = (JSON.parse(File.open(file_path).read)["last_sequence"] rescue nil)
 
-  couch_address = "http://#{couch_host}:#{couch_port}/#{couch_db}/_changes?descending=true&include_docs=true"
+  if last_sequence_number.blank?
+    couch_address = "http://#{couch_host}:#{couch_port}/#{couch_db}/_changes?include_docs=true"
+  else
+    couch_address = "http://#{couch_host}:#{couch_port}/#{couch_db}/_changes?since=#{last_sequence_number}&include_docs=true"
+  end
+
   received_params = RestClient.get(couch_address)
   results = JSON.parse(received_params)
   couch_data = {}
+  seq = []
 
+  puts "Starting from sequence#: #{last_sequence_number}"
+  #raise results["results"].count.inspect
   results.each do |key, values|
     values.each do |data|
       date = data["doc"]["date"].to_date.strftime('%Y-%m-%d') rescue nil
       next if date.blank?
+      seq << data["seq"].to_i
       consumption_rate = data["doc"]["consumption_rate"]
-
       dispensations = data["doc"]["dispensations"]
       prescriptions = data["doc"]["prescriptions"]
       receipts = data["doc"]["receipts"]
@@ -40,8 +51,18 @@ def get_couch_changes
       create_or_update_mysql_from_couch(couch_data, date)
     end rescue nil
   end
+  last_sequence = seq.sort.last
+  update_sequence_in_file(last_sequence)
   return couch_data
   #render :text => couch_data.to_json and return
+end
+
+def update_sequence_in_file(last_sequence_number)
+  data = {"last_sequence" => last_sequence_number}.to_json
+  file_path = Rails.root.to_s + "/log/last_sequence.txt"
+  File.open(file_path, "w") do |f|
+    f.write(data)
+  end
 end
 
 def create_or_update_mysql_from_couch(data, date)
