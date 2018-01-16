@@ -37,14 +37,14 @@ def get_couch_changes
       couch_data["supervision_verification_in_details"] = supervision_verification_in_details
       couch_data["relocations"] = relocations
 
-      create_or_update_mysql_from_couch(couch_data)
+      create_or_update_mysql_from_couch(couch_data, date)
     end rescue nil
   end
   return couch_data
   #render :text => couch_data.to_json and return
 end
 
-def create_or_update_mysql_from_couch(data)
+def create_or_update_mysql_from_couch(data, date)
   prescription_id = Definition.where(:name => "prescription").first.id
   dispensation_id = Definition.where(:name => "dispensation").first.id
 
@@ -301,23 +301,26 @@ def create_or_update_mysql_from_couch(data)
   #.............................................................................
   ##### calculating month of stock start #################
   drugs = Observation.find_by_sql("SELECT DISTINCT value_drug FROM observations where voided = 0")
-  sites = Site.where(:active => 1)
-  (sites || []).each do |site|
-    puts "calculating for site : #{site.name}"
-    (drugs || []).each do |drug|
-      month_of_stock = Observation.calculate_month_of_stock(drug.value_drug, site.id)
+  #sites = Site.where(:active => 1)
+  #(sites || []).each do |site|
+  site = Site.find_by_site_code(site_code)
+  date = date.to_date.strftime("%d-%b-%Y")
+  puts "calculating for site : #{site.name} on #{date}"
+  (drugs || []).each do |drug|
+    month_of_stock = Observation.calculate_month_of_stock(drug.value_drug, site_id)
 
-      unless (month_of_stock.is_a? String ||  month_of_stock.nan? || month_of_stock.to_s.downcase == "infinity")
-        puts "Month of stock : #{month_of_stock} for drug #{drug.value_drug} "
-        Observation.create({:site_id => site.id,
-            :definition_id => month_of_stock_defn,
-            :value_numeric => month_of_stock.to_f.round(3),
-            :value_drug => drug.value_drug,
-            :value_date => Date.today})
+    unless (month_of_stock.is_a? String ||  month_of_stock.nan? || month_of_stock.to_s.downcase == "infinity")
+      puts "Month of stock : #{month_of_stock} for drug #{drug.value_drug} "
+      Observation.create({:site_id => site_id,
+          :definition_id => month_of_stock_defn,
+          :value_numeric => month_of_stock.to_f.round(3),
+          :value_drug => drug.value_drug,
+          :value_date => Date.today})
 
-      end
     end
   end
+
+  #end
   ##### calculating month of stock end#################
 
   pulled_time = PullTracker.where(:'site_id' => site_id).first
