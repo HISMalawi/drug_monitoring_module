@@ -2,7 +2,7 @@
 <html>
   <head>
     <title></title>
-    <%=javascript_include_tag "bootstrap-tree/jquery-1.8.2"%>
+
     <base target="_parent"/>
     <style>
       body {
@@ -30,14 +30,14 @@
 
     </style>
     <script type="text/javascript">
-      window.switch = function (site)
+      /*window.switch = function (site)
       {
 
         window.frames['main-display'].contentDocument.getElementById(sites[current_pos]).style.fill= "red"
         window.frames['main-display'].contentDocument.getElementById(sites[sites.indexOf(site)]).style.fill= "green"
         current_pos = sites.indexOf(site)
         __$("report-display").setAttribute("src", "/report/months_of_stock_main?site="+ site);
-      }
+      }*/
 
 
       function resizeIframe(id){
@@ -46,9 +46,11 @@
         frame.height = frame.contentWindow.document.body.scrollHeight + "px";
         frame.width = frame.contentWindow.document.body.scrollWidth + "px";
       }
+      
       var circle = '';
       var previousCircle = '';
       var previousColor = '';
+      
       function setAttibutes(){
         mainDisplay = document.getElementById('main-display').contentDocument
         try {
@@ -86,16 +88,22 @@
       }
     </script>
   </head>
-  <body onresize="resizeTable()" onload="switchViews()">
+  <body onresize="resizeTable()" onload="renderGraph();" >
 
     <div id="main" class="table" style="width: 99%; height: 83vh; border: 0px solid #000; top: 50px; position: absolute;">
       <div class="row">
         <div style="text-align: center;background-color: #f5f5f5;border: 1px solid rgba(0, 0, 0, 0.05);border-radius: 4px;padding-left: 50px;" >
           <iframe id="main-display" onload="resizeIframe(this.id)" style=" height: 85vh;width: 100%; border: none; overflow: auto;" src="/home/map_main"></iframe>
         </div>
+
         <div class="cell" style="vertical-align: top;width: 65%;">
-          <iframe id="report-display" style="width: 100%;border: none; height: 90vh;overflow: auto;" ></iframe>
+          <!--<iframe id="report-display" style="width: 100%;border: none; height: 90vh;overflow: auto;" ></iframe>-->
+          <div id="notifier"></div>
+          <div id="container" style="height: 80%;">
+
+          </div>
         </div>
+
       </div>
     </div>
 
@@ -103,6 +111,7 @@
       <!--
 
       var sites = []
+      var sites_copy = []
       var current_pos = 0;
       var timerHnd;
 
@@ -111,6 +120,7 @@
 
 <% (@sites || []).each do |site| %>
     sites.push('<%= site.name.downcase %>')
+    sites_copy.push('<%= site.name.downcase %>')
 <% end %>
 
   function __$(id){
@@ -118,6 +128,210 @@
   }
 
   var previousCircle = '';
+
+  function sleep(delay) {
+    var start = new Date().getTime();
+    while (new Date().getTime() < start + delay);
+  }
+
+  function renderGraph(){
+    if (sites.length == 0){
+      sites = JSON.parse(JSON.stringify(sites_copy));
+    }
+    
+    site = sites.shift();
+    jQuery.ajax({
+      type: "POST",
+      url: "/report/render_months_of_stock_main",
+      data: "site=" + site,
+      beforeSend: function(){
+        $('#notifier').html('Loading data for ' + site);
+      },
+      success: function(data){
+        $('#notifier').hide();
+        $('#container').html()
+        data = JSON.parse(data);
+        showGraph(data);
+
+        setTimeout(renderGraph, 15000);
+
+      }
+
+    });
+
+    
+  }
+
+  function dataG(data) {
+    result = data["results"];
+    var correctedWeights = [];
+
+    for (var drug in result){
+      var val = parseFloat(result[drug]['month_of_stock'])
+      var col = (val <= 2) ? 'red' : (val >= 5 ? 'yellow' : 'green');
+      correctedWeights.push({y: val, color: col});
+    }
+
+    return [{name: 'Month(s) of stock', showInLegend: false, data: correctedWeights, pointWidth: 20}];
+  }
+
+  function showGraph(data){
+    //console.log(dataG(data))
+    var drugs = []
+    var data_list = {}
+
+    result = data["results"];
+    site_details = data["site"];
+    last_pull_date = data["latest_pull_date"];
+
+
+    if (last_pull_date.length > 0){
+      site_details = site_details + " as of  <span style='font-weight:bold; color:red; font-size: 12pt;'>" + last_pull_date + "</span>";
+    }
+
+    for (var drug in result){
+      drugs.push(drug);
+      data_list[drug] = {
+        month_of_stock: result[drug]['month_of_stock'],
+        stock_level: result[drug]['stock_level'],
+        consumption_rate: result[drug]['consumption_rate'],
+        stocked_out: result[drug]['stocked_out'],
+        active: result[drug]['active'],
+        pack_size: result[drug]['pack_size']
+      }
+    }
+
+    //console.log(drugs)
+    //graph start
+    $('#container').highcharts({
+      chart: {
+        type: 'bar',
+        borderWidth: 1,
+        plotBorderWidth: 1,
+        // Edit chart spacing
+        spacingBottom: 15,
+        spacingTop: 10,
+        spacingLeft: 10,
+        spacingRight: 10,
+        // Explicitly tell the width and height of a chart
+        height: (window.innerHeight - 50)
+
+      },
+      title: {
+        style: {
+          fontFamily: "'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif",
+          fontSize: '14px'
+        },
+        useHTML: true,
+        text: "ARV Stock Levels At " + site_details
+      },
+      xAxis: {
+        categories: drugs,
+        title: {
+          text: null,
+          style: {
+            font: "12px 'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif"
+          }
+
+        },
+        labels: {
+          style: {
+            color: '#000000',
+            font: "12px Arial, 'Helvetica Neue', Helvetica, sans-serif;",
+            width: 'auto',
+            'min-width': 'auto'
+          },
+
+          formatter: function () {
+            if (!data_list[this.value]["active"])
+            {
+              return '<span style="fill: grey;">' + this.value + '</span>';
+            }
+            else if (data_list[this.value]["stocked_out"]) {
+
+              return '<span style="fill: red;">' + this.value + '</span>';
+
+            }
+            else {
+              return this.value;
+            }
+          }
+
+        }
+      },
+      yAxis: {
+        min: 0,
+        max: 9,
+        tickInterval: 1,
+        title: {
+          text: 'Months of Stock',
+          align: 'high',
+          style: {
+            font: "13px 'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif"
+          }
+        },
+        labels: {
+          overflow: 'justify',
+          style: {
+            color: '#000000',
+            font: "13px 'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif"
+          }
+        },
+        plotBands: [{ // mark the weekend
+            color: '#66CDAA',
+            from: 2,
+            to: 5
+          },
+          {
+            color: 'rgb(225, 225, 225)',
+            from: 0,
+            to: 2
+          },
+          {
+            color: 'rgb(225, 225, 225)',
+            from: 5,
+            to: 9
+          }]
+      },
+      tooltip: {
+        shared: true,
+        useHTML: true,
+        valueSuffix: ' ',
+        formatter: function() {
+
+          var stock_level_string = (this.y == 0) ? ' 0' : ' ' +
+            ((parseInt(this.y) == 0) ? '' :  parseInt(this.y) + (parseInt(this.y) == 1 ? ' month ': ' months ')) +
+            parseInt((this.y*30 % 30)) + ( parseInt((this.y*30 % 30)) == 1 ? " day" :  " days");
+
+          return '<span  style= "font-weight: bold; font-size : 10px;">' +
+            'Drug Name:  &nbsp&nbsp&nbsp&nbsp<span style="color: #097054; " >' + this.x + '</span> <br />' +
+            'Months of stock:  &nbsp&nbsp&nbsp<span style="color: #097054; " >' + stock_level_string + '</span> <br />' +
+            'Stock level:  &nbsp&nbsp&nbsp<span style="color: #097054; ">' + data_list[this.x]['stock_level'] + ' tins</span><br />' +
+            'Consumption rate:  &nbsp&nbsp&nbsp<span style="color: #097054; ">' + data_list[this.x]['consumption_rate'] + ' tins/month</span> </span>';
+        }
+      },
+      plotOptions: {
+        bar: {
+          dataLabels: {
+            enabled: false
+          },
+          series: {
+            pointWidth: 400//width of the column bars irrespective of the chart size
+          }
+        }
+      },
+      credits: {
+        enabled: false
+      },
+      series: dataG(data),
+      exporting: { enabled: false }
+
+    });
+
+    //graph end
+  }
+
+
   function switchViews(){
     clearTimeout(timerHnd);
     if (typeof(blinkInterval) != 'undefined')clearInterval(blinkInterval);
@@ -134,7 +348,7 @@
 
     //window.frames['main-display'].contentDocument.getElementById(sites[current_pos].toLowerCase()).style.fill= "green"
 
-    __$("report-display").setAttribute("src", "/report/months_of_stock_main?site="+ sites[current_pos]);
+    //__$("report-display").setAttribute("src", "/report/months_of_stock_main?site="+ sites[current_pos]);
     mainDisplay = document.getElementById('main-display').contentDocument;
     facility = mainDisplay.getElementById("map").contentDocument.getElementById(sites[current_pos]);
     if (previousCircle != ''){
@@ -185,7 +399,7 @@
         });
 
       }
-/*
+      /*
       listenToCouchChangesFeed();
 
 
@@ -193,8 +407,9 @@
         listenToCouchChangesFeed();
       }, 1000 * 60 * 60); //Run it every hour 1000 * 60 * 60
 
-*/
+       */
 
     </script>
+
   </body>
 </html>

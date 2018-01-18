@@ -41,23 +41,23 @@ class ReportController < ApplicationController
     end_date = params[:end_date].to_date.strftime("%Y-%m-%d") rescue nil
 
     case params[:report_type]
-      when "drug stock report"
-        drug = params[:drug]
-        redirect_to :action => 'drug_report',:drug => drug, :start_date => start_date, :end_date => end_date
-      when "drug utilization report"
-        drug = params[:drug]
-        redirect_to :action => 'drug_utilization_report',:drug => drug, :start_date => start_date, :end_date => end_date
-      when "aggregate report"
-        redirect_to :action => 'aggregate_report', :start_date => start_date, :end_date => end_date
-      when "site report"
-        site = params[:sitename]
-        redirect_to :action => 'site_report', :site => site, :start_date => start_date, :end_date => end_date
-      when "stock movement"
-        redirect_to :action => 'stock_out_estimates', :start_date => start_date, :end_date => end_date,
-          :type => "verified_by_supervision", :name => "stock_movement", :site_name => params[:sitename]
-      when "delivery report"
-        redirect_to :action => 'delivery_report', :start_date => start_date, :end_date => end_date,
-          :name => "delivery_report", :site_name => params[:sitename], :delivery_code => params[:delivery_code]
+    when "drug stock report"
+      drug = params[:drug]
+      redirect_to :action => 'drug_report',:drug => drug, :start_date => start_date, :end_date => end_date
+    when "drug utilization report"
+      drug = params[:drug]
+      redirect_to :action => 'drug_utilization_report',:drug => drug, :start_date => start_date, :end_date => end_date
+    when "aggregate report"
+      redirect_to :action => 'aggregate_report', :start_date => start_date, :end_date => end_date
+    when "site report"
+      site = params[:sitename]
+      redirect_to :action => 'site_report', :site => site, :start_date => start_date, :end_date => end_date
+    when "stock movement"
+      redirect_to :action => 'stock_out_estimates', :start_date => start_date, :end_date => end_date,
+        :type => "verified_by_supervision", :name => "stock_movement", :site_name => params[:sitename]
+    when "delivery report"
+      redirect_to :action => 'delivery_report', :start_date => start_date, :end_date => end_date,
+        :name => "delivery_report", :site_name => params[:sitename], :delivery_code => params[:delivery_code]
     end
   end
 
@@ -73,7 +73,7 @@ class ReportController < ApplicationController
 
     @values = {}
     obs = Observation.where("definition_id in (?) AND site_id = ? AND value_date >= ? AND value_date <= ?",
-                             [defns,site.id,params[:start_date],params[:end_date]]).order("value_date DESC")
+      [defns,site.id,params[:start_date],params[:end_date]]).order("value_date DESC")
 
     (obs || []).each do |record|
 
@@ -138,43 +138,43 @@ class ReportController < ApplicationController
   def drug_report
     @title = "Drug Stock Report For #{params[:drug]} From #{params["start_date"].to_date.strftime("%d %B %Y")} To #{params["end_date"].to_date.strftime("%d %B %Y")}"
     defns = Definition.where(:name => ["Supervision verification", "People who received drugs",
-                                       "Clinic verification","People prescribed drug"]).collect{|x| x.definition_id}
+        "Clinic verification","People prescribed drug"]).collect{|x| x.definition_id}
 
     @values = Hash.new()
     @values["All"] = {}
 
     obs = Observation.where("definition_id in (?) AND value_drug = ? AND value_date >= ? AND value_date <= ?",
-                            [defns,params[:drug],params[:start_date],params[:end_date]]).order("value_date ASC")
+      [defns,params[:drug],params[:start_date],params[:end_date]]).order("value_date ASC")
 
 
     (obs || []).each do |record|
       @values[record.site.name] = {} unless !@values[record.site.name].blank?
       @values[record.site.name][record.value_date] = {"supervision_count" => 0,"clinic_count" => 0,
-                                                      "ppo_who_received_drugs" => 0, "ppo_prescribed_drugs" => 0} unless !@values[record.site.name][record.value_date].blank?
+        "ppo_who_received_drugs" => 0, "ppo_prescribed_drugs" => 0} unless !@values[record.site.name][record.value_date].blank?
       @values["All"][record.value_date] = {"supervision_count" => 0,"clinic_count" => 0,
-                                           "ppo_who_received_drugs" => 0, "ppo_prescribed_drugs" => 0} unless !@values["All"][record.value_date].blank?
+        "ppo_who_received_drugs" => 0, "ppo_prescribed_drugs" => 0} unless !@values["All"][record.value_date].blank?
 
       case (record.definition_name.downcase)
-        when "supervision verification"
-          @values[record.site.name][record.value_date]["supervision_count"] = record.value_numeric
-          @values["All"][record.value_date]["supervision_count"] += record.value_numeric
-        when "clinic verification"
-          @values[record.site.name][record.value_date]["clinic_count"] = record.value_numeric
-          @values["All"][record.value_date]["clinic_count"] += record.value_numeric
-        when "people who received drugs"
-          @values[record.site.name][record.value_date]["ppo_who_received_drugs"] = record.value_numeric
-          @values["All"][record.value_date]["ppo_who_received_drugs"] += record.value_numeric
-        when "people prescribed drug"
-          @values[record.site.name][record.value_date]["ppo_prescribed_drugs"] = record.value_numeric
+      when "supervision verification"
+        @values[record.site.name][record.value_date]["supervision_count"] = record.value_numeric
+        @values["All"][record.value_date]["supervision_count"] += record.value_numeric
+      when "clinic verification"
+        @values[record.site.name][record.value_date]["clinic_count"] = record.value_numeric
+        @values["All"][record.value_date]["clinic_count"] += record.value_numeric
+      when "people who received drugs"
+        @values[record.site.name][record.value_date]["ppo_who_received_drugs"] = record.value_numeric
+        @values["All"][record.value_date]["ppo_who_received_drugs"] += record.value_numeric
+      when "people prescribed drug"
+        @values[record.site.name][record.value_date]["ppo_prescribed_drugs"] = record.value_numeric
       end
-          @values["All"][record.value_date]["ppo_prescribed_drugs"] += record.value_numeric
+      @values["All"][record.value_date]["ppo_prescribed_drugs"] += record.value_numeric
 
     end
     @days = obs.collect{|x| x.value_date}.uniq.sort.reverse
 
     @sites = @values.keys.sort!
 
-#    render :layout => 'report_layout'
+    #    render :layout => 'report_layout'
   end
 
   def drug_utilization_report
@@ -182,13 +182,13 @@ class ReportController < ApplicationController
               #{params["end_date"].to_date.strftime("%d %B %Y")}"
 
     defns = Definition.where(:name => ["prescription","dispensation","relocation", "People who received drugs",
-                                       "People prescribed drug"]).collect{|x| x.definition_id}
+        "People prescribed drug"]).collect{|x| x.definition_id}
 
     @values = Hash.new()
     @values["All"] = {}
 
     obs = Observation.find("definition_id in (?) AND value_drug = ? AND value_date >= ? AND value_date <= ?",
-                           [defns,params[:drug],params[:start_date],params[:end_date]]).order("value_date ASC")
+      [defns,params[:drug],params[:start_date],params[:end_date]]).order("value_date ASC")
 
 
     (obs || []).each do |record|
@@ -200,19 +200,19 @@ class ReportController < ApplicationController
 
       case (record.definition_name.downcase)
       when "prescription"
-          @values[record.site.name][record.value_date]["prescription"] = record.value_numeric
+        @values[record.site.name][record.value_date]["prescription"] = record.value_numeric
         @values["All"][record.value_date]["prescription"] += record.value_numeric
       when "dispensation"
-          @values[record.site.name][record.value_date]["dispensation"] = record.value_numeric
+        @values[record.site.name][record.value_date]["dispensation"] = record.value_numeric
         @values["All"][record.value_date]["dispensation"] += record.value_numeric
       when "relocation"
-          @values[record.site.name][record.value_date]["relocation"] =  record.value_numeric
+        @values[record.site.name][record.value_date]["relocation"] =  record.value_numeric
         @values["All"][record.value_date]["relocation"] += record.value_numeric
       when "people who received drugs"
-          @values[record.site.name][record.value_date]["ppo_who_received_drugs"] = record.value_numeric
+        @values[record.site.name][record.value_date]["ppo_who_received_drugs"] = record.value_numeric
         @values["All"][record.value_date]["ppo_who_received_drugs"] += record.value_numeric
       when "people prescribed drug"
-          @values[record.site.name][record.value_date]["ppo_prescribed_drugs"] = record.value_numeric
+        @values[record.site.name][record.value_date]["ppo_prescribed_drugs"] = record.value_numeric
         @values["All"][record.value_date]["ppo_prescribed_drugs"] += record.value_numeric
       end
 
@@ -221,7 +221,7 @@ class ReportController < ApplicationController
 
     @sites = @values.keys.sort!
 
- #   render :layout => 'report_layout'
+    #   render :layout => 'report_layout'
   end
 
 
@@ -238,7 +238,7 @@ class ReportController < ApplicationController
       definition_id = Definition.where(:name => "Supervision verification").first.id
       site_id = Site.find_by_name(params[:site_name]).id
       @drugs = Observation.where("site_id = ? AND definition_id = ? AND value_date < ?",
-                                 [site_id, definition_id, params[:end_date].to_date]).order("value_date").map(&:value_drug).uniq
+        [site_id, definition_id, params[:end_date].to_date]).order("value_date").map(&:value_drug).uniq
     end
 
     @drug_map = drug_map
@@ -270,9 +270,9 @@ class ReportController < ApplicationController
         active = (disp_rate.to_i == 0 && stock_level.to_i != 0)? false : true
         #drug_cms = DrugCms.find(drug.drug_id)
         @list["#{drug.short_name} #{drug.strength} #{drug.tabs}"] = {"month_of_stock" => month_of_stock,"weight" => drug.weight,
-                                                     "stock_level" => stock_level, "consumption_rate" => disp_rate,
-                                                     "stocked_out" => stocked_out, "active" => active, "pack_size" => drug.pack_size
-                                                    }
+          "stock_level" => stock_level, "consumption_rate" => disp_rate,
+          "stocked_out" => stocked_out, "active" => active, "pack_size" => drug.pack_size
+        }
       end
     end
 
@@ -497,9 +497,9 @@ class ReportController < ApplicationController
         active = (disp_rate.to_i == 0 && stock_level.to_i != 0)? false : true
         #drug = DrugCms.find(drug.drug_id)
         @list["#{drug.name}"] = {"month_of_stock" => month_of_stock,"weight" => drug.weight,
-                                                     "stock_level" => stock_level, "consumption_rate" => disp_rate,
-                                                     "stocked_out" => stocked_out, "active" => active,"pack_size" => drug.pack_size 
-                                                    }
+          "stock_level" => stock_level, "consumption_rate" => disp_rate,
+          "stocked_out" => stocked_out, "active" => active,"pack_size" => drug.pack_size
+        }
 
       end
     end
@@ -548,6 +548,46 @@ class ReportController < ApplicationController
 
 
     render :layout => false
+  end
+
+  def render_months_of_stock_main
+    @site = Site.find_by_name(params[:site])
+    @latest_pull_date = PullTracker.where(:'site_id' => @site.id).select('MAX(pulled_datetime) as pulled_datetime').first.pulled_datetime.to_date.strftime("%d-%b-%Y") rescue ""
+    @list = {}
+
+    drug_names = []
+    unless @site.blank?
+      #hiv_unit_drugs = DrugSet.where(:definition_id => Definition.find_by_name("HIV Unit Drugs").id).order("weight asc")
+      hiv_unit_drugs = DrugCms.order("weight asc")
+      (hiv_unit_drugs || []).each do |drug|
+        drug_names << drug.name
+        stock_level = Observation.calculate_stock_level(drug.id,@site.id)
+        stock_level = (stock_level / drug.pack_size).round # stock level comes in pills/day here we convert it to tins/month
+        disp_rate = Observation.drug_dispensation_rates(drug.id, @site.id)
+        #disp_rate = (disp_rate.to_f * 0.5).round #rate is an avg of pills dispensed per day. here we convert it to tins per month
+        disp_rate = ((30 * disp_rate)/drug.pack_size)
+        month_of_stock = Observation.calculate_month_of_stock(drug.id, @site.id, drug.pack_size).to_f
+
+        stocked_out = (disp_rate.to_i != 0 && month_of_stock.to_f.round(3) == 0.00)
+
+        active = (disp_rate.to_i == 0 && stock_level.to_i != 0)? false : true
+        #drug = DrugCms.find(drug.drug_id)
+        @list["#{drug.name.squish.to_s}"] = {'month_of_stock' => month_of_stock.to_s,'weight' => drug.weight,
+          'stock_level' => stock_level, 'consumption_rate' => disp_rate,
+          'stocked_out' => stocked_out, 'active' => active,'pack_size' => drug.pack_size
+        }
+      end
+      
+    end
+    
+    #@list = @list.sort_by{|drug, values| drug}
+    
+    data = {}
+    data["results"] = @list
+    data["site"] = @site.name
+    data["latest_pull_date"] = @latest_pull_date
+
+    render :text => data.to_json
   end
 
   def physical_stock_summary
@@ -617,12 +657,12 @@ class ReportController < ApplicationController
       state.save
 
       Observation.create({:definition_id => Definition.find_by_name("comment").id,
-                          :value_text => params[:comment],
-                          :creator => User.find_by_username(params[:editor]).id,
-                          :value_numeric => state.id,
-                          :value_date => Date.today,
-                          :site_id => state.observation.site_id
-                         })
+          :value_text => params[:comment],
+          :creator => User.find_by_username(params[:editor]).id,
+          :value_numeric => state.id,
+          :value_date => Date.today,
+          :site_id => state.observation.site_id
+        })
     end
     render :text => true and return
   end
