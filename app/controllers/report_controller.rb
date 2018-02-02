@@ -496,7 +496,7 @@ class ReportController < ApplicationController
 
         active = (disp_rate.to_i == 0 && stock_level.to_i != 0)? false : true
         #drug = DrugCms.find(drug.drug_id)
-        @list["#{drug.name}"] = {"month_of_stock" => month_of_stock,"weight" => drug.weight,
+        @list["#{drug.short_name}, #{drug.strength}"] = {"month_of_stock" => month_of_stock,"weight" => drug.weight,
           "stock_level" => stock_level, "consumption_rate" => disp_rate,
           "stocked_out" => stocked_out, "active" => active,"pack_size" => drug.pack_size
         }
@@ -572,7 +572,7 @@ class ReportController < ApplicationController
 
         active = (disp_rate.to_i == 0 && stock_level.to_i != 0)? false : true
         #drug = DrugCms.find(drug.drug_id)
-        @list["#{drug.name.squish.to_s}"] = {'month_of_stock' => month_of_stock.to_s,'weight' => drug.weight,
+        @list["#{drug.short_name}, #{drug.strength}"] = {'month_of_stock' => month_of_stock.to_s,'weight' => drug.weight,
           'stock_level' => stock_level, 'consumption_rate' => disp_rate,
           'stocked_out' => stocked_out, 'active' => active,'pack_size' => drug.pack_size
         }

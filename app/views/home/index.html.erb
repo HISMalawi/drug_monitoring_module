@@ -52,7 +52,7 @@
       var previousColor = '';
       
       function setAttibutes(){
-        mainDisplay = document.getElementById('main-display').contentDocument
+        /*mainDisplay = document.getElementById('main-display').contentDocument
         try {
           facilities = mainDisplay.getElementById("map").contentDocument.getElementsByTagName("circle");
         }catch(e) { 
@@ -75,7 +75,7 @@
             blinkInterval = window.setInterval("BlinkIt()", 300);
             __$("report-display").setAttribute("src", "/report/months_of_stock_main?site="+ site);            
           }
-        }
+        }*/
       }
 
       var color = "white";
@@ -152,6 +152,17 @@
         $('#container').html()
         data = JSON.parse(data);
         showGraph(data);
+
+        if (previousCircle != ''){
+          previousCircle.setAttribute("fill", previousColor);
+          clearInterval(blinkInterval);
+        }
+        
+        mainDisplay = document.getElementById('main-display').contentDocument
+        circle = mainDisplay.getElementById("map").contentDocument.getElementById(site);
+        previousCircle = circle;
+        previousColor = circle.getAttribute("fill");
+        blinkInterval = window.setInterval("BlinkIt()", 300);
 
         setTimeout(renderGraph, 15000);
 
