@@ -1,99 +1,99 @@
-DrugMonitoringProgram::Application.routes.draw do
+Rails.application.routes.draw do
+  # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
+  # get "administration/index"
 
-  get "administration/index"
+  # get "administration/add_site"
 
-  get "administration/add_site"
+  # get "administration/edit_site"
 
-  get "administration/edit_site"
+  # get "administration/list_sites"
 
-  get "administration/list_sites"
+  # post "administration/save_site"
 
-  post "administration/save_site"
+  # post "administration/delete_site"
 
-  post "administration/delete_site"
-
-  get '/map' => "administration#map"
+  # get '/map' => "administration#map"
   
-  post "administration/save_notice_changes"
-  ################### USER ##############################
-  match '/login' => "user#login"
+  # post "administration/save_notice_changes"
+  # ################### USER ##############################
+  # match '/login' => "user#login"
 
-  match '/logout' => "user#logout"
+  # match '/logout' => "user#logout"
 
-  match '/verify_user' => "user#verify_user"
+  # match '/verify_user' => "user#verify_user"
 
-  match '/new_user' => "user#create"
+  # match '/new_user' => "user#create"
 
-  match '/check_username' => "user#check_username"
+  # match '/check_username' => "user#check_username"
 
-  get "user/index"
+  # get "user/index"
 
-  get "user/login"
+  # get "user/login"
 
-  get "user/logout"
+  # get "user/logout"
 
-  get "user/create"
+  # get "user/create"
 
-  get "user/edit"
+  # get "user/edit"
 
-  get "user/edit_user"
+  # get "user/edit_user"
 
-  post "user/verify_user"
+  # post "user/verify_user"
 
-  post "user/check_username"
+  # post "user/check_username"
 
-  post "user/save"
+  # post "user/save"
 
-  post "user/delete"
+  # post "user/delete"
 
-  post "user/save_edit"
+  # post "user/save_edit"
 
 
-  ################### OBSERVATION ######################
+  # ################### OBSERVATION ######################
 
-  ################### REPORT ############################
-  get "report/index"
-  get "report/site_list"
-  get "report/report_menu"
-  get "report/drug_report"
-  get "report/drug_utilization_report"
-  get "report/site_report"
-  get "report/aggregate_report"
-  post "report/process_report"
-  get "report/stock_out_estimates"
-  get "report/months_of_stock"
-  get "report/months_of_stock_main"
-  get "report/render_months_of_stock_main"
-  post "report/render_months_of_stock_main"
-  get "report/stock_movement"
-  get "report/delivery_report"
-  get "report/update_display_units"
-  post "report/delivery_report"
-  get "report/physical_stock_summary"
-  get "report/notices"
-  post "report/notices"
-  post "report/physical_stock_summary"
-  post "report/update_notice"
-  match 'report/:id' => 'report#menu', :as => :report
-  match '/months_of_stock_main' => "report#months_of_stock_main"
-  match '/stock_report' => "report#stock_report"
-  match '/get_stock_report' => "report#get_stock_report"
-  ################### HOME ##############################
+  # ################### REPORT ############################
+  # get "report/index"
+  # get "report/site_list"
+  # get "report/report_menu"
+  # get "report/drug_report"
+  # get "report/drug_utilization_report"
+  # get "report/site_report"
+  # get "report/aggregate_report"
+  # post "report/process_report"
+  # get "report/stock_out_estimates"
+  # get "report/months_of_stock"
+  # get "report/months_of_stock_main"
+  # get "report/render_months_of_stock_main"
+  # post "report/render_months_of_stock_main"
+  # get "report/stock_movement"
+  # get "report/delivery_report"
+  # get "report/update_display_units"
+  # post "report/delivery_report"
+  # get "report/physical_stock_summary"
+  # get "report/notices"
+  # post "report/notices"
+  # post "report/physical_stock_summary"
+  # post "report/update_notice"
+  # match 'report/:id' => 'report#menu', :as => :report
+  # match '/months_of_stock_main' => "report#months_of_stock_main"
+  # match '/stock_report' => "report#stock_report"
+  # match '/get_stock_report' => "report#get_stock_report"
+  # ################### HOME ##############################
 
-  match '/home' => "home#index"
-  match '/map_main' => "home#map_main"
-  get "home/index"
-  get '/dashboard' => "home#dashboard"
-  get "home/notices"
-  get "home/map_main"
-  get "home/overstock"
-  get "home/low_stock"
-  post "home/graph"
-  get '/ajax_burdens' => "home#ajax_burdens"
-  get '/ajax_low_stock' => "home#ajax_low_stock"
-  get '/ajax_high_stock' => "home#ajax_high_stock"
-  get "home/manage_notices"
-  get '/get_couch_changes' => "home#get_couch_changes"
+  # match '/home' => "home#index"
+  # match '/map_main' => "home#map_main"
+  # get "home/index"
+  # get '/dashboard' => "home#dashboard"
+  # get "home/notices"
+  # get "home/map_main"
+  # get "home/overstock"
+  # get "home/low_stock"
+  # post "home/graph"
+  # get '/ajax_burdens' => "home#ajax_burdens"
+  # get '/ajax_low_stock' => "home#ajax_low_stock"
+  # get '/ajax_high_stock' => "home#ajax_high_stock"
+  # get "home/manage_notices"
+  # get '/get_couch_changes' => "home#get_couch_changes"
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
