@@ -1,4 +1,4 @@
-class CreatePublications < ActiveRecord::Migration
+class CreatePublications < ActiveRecord::Migration[5.2]
   def change
     create_table :publications, :primary_key => :publication_id do |t|
       t.string :author

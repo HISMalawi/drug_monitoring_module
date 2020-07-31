@@ -1,5 +1,5 @@
 class DrugCms < ActiveRecord::Base
-  set_primary_key :drug_inventory_id
+  self.primary_key = "drug_inventory_id"
 
 
   def get_category

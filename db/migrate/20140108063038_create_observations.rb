@@ -1,4 +1,4 @@
-class CreateObservations < ActiveRecord::Migration
+class CreateObservations < ActiveRecord::Migration[5.2]
   def change
     create_table :observations, :primary_key => :observation_id do |t|
       t.integer :site_id

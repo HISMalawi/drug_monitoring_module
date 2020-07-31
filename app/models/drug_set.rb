@@ -1,6 +1,6 @@
 class DrugSet < ActiveRecord::Base
-  set_table_name :drug_set
-  set_primary_key :drug_set_id
+  self.table_name = "drug_set"
+  self.primary_key = "drug_set_id"
   belongs_to :definition
   belongs_to :drug, :foreign_key => :drug_id
   belongs_to :drug_cms, :foreign_key => :drug_id

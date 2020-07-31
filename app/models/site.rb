@@ -1,5 +1,5 @@
 class Site < ActiveRecord::Base
-  set_primary_key :site_id
+  self.primary_key = "site_id"
 
   def number_of_patients
     defn = Definition.find(:first, :conditions => ["name = ?", "Number of patients"]).id

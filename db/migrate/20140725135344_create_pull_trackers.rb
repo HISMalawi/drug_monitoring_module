@@ -1,4 +1,4 @@
-class CreatePullTrackers < ActiveRecord::Migration
+class CreatePullTrackers < ActiveRecord::Migration[5.2]
   def change
     create_table :pull_trackers, :primary_key => :pull_tracker_id do |t|
       t.integer :site_id, :null => false

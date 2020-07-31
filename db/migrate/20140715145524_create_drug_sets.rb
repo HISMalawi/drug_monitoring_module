@@ -1,4 +1,4 @@
-class CreateDrugSets < ActiveRecord::Migration
+class CreateDrugSets < ActiveRecord::Migration[5.2]
   def change
     create_table :drug_set,:primary_key => :drug_set_id do |t|
 

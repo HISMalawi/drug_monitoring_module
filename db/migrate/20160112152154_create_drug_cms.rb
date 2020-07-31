@@ -1,4 +1,4 @@
-class CreateDrugCms < ActiveRecord::Migration
+class CreateDrugCms < ActiveRecord::Migration[5.2]
   def self.up
     create_table :drug_cms, :id => false do |t|
       t.integer :drug_inventory_id, :null => false
@@ -11,7 +11,7 @@ class CreateDrugCms < ActiveRecord::Migration
       t.string :strength
       t.integer :category
       t.integer :voided, :default => 0, :limit => 1
-      t.integer :voided_by , :limit => 11
+      t.integer :voided_by , :limit => 5
       t.datetime :date_voided
       t.string :void_reason, :limit => 225
       t.timestamps

@@ -1,4 +1,4 @@
-class CreateUserRoles < ActiveRecord::Migration
+class CreateUserRoles < ActiveRecord::Migration[5.2]
   def self.up
     create_table :user_roles, :primary_key => :user_role_id do |t|
 

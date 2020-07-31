@@ -1,6 +1,6 @@
 class Drug < ActiveRecord::Base
   # attr_accessible :title, :body
-  set_primary_key :drug_id
+  self.primary_key = "drug_id"
   belongs_to :definition, :foreign_key => :category_id
   validates_uniqueness_of :full_name
 

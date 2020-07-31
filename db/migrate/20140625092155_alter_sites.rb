@@ -1,4 +1,4 @@
-class AlterSites < ActiveRecord::Migration
+class AlterSites < ActiveRecord::Migration[5.2]
   def up
     change_table :sites do |s|
       s.column :x, :string, :default => " "
