@@ -587,7 +587,7 @@ class ReportController < ApplicationController
     data["site"] = @site.name
     data["latest_pull_date"] = @latest_pull_date
 
-    render :text => data.to_json
+    render json: data
   end
 
   def physical_stock_summary

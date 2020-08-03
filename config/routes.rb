@@ -16,6 +16,7 @@ Rails.application.routes.draw do
   
   post "administration/save_notice_changes"
   # ################### USER ##############################
+  get '/login' => "user#login"
   post '/login' => "user#login"
 
   get '/logout' => "user#logout"
@@ -64,7 +65,8 @@ Rails.application.routes.draw do
   get "report/months_of_stock"
   get "report/months_of_stock_main"
   get "report/render_months_of_stock_main"
-  post "report/render_months_of_stock_main"
+  # post "report/render_months_of_stock_main"
+  post 'report/render_months_of_stock_main', to: 'report#render_months_of_stock_main'
   get "report/stock_movement"
   get "report/delivery_report"
   get "report/update_display_units"

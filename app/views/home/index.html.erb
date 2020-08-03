@@ -150,7 +150,6 @@
       success: function(data){
         $('#notifier').hide();
         $('#container').html()
-        data = JSON.parse(data);
         showGraph(data);
 
         if (previousCircle != ''){
@@ -158,8 +157,8 @@
           clearInterval(blinkInterval);
         }
         
-        mainDisplay = document.getElementById('main-display').contentDocument
-        circle = mainDisplay.getElementById("map").contentDocument.getElementById(site);
+        mainDisplay = document.getElementById('main-display').contentWindow.document
+        circle = mainDisplay.getElementById("map").contentWindow.document.getElementById(site);
         previousCircle = circle;
         previousColor = circle.getAttribute("fill");
         blinkInterval = window.setInterval("BlinkIt()", 300);
@@ -360,8 +359,8 @@
     //window.frames['main-display'].contentDocument.getElementById(sites[current_pos].toLowerCase()).style.fill= "green"
 
     //__$("report-display").setAttribute("src", "/report/months_of_stock_main?site="+ sites[current_pos]);
-    mainDisplay = document.getElementById('main-display').contentDocument;
-    facility = mainDisplay.getElementById("map").contentDocument.getElementById(sites[current_pos]);
+    mainDisplay = document.getElementById('main-display').contentWindow.document
+    facility = mainDisplay.getElementById("map").contentWindow.document.getElementById(sites[current_pos]);
     if (previousCircle != ''){
       previousCircle.setAttribute("fill", previousColor);
       clearInterval(blinkInterval);
@@ -371,6 +370,7 @@
       circle = facility;
       previousCircle = circle;
       previousColor = previousCircle.getAttribute("fill");
+        // data = JSON.parse(data);
     }
 
     blinkInterval = window.setInterval("BlinkIt()", 300);
