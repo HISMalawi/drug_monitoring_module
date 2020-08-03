@@ -307,7 +307,8 @@ class HomeController < ApplicationController
 
   def map_main
     @sites = []
-    sites = Site.find(:all, :conditions => ["active =?", true])
+    # sites = Site.find(:all, :conditions => ["active =?", true])
+    sites = Site.where(:active => 1)
     (sites || []).each do |source|
       notices = ReportTool.get_notices_summary(source.id)
       site = {
