@@ -2,6 +2,9 @@
 require "yaml"
 require 'mysql2'
 require "json"
+require 'net/http'
+
+
 #require 'couch_tap'
 
 DIR = File.dirname(__FILE__)
@@ -33,25 +36,44 @@ client = Mysql2::Client.new(:host => mysql_host,
 )
 #raise Definition.first.inspect
 #raise ActiveRecord::Base.inspect
-changes "http://#{couch_username}:#{couch_password}@#{couch_host}:#{couch_port}/#{couch_db}" do
+# uri = URI.parse"http://#{couch_username}:#{couch_password}@#{couch_host}:#{couch_port}/#{couch_db}" #do
+# uri = URI.parse("http://example.org")
+
+# Shortcut
+#response = Net::HTTP.post_form(uri, {"user[name]" => "testusername", "user[email]" => "testemail@yahoo.com"})
+
+# Full control
+# http = Net::HTTP.new(uri.host, uri.port)
+
+# request = Net::HTTP::Post.new(uri.request_uri)
+# request.set_form_data({"user[name]" => "testusername", "user[email]" => "testemail@yahoo.com"})
+
+# response = http.request(request)
+# render :json => response.body
+# info = JSON.parse(`curl -X GET http://#{username}:#{password}@#{ip_address}:#{port}/#{database}/_design/#{doc_type}/_view/by_date?key=\\\"#{key}\\\"`)
+lett = JSON.parse(`curl -X GET http://admin:password@127.0.0.1:5984/stock_levels/_all_docs?include_docs=true`)
+# puts lett["rows"]
   # Which database should we connect to?
-  logger.info("Successfully connected to couchdb: #{couch_db} available at #{couch_host}")
-  database "#{mysql_adapter}://#{mysql_username}:#{mysql_password}@#{mysql_host}:#{mysql_port}/#{mysql_db}"
-  logger.info("Successfully connected to Mysql DB: #{mysql_db} available at #{mysql_host}")
+  puts("Successfully connected to couchdb: #{couch_db} available at #{couch_host}")
+  database  = "#{mysql_adapter}://#{mysql_username}:#{mysql_password}@#{mysql_host}:#{mysql_port}/#{mysql_db}"
+  puts ("Successfully connected to Mysql DB: #{mysql_db} available at #{mysql_host}")
   #StatusCouchdb Document Type
 
-  document 'type' => "StockLevelCouchdb" do |doc|
-    consumption_rate = doc.document["consumption_rate"]
-    date = doc.document["date"].to_date.strftime('%Y-%m-%d') rescue doc.document["date"]
-    dispensations = doc.document["dispensations"]
-    #location = doc.document["location"]
-    prescriptions = doc.document["prescriptions"]
-    receipts = doc.document["receipts"]
-    site_code = doc.document["site_code"]
-    stock_level = doc.document["stock_level"]
-    supervision_verification = doc.document["supervision_verification"]
-    supervision_verification_in_details = doc.document["supervision_verification_in_details"]
-    relocations = doc.document["relocations"]
+  lett["rows"].each do
+    puts("hey")
+  end
+   lett["rows"].each do |doc|
+    consumption_rate = doc["doc"]["consumption_rate"]
+    date = doc["doc"]["date"].to_date.strftime('%Y-%m-%d') rescue doc["doc"]["date"]
+    dispensations = doc["doc"]["dispensations"]
+    #location = doc["doc"]["location"]
+    prescriptions = doc["doc"]["prescriptions"]
+    receipts = doc["doc"]["receipts"]
+    site_code = doc["doc"]["site_code"]
+    stock_level = doc["doc"]["stock_level"]
+    supervision_verification = doc["doc"]["supervision_verification"]
+    supervision_verification_in_details = doc["doc"]["supervision_verification_in_details"]
+    relocations = doc["doc"]["relocations"]
     
     data = {}
     data["date"] = date
@@ -65,9 +87,10 @@ changes "http://#{couch_username}:#{couch_password}@#{couch_host}:#{couch_port}/
     data["supervision_verification_in_details"] = supervision_verification_in_details
     data["relocations"] = relocations
 
-    
+
+    puts(data)
     Kernel.system("rails runner script/counch_sync_main.rb '#{data.to_json}'")
 
   end
 
-end
+# end
