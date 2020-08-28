@@ -89,7 +89,12 @@ lett = JSON.parse(`curl -X GET http://admin:password@127.0.0.1:5984/stock_levels
 
 
     puts(data)
+    if date
+      
     Kernel.system("rails runner script/counch_sync_main.rb '#{data.to_json}'")
+    else
+      
+    end
 
   end
 

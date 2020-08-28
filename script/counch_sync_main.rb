@@ -280,6 +280,7 @@ if pulled_time.blank?
   pulled_time = PullTracker.new()
   pulled_time.site_id = site_id
 end
+puts(date.to_date)
 pulled_time.pulled_datetime = ("#{date.to_date} #{Time.now().strftime('%H:%M:%S')}")
 pulled_time.save
 #################### END ####################################################
