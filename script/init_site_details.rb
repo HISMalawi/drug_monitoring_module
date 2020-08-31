@@ -32,12 +32,13 @@ def start
       #puts "Getting Data For Site #{key}, Date: #{date.strftime('%A, %d %B %Y')}"
       unless site.ip_address.blank?
 
-        url = "http://#{site.ip_address}:#{site.port}/drug/art_summary_dispensation?date=#{date}"
-        data = JSON.parse(RestClient::Request.execute(:method => :post, :url => url, :timeout => 100000000)) rescue (
-          puts "**** Error when pulling data from site #{site.name}"
-         break
-        )
-        record(site,date ,data)
+        lett = JSON.parse(`curl -X GET http://admin:password@127.0.0.1:5984/stock_levels/_all_docs?include_docs=true`)
+        # url = "http://#{site.ip_address}:#{site.port}/drug/art_summary_dispensation?date=#{date}"
+        # data = JSON.parse(RestClient::Request.execute(:method => :post, :url => url, :timeout => 100000000)) rescue (
+        #   puts "**** Error when pulling data from site #{site.name}"
+        #  break
+        # )
+        record(site,date ,lett["rows"])
       end
       record_pulled_datetime(site, date)
     end
@@ -59,8 +60,8 @@ def record_pulled_datetime(site, date)
 end
 
 def record(site, date,data)
-
-  (data['prescriptions'] || []).each do |key,prescription|
+  # puts(dsta)
+  (data[0]['prescriptions'] || []).each do |key,prescription|
 
     pres_obs = Observation.where(:site_id => site.id,
       :definition_id => $prescription_id,
@@ -97,7 +98,7 @@ def record(site, date,data)
     end
   end
 
-  (data['dispensations'] || []).each do |key,dispensation|
+  (data[0]['dispensations'] || []).each do |key,dispensation|
     disp_obs = Observation.where(:site_id => site.id,
       :definition_id => $dispensation_id,
       :value_drug => Drug.check(key),
@@ -133,7 +134,7 @@ def record(site, date,data)
     end
   end
 
-  (data['relocations'] || []).each do |key,relocation|
+  (data[0]['relocations'] || []).each do |key,relocation|
     next if relocation["relocated"] == 0
     relocation_obs = Observation.where(:site_id => site.id,
       :definition_id => $relocation_id,
@@ -154,9 +155,9 @@ def record(site, date,data)
 
   end
 
-  (data['stock_level'].keys || []).each do |drug|
+  (data[0]['stock_level'] || []).each do |drug|
 
-    data['stock_level'][drug].each do |key, value|
+    data[0]['stock_level'][drug].each do |key, value|
       $definition_id = Definition.where(:name => key).first.id
       if value.class.to_s == "Array"
 
