@@ -420,12 +420,12 @@ class Observation < ActiveRecord::Base
   end
 
   def self.calculate_month_of_stock(drug, site_id, unitQty = 60)
-
     stock_level = Observation.calculate_stock_level(drug, site_id).to_i
 
     dispensation_rate = Observation.drug_dispensation_rates(drug,site_id)
 
-    if dispensation_rate.blank?
+    puts(dispensation_rate)
+    if dispensation_rate.blank? || dispensation_rate.round == 0 
       return "Unknown"
 
     else
@@ -454,13 +454,15 @@ class Observation < ActiveRecord::Base
     state_defn = Definition.find_by_name("New")
     states = Definition.where(:name => ["new", "investigating"]).collect{|x| x.id}
 
-    obs = State.joins(:observation).where("observations.site_id" => site_id,
-                            "observations.value_drug" => drug,
-                            "observations.value_text" => notice,
-                            :state => states
+    obs = State.joins(:observation).where("observations.site_id" => 1,
+                            "observations.value_drug" => 12,
+                            "observations.value_text" => "hey",
+                            :state => [17,18]
     ).first
 
-    if obs.blank?
+      puts(obs.class)
+    if !obs
+      
       obs = Observation.create(:site_id => site_id,
                                :definition_id => notice_defn.id,
                                :value_drug => drug,
@@ -468,6 +470,7 @@ class Observation < ActiveRecord::Base
                                :value_text => notice
       )
       state = State.create(:observation_id => obs.id, :state => state_defn.id)
+      puts(state.errors.full_messages)
     end
   end
 
