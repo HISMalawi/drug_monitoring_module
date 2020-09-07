@@ -560,7 +560,7 @@ class ReportController < ApplicationController
       #hiv_unit_drugs = DrugSet.where(:definition_id => Definition.find_by_name("HIV Unit Drugs").id).order("weight asc")
       hiv_unit_drugs = DrugCms.order("weight asc")
       (hiv_unit_drugs || []).each do |drug|
-        drug_names << drug.full_name
+        drug_names << drug.name
         stock_level = Observation.calculate_stock_level(drug.id,@site.id)
         stock_level = (stock_level / drug.pack_size).round # stock level comes in pills/day here we convert it to tins/month
         disp_rate = Observation.drug_dispensation_rates(drug.id, @site.id)
@@ -577,7 +577,7 @@ class ReportController < ApplicationController
           'stocked_out' => stocked_out, 'active' => active,'pack_size' => drug.pack_size
         }
       end
-      
+
     end
     
     #@list = @list.sort_by{|drug, values| drug}

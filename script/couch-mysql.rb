@@ -59,9 +59,6 @@ lett = JSON.parse(`curl -X GET http://admin:password@127.0.0.1:5984/stock_levels
   puts ("Successfully connected to Mysql DB: #{mysql_db} available at #{mysql_host}")
   #StatusCouchdb Document Type
 
-  lett["rows"].each do
-    puts("hey")
-  end
    lett["rows"].each do |doc|
     consumption_rate = doc["doc"]["consumption_rate"]
     date = doc["doc"]["date"].to_date.strftime('%Y-%m-%d') rescue doc["doc"]["date"]

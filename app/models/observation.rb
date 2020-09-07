@@ -454,13 +454,12 @@ class Observation < ActiveRecord::Base
     state_defn = Definition.find_by_name("New")
     states = Definition.where(:name => ["new", "investigating"]).collect{|x| x.id}
 
-    obs = State.joins(:observation).where("observations.site_id" => 1,
-                            "observations.value_drug" => 12,
-                            "observations.value_text" => "hey",
-                            :state => [17,18]
+    obs = State.joins(:observation).where("observations.site_id" => site_id,
+                            "observations.value_drug" => drug,
+                            "observations.value_text" => notice,
+                            :state => states
     ).first
 
-      puts(obs.class)
     if !obs
       
       obs = Observation.create(:site_id => site_id,
@@ -469,6 +468,7 @@ class Observation < ActiveRecord::Base
                                :value_date => date,
                                :value_text => notice
       )
+      puts(obs.errors.full_messages)
       state = State.create(:observation_id => obs.id, :state => state_defn.id)
       puts(state.errors.full_messages)
     end
