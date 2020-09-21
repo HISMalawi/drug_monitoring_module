@@ -22,6 +22,9 @@ class CreateDrugs < ActiveRecord::Migration[5.2]
       t.index ["retired_by"], name: "user_who_voided_drug"
       t.index ["route"], name: "route_concept"
       t.index ["uuid"], name: "drug_uuid_index", unique: true
+      t.string :full_name, default: "" 
+      t.string :short_name, default: ""
+      t.integer :category, default: 0 
       t.timestamps
     end
   end
