@@ -157,8 +157,7 @@
         $('#notifier').hide();
         $('#container').html()
         showGraph(data);
-
-        if (previousCircle != ''){
+        if (previousCircle != '' && previousCircle !== null){
           previousCircle.setAttribute("fill", previousColor);
           clearInterval(blinkInterval);
         }
