@@ -9,7 +9,6 @@ class CreateDrugCms < ActiveRecord::Migration[5.2]
       t.integer :pack_size
       t.integer :weight
       t.string :strength
-      t.integer :category
       t.integer :voided, :default => 0, :limit => 1
       t.integer :voided_by , :limit => 5
       t.datetime :date_voided

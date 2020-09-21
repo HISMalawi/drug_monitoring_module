@@ -19,7 +19,7 @@ def load_drug_map
 
   CSV.foreach("#{csv_url}", {:col_sep =>',', headers:true}) do |drug_map|
 
-    drug_map = Drug.where(:full_name => drug_map[0], :short_name => drug_map[1], :category => type[drug_map[2]]).first_or_create
+    drug_map = Drug.where(:name => drug_map[0], :short_name => drug_map[1], :category => type[drug_map[2]]).first_or_create
   end
 end
 

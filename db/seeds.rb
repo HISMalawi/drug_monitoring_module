@@ -11710,37 +11710,18 @@ end
 
 puts "Create Drug CMS "
 def load_cms_drugs
-  cms_drugs = Spreadsheet.open "#{Rails.root}/db/cms.xls"
-  sheet1 = cms_drugs.worksheet 0
+    connection = ActiveRecord::Base.connection
 
-  ActiveRecord::Base.transaction do
-    sheet1.each 1 do |row|
-      drug_name = row[0]
-      drug_code = row[1]
-      drug_inventory_id = row[2]
-      drug_short_name = row[3]
-      drug_tabs = row[4]
-      weight = row[5]
-      strength = row[6]
-      category = row[7]
-      puts "#{drug_name} ......... #{drug_inventory_id}"
-      pack_size = drug_name.split(/[^\d]/).last rescue nil
-      next if drug_inventory_id.blank?
-      next if pack_size.blank?
-      drug_cms = DrugCms.find(drug_inventory_id) rescue nil
-      drug_cms = DrugCms.new if drug_cms.blank?
-      drug_cms.drug_inventory_id = drug_inventory_id
-      drug_cms.name = drug_name
-      drug_cms.short_name = drug_short_name
-      drug_cms.tabs = drug_tabs
-      drug_cms.code = drug_code
-      drug_cms.pack_size = pack_size
-      drug_cms.weight = weight
-      drug_cms.strength = strength
-      drug_cms.category = Definition.find_by_name(category).id
-      drug_cms.save
+    sql = File.read('db/sql/drug.sql') # Change path and filename as necessary
+    statements = sql.split(/;$/)
+    statements.pop
+
+    ActiveRecord::Base.transaction do
+        statements.each do |statement|
+            connection.execute(statement)
+        end
     end
-  end
+
 end
 
 load_cms_drugs
