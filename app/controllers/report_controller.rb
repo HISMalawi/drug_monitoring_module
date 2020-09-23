@@ -427,6 +427,7 @@ class ReportController < ApplicationController
     @unitQty =  60 if @unitQty == 0
     @unitQty = @unitQty.to_f
 
+
     if request.get?
       @tree = {}
       @tree["Available Sites"] = Site.where(:active => true).collect{|x| x.name}
